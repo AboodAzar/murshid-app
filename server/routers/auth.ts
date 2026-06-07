@@ -152,10 +152,10 @@ export const authRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       // Validate official university email
-      if (!input.email.endsWith("@zuj.edu.jo") && !input.email.endsWith("@student.zuj.edu.jo")) {
+      if (!input.email.endsWith("@zuj.edu.jo") && !input.email.endsWith("@std-zuj.edu.jo")) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "You must use an official Al-Zaytoonah University email address (@zuj.edu.jo or @student.zuj.edu.jo)",
+          message: "You must use an official Al-Zaytoonah University email address (@zuj.edu.jo or @std-zuj.edu.jo)",
         });
       }
 
