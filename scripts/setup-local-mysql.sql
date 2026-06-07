@@ -1,0 +1,15 @@
+CREATE DATABASE IF NOT EXISTS `murshid`
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+CREATE USER IF NOT EXISTS 'murshid_app'@'localhost'
+  IDENTIFIED BY '0RPMcGp36cZNlB4QY1yOBcJyOzkPSlZZ';
+
+ALTER USER 'murshid_app'@'localhost'
+  IDENTIFIED BY '0RPMcGp36cZNlB4QY1yOBcJyOzkPSlZZ';
+
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, DROP
+  ON `murshid`.*
+  TO 'murshid_app'@'localhost';
+
+FLUSH PRIVILEGES;

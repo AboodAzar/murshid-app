@@ -1,0 +1,48 @@
+Install project libraries, run:
+python3 -m pip install torch streamlit langchain-ollama langchain-community langchain-chroma langchain-text-splitters pypdf sentence-transformers
+
+Install Ollama, run:
+curl -fsSL https://ollama.com/install.sh | sh
+
+to set Ollama with 1 million context window and start it use:
+OLLAMA_CONTEXT_LENGTH=1048576 OLLAMA_MODELS=/workspace/ollama_models ollama serve &
+
+to start Ollama use:
+export OLLAMA_MODELS=/workspace/ollama_models
+then:
+ollama serve > ollama.log 2>&1 &
+
+Ollama pull model:
+ollama pull qwen3.6:35b
+ollama pull qwen3.6:35b-a3b-q8_0
+ollama pull nemotron-3-super:120b
+ollama pull nemotron-3-super:120b-a12b-q8_0
+
+run the app use:
+python3 -m streamlit run /workspace/app_v1.py --server.port 8501 --server.address 0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false
+
+tests scripts:
+انا طالب ذكاء اصطناعي بالسنة الاولى والفصل الاول، ايش انزل مواد؟
+
+انا طالب علم حاسوب بالسنة الاولى والفصل الاول، ايش انزل مواد؟
+
+انا طالب علم حاسوب بالسنة الثانية والفصل الاول، ايش انزل مواد؟
+
+انا منزل البرمجة التطبيقية اعطيني مادة غيرها.
+
+لا انا مش ما بدي انزلها، انا نزلتها الفصل الماضي وخلصتها، فاعطيني مادة مكاناها
+
+انا طالب ذكاء اصطناعي سنة رابعة فصل اول، ايش انزل مواد؟
+
+بتقدر تحكي انه بدي انزل تدريب ميداني الفصل الجاي مش هاض الفصل، وكمان انا نزلت نماذج اللغات الضخمة وهندسة الاستعلام و هندسة البيانات وتحليلاتها
+
+منزل هاي المادة كمان تطبيقات التعلم الالي والعميق (1)، يعني انا متاخر بمواد الجامعة ومش منزل غير ثلاث مواد جامعة، اعطيني اسماء مواد الجامعة عشان اقلك ايش نزلت وايش لا
+
+انا نزلت مهارات حياتية وكمان نزلت الريادة والابتكار بس هدول، هل هاد اشي سيء؟
+
+يعني ايش انزل الفصل ما اعطيتني جواب واضح؟
+
+بدي انزل اول فصل بالجامعة 15 ساعة، قديش بطلع الفصل؟
+
+بدي انزل الرياضيات المتقطعة، أساسيات تكنولوجيا المعلومات،التربية الوطنية،اللغة الانجليزية التقنية لطلاب تكنولوجيا المعلومات،مهارات حياتية. وعندي خصم 40%، قديش بطلع الفصل علي؟
+
