@@ -24,6 +24,7 @@ export default function Register() {
   const { t, dir } = useI18n();
   const [, setLocation] = useLocation();
   const [page, setPage] = useState(1);
+  const [otp, setOtp] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -34,6 +35,7 @@ export default function Register() {
   const [error, setError] = useState("");
 
   const registerMutation = trpc.auth.register.useMutation();
+  const verifyEmailMutation = trpc.auth.verifyEmail.useMutation();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -53,37 +55,64 @@ export default function Register() {
       return;
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      setError(t("auth.passwordMismatch"));
+    if (page === 2) {
+      if (formData.password !== formData.confirmPassword) {
+        setError(t("auth.passwordMismatch"));
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const result = await registerMutation.mutateAsync({
+          email: formData.email,
+          password: formData.password,
+          name: formData.name,
+        });
+
+        if (result.success) {
+          if (result.requireVerification) {
+            setPage(3);
+            return;
+          }
+          // Redirect based on role if no verification needed
+          if (result.user?.role === "student") setLocation("/dashboard");
+          else if (result.user?.role === "advisor") setLocation("/advisor");
+          else if (result.user?.role === "admin") setLocation("/admin");
+        }
+      } catch (err: any) {
+        const errorMessage = err?.message || t("auth.registrationFailed");
+        setError(errorMessage);
+        console.error("Registration error:", err);
+      } finally {
+        setIsLoading(false);
+      }
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      const result = await registerMutation.mutateAsync({
-        email: formData.email,
-        password: formData.password,
-        name: formData.name,
-      });
-
-      if (result.success && result.user) {
-        // Redirect based on role
-        if (result.user.role === "student") {
-          setLocation("/dashboard");
-        } else if (result.user.role === "advisor") {
-          setLocation("/advisor");
-        } else if (result.user.role === "admin") {
-          setLocation("/admin");
-        }
+    if (page === 3) {
+      if (otp.length !== 6) {
+        setError("Please enter the 6-digit code");
+        return;
       }
-    } catch (err: any) {
-      const errorMessage =
-        err?.message || t("auth.registrationFailed");
-      setError(errorMessage);
-      console.error("Registration error:", err);
-    } finally {
-      setIsLoading(false);
+
+      setIsLoading(true);
+      try {
+        const result = await verifyEmailMutation.mutateAsync({
+          email: formData.email,
+          code: otp,
+        });
+
+        if (result.success && result.user) {
+          if (result.user.role === "student") setLocation("/dashboard");
+          else if (result.user.role === "advisor") setLocation("/advisor");
+          else if (result.user.role === "admin") setLocation("/admin");
+        }
+      } catch (err: any) {
+        setError(err?.message || "Invalid verification code");
+        console.error("Verification error:", err);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -177,7 +206,7 @@ export default function Register() {
                     </div>
                   </div>
                 </>
-              ) : (
+              ) : page === 2 ? (
                 <>
                   {/* Password Input */}
                   <div className="space-y-2">
@@ -219,6 +248,32 @@ export default function Register() {
                     </div>
                   </div>
                 </>
+              ) : (
+                <>
+                  {/* OTP Input */}
+                  <div className="space-y-4 text-center">
+                    <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Mail className="w-8 h-8 text-blue-400" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white">Check your email</h3>
+                    <p className="text-slate-400 text-sm">
+                      We've sent a 6-digit verification code to<br/>
+                      <span className="text-blue-400 font-semibold">{formData.email}</span>
+                    </p>
+                    
+                    <div className="pt-4">
+                      <Input
+                        type="text"
+                        placeholder="000000"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        className="text-center text-2xl tracking-widest bg-slate-700/50 border-slate-600 text-white placeholder-slate-500 focus:border-blue-500 h-14"
+                        required
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
+                </>
               )}
 
               {/* Error Message */}
@@ -246,7 +301,7 @@ export default function Register() {
                   disabled={isLoading}
                   className={`flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white py-6 text-base font-semibold ${page === 1 ? "w-full" : ""}`}
                 >
-                  {page === 1 ? t("common.next") : t("auth.createAccount")}
+                  {page === 1 ? t("common.next") : page === 2 ? t("auth.createAccount") : "Verify Email"}
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </div>

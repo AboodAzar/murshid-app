@@ -1,7 +1,7 @@
 import { publicProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
-import { users } from "../../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { users, emailVerificationTokens } from "../../drizzle/schema";
+import { eq, and, desc } from "drizzle-orm";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { getSessionCookieOptions } from "../_core/cookies";
@@ -12,6 +12,7 @@ import {
   verifyLocalAuthToken,
   verifyPassword,
 } from "../_core/authSecurity";
+import { sendVerificationEmail } from "../utils/email";
 
 export const authRouter = router({
   // Get current authenticated user
@@ -82,6 +83,24 @@ export const authRouter = router({
           });
         }
 
+        if (!user.isEmailVerified) {
+          // Generate new OTP
+          const otp = Math.floor(100000 + Math.random() * 900000).toString();
+          const expiresAt = Date.now() + 15 * 60 * 1000;
+          await db.insert(emailVerificationTokens).values({
+            userId: user.id,
+            token: otp,
+            expiresAt,
+          });
+          await sendVerificationEmail(user.email, otp);
+          
+          return {
+            success: true,
+            requireVerification: true,
+            email: user.email,
+          };
+        }
+
         const token = await generateLocalAuthToken({
           userId: user.id,
           email: user.email,
@@ -132,6 +151,14 @@ export const authRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      // Validate official university email
+      if (!input.email.endsWith("@zuj.edu.jo") && !input.email.endsWith("@student.zuj.edu.jo")) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You must use an official Al-Zaytoonah University email address (@zuj.edu.jo or @student.zuj.edu.jo)",
+        });
+      }
+
       const db = await getDb();
       if (!db)
         throw new TRPCError({
@@ -177,6 +204,94 @@ export const authRouter = router({
         }
 
         const user = newUser[0];
+        
+        // Generate OTP and send email instead of logging in instantly
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = Date.now() + 15 * 60 * 1000; // 15 minutes
+        
+        await db.insert(emailVerificationTokens).values({
+          userId: user.id,
+          token: otp,
+          expiresAt,
+        });
+
+        await sendVerificationEmail(user.email, otp);
+
+        return {
+          success: true,
+          requireVerification: true,
+          email: user.email,
+        };
+      } catch (error) {
+        if (error instanceof TRPCError) throw error;
+        console.error("[Auth] Register failed:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Registration failed",
+        });
+      }
+    }),
+
+  // Verify Email endpoint
+  verifyEmail: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+        code: z.string().length(6),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Database unavailable",
+        });
+
+      try {
+        const result = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, input.email))
+          .limit(1);
+        const user = result[0];
+
+        if (!user) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+        }
+
+        if (user.isEmailVerified) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Email is already verified" });
+        }
+
+        const tokens = await db
+          .select()
+          .from(emailVerificationTokens)
+          .where(
+            and(
+              eq(emailVerificationTokens.userId, user.id),
+              eq(emailVerificationTokens.token, input.code)
+            )
+          );
+
+        const validToken = tokens.find(t => t.expiresAt > Date.now());
+
+        if (!validToken) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid or expired verification code",
+          });
+        }
+
+        await db
+          .update(users)
+          .set({ isEmailVerified: true })
+          .where(eq(users.id, user.id));
+
+        await db
+          .delete(emailVerificationTokens)
+          .where(eq(emailVerificationTokens.userId, user.id));
+
         const token = await generateLocalAuthToken({
           userId: user.id,
           email: user.email,
@@ -202,10 +317,10 @@ export const authRouter = router({
         };
       } catch (error) {
         if (error instanceof TRPCError) throw error;
-        console.error("[Auth] Register failed:", error);
+        console.error("[Auth] Verify email failed:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Registration failed",
+          message: "Verification failed",
         });
       }
     }),

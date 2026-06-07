@@ -35,6 +35,7 @@ export const users = mysqlTable(
     bio: text("bio"),
     phone: varchar("phone", { length: 20 }),
     language: mysqlEnum("language", ["en", "ar"]).default("en").notNull(),
+    isEmailVerified: boolean("isEmailVerified").default(false).notNull(),
     isActive: boolean("isActive").default(true).notNull(),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
     updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -445,6 +446,25 @@ export const passwordResetTokensRelations = relations(
   ({ one }: { one: any }) => ({
     user: one(users, {
       fields: [passwordResetTokens.userId],
+      references: [users.id],
+    }),
+  })
+);
+
+// Email verification tokens table
+export const emailVerificationTokens = mysqlTable("email_verification_tokens", {
+  id: serial("id").primaryKey(),
+  userId: int("user_id").notNull(),
+  token: varchar("token", { length: 10 }).notNull(),
+  expiresAt: bigint("expires_at", { mode: "number" }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const emailVerificationTokensRelations = relations(
+  emailVerificationTokens,
+  ({ one }: { one: any }) => ({
+    user: one(users, {
+      fields: [emailVerificationTokens.userId],
       references: [users.id],
     }),
   })
