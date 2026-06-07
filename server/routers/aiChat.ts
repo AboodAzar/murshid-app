@@ -145,16 +145,17 @@ export const aiChatRouter = router({
           content: input.message,
         });
 
-        // Get FAQ context for RAG
-        const relevantFAQs = await db
+        // Fetch chat history
+        const history = await db
           .select()
-          .from(faqs)
-          .where(eq(faqs.isActive, true))
-          .limit(5);
-
-        const context = relevantFAQs
-          .map(faq => `Q: ${faq.question}\nA: ${faq.answer}`)
-          .join("\n\n");
+          .from(chatMessages)
+          .where(eq(chatMessages.conversationId, input.conversationId))
+          .orderBy(chatMessages.createdAt);
+        
+        const chat_history = history.map(msg => ({
+          role: msg.role,
+          content: msg.content
+        }));
 
         // Generate AI response via Runpod
         const runpodUrl = process.env.RUNPOD_API_URL;
@@ -166,12 +167,10 @@ export const aiChatRouter = router({
         }
 
         const runpodPayload = {
-          user_id: String(ctx.user.id),
-          session_id: String(input.conversationId),
-          message: input.message,
-          file_name: "None",
-          file_content: null,
-          role: "student"
+          query: input.message,
+          chat_history: chat_history,
+          uploaded_file_name: "None",
+          uploaded_file_context: null
         };
 
         const response = await fetch(`${runpodUrl.replace(/\/$/, '')}/chat`, {
@@ -190,7 +189,7 @@ export const aiChatRouter = router({
         }
 
         const runpodData = await response.json();
-        const aiMessage = runpodData.response || "I apologize, I could not generate a response.";
+        const aiMessage = runpodData.answer || "I apologize, I could not generate a response.";
 
         // Save AI response
         await db.insert(chatMessages).values({
