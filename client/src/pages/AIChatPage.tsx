@@ -39,6 +39,7 @@ export default function AIChatPage() {
       enabled: !!selectedConversation,
     }
   );
+  const utils = trpc.useUtils();
 
   // Mutations
   const createConversationMutation =
@@ -60,7 +61,16 @@ export default function AIChatPage() {
   // Update messages
   useEffect(() => {
     if (messagesData) {
-      setMessages(messagesData);
+      // Only update if messagesData is longer, or if we have no optimistic messages.
+      // This prevents background refetches from wiping out messages that haven't been saved yet.
+      setMessages(prev => {
+        // Find if we have optimistic unsaved messages (no ID)
+        const hasOptimistic = prev.some(m => !m.id);
+        if (hasOptimistic && prev.length >= messagesData.length) {
+          return prev;
+        }
+        return messagesData;
+      });
       scrollToBottom();
     }
   }, [messagesData]);
@@ -107,6 +117,9 @@ export default function AIChatPage() {
           content: response.response,
         };
         setMessages(prev => [...prev, assistantMessage]);
+        
+        // Force React Query to fetch the new messages including IDs
+        utils.aiChat.getMessages.invalidate(selectedConversation);
       }
     } catch (error) {
       console.error("Failed to send message:", error);
