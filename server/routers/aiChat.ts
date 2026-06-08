@@ -188,21 +188,38 @@ export const aiChatRouter = router({
           });
         }
 
-        const runpodData = await response.json();
+        let runpodData;
+        try {
+          const textResponse = await response.text();
+          try {
+            runpodData = JSON.parse(textResponse);
+          } catch (e) {
+            console.error("Runpod returned non-JSON:", textResponse);
+            runpodData = { answer: "Error: Runpod returned an invalid response format. Check the local console." };
+          }
+        } catch (e) {
+           runpodData = { answer: "Error: Failed to read Runpod response." };
+        }
+        
         const aiMessage = runpodData.answer || "I apologize, I could not generate a response.";
 
         // Save AI response
-        await db.insert(chatMessages).values({
-          conversationId: input.conversationId,
-          role: "assistant" as const,
-          content: aiMessage as string,
-          tokens: 0,
-        });
+        try {
+          await db.insert(chatMessages).values({
+            conversationId: input.conversationId,
+            role: "assistant" as const,
+            content: aiMessage as string,
+            tokens: 0,
+          });
+        } catch (dbError) {
+          console.error("Failed to save AI message to DB:", dbError);
+          // Don't throw, we still want to show the message to the user!
+        }
 
         return { success: true, response: aiMessage };
       } catch (error) {
         console.error("[AI Chat] Failed to send message:", error);
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+        return { success: false, response: "An internal server error occurred while contacting the AI." };
       }
     }),
 
