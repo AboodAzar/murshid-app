@@ -27,12 +27,12 @@ DB_PATH = '/workspace/db/university.db'
 os.makedirs(DATA_DIRECTORY, exist_ok=True)
 os.makedirs('/workspace/db', exist_ok=True)
 
-app = FastAPI(title="Murshid Academic Advisor API", version="5.0")
+app = FastAPI(title="Murshid Academic Advisor API - V6", version="6.0")
 
 # Allow Frontend to communicate with this Backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Change this to your frontend URL in production
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -53,28 +53,6 @@ class FAQRequest(BaseModel):
     question: str
     answer: str
 
-# --- Intelligent Pre-Routing Catalog ---
-DOCUMENT_CATALOG = {
-    "AI_Study_Giude.csv": "AI Semester Guide...",
-    "AI_Study_Plan_1.csv": "AI Detailed Master Plan...",
-    "AI_Study_Plan_2.csv": "AI Master Plan Part 2...",
-    "AI_Materials_Descriptions.csv": "AI Course Syllabus Overviews...",
-    "CS_Study_Giude.csv": "CS Semester Guide...",
-    "CS_Study_Plan_1.csv": "CS Detailed Master Plan...",
-    "CS_Study_Plan_2.csv": "CS Master Plan Part 2...",
-    "CS_Materials_Descriptions.csv": "CS Course Syllabus Overviews...",
-    "SE_Study_Giude.csv": "Software Engineering (SE) Semester Guide...",
-    "SE_Study_Plan_1.csv": "Software Engineering (SE) Detailed Master Plan...",
-    "SE_Study_Plan_2.csv": "Software Engineering (SE) Master Plan Part 2...",
-    "SE_Materials_Descriptions.csv": "Software Engineering (SE) Course Syllabus Overviews...",
-    "AI_Summary_Facts.csv": "Quick FAQ and procedural rules specifically for the AI major.",
-    "Rules_and_Regulations.pdf": "Official 2024-2025 Rules and Regulations...",
-    "Student_Guide_2024_2025.pdf": "Official Student Guide...",
-    "Faculty_Guide_3.pdf": "Faculty of Science & IT Guide...",
-    "Unversity_Fees.csv": "Contains standard semester registration fees...",
-    "Facility_Fees.csv": "Contains the exact credit hour price..."
-}
-
 # --- Database Initialization ---
 def init_databases():
     conn = sqlite3.connect(DB_PATH)
@@ -86,13 +64,6 @@ def init_databases():
             answer TEXT NOT NULL
         )
     """)
-    cursor.execute("SELECT COUNT(*) FROM faqs")
-    if cursor.fetchone()[0] == 0:
-        cursor.execute("""
-            INSERT INTO faqs (question, answer) VALUES 
-            ('Where is the IT department facility?', 'The IT facility is located on the main campus...'),
-            ('How do I register for my graduation project?', 'You must complete 90+ credit hours...')
-        """)
     conn.commit()
     conn.close()
 
@@ -141,23 +112,100 @@ pdf_store, faq_store = get_vectorstores()
 # --- LLM and Prompts ---
 llm = OllamaLLM(model=MODEL_NAME, base_url="http://localhost:11434", num_ctx=32768)
 
-analyze_intent_prompt = ChatPromptTemplate.from_template("""
-You are a brilliant Academic Intent Analyzer Agent...
-[INSERT YOUR FULL ANALYZE INTENT PROMPT HERE]
+# 1. THE SUPERVISOR PROMPT
+supervisor_prompt = ChatPromptTemplate.from_template("""
+أنت المشرف الذكي (Supervisor) لـ "مرشد"، المستشار الأكاديمي لجامعة الزيتونة الأردنية.
+مهمتك هي تحليل سؤال الطالب وتحديد الـ Use Case (حالة الاستخدام) بدقة تامة.
+
+التاريخ السابق للمحادثة:
+{chat_history}
+
+سؤال الطالب الحالي:
+{question}
+
+عليك تصنيف السؤال إلى واحدة من الفئات التالية:
+1. [REGISTRATION]: إذا كان يسأل عن تسجيل المواد، الخطة الدراسية، جدول الفصل، أو تنزيل مواد.
+2. [FINANCE]: إذا كان يسأل عن حساب الرسوم، سعر الساعة، أو تكلفة الفصل الدراسي.
+3. [QA]: إذا كان يسأل عن قوانين الجامعة، التخصصات، الموقع، أو أسئلة عامة أخرى.
+
+*** قاعدة حاسمة جداً (منع الهلوسة): ***
+- إذا كانت الفئة [REGISTRATION] أو [FINANCE]، **يجب** أن تعرف "تخصص الطالب" (مثلاً AI، CS، SE).
+- إذا لم يذكر الطالب تخصصه في السؤال أو في التاريخ السابق، **يمنع منعاً باتاً** التخمين!
+- في هذه الحالة، يجب أن ترد حصراً بكلمة [CLARIFICATION_NEEDED] متبوعة بسؤال مهذب تطلب فيه من الطالب تحديد تخصصه وسنته الدراسية.
+- مثال:
+[CLARIFICATION_NEEDED]
+مرحباً بك! لكي أتمكن من مساعدتك بدقة، يرجى إخباري ما هو تخصصك (AI, CS, SE) وأي سنة دراسية أنت؟
+
+- إذا كانت كل المعلومات متوفرة، أو كانت الفئة [QA] ولا تحتاج لتخصص، رد بـ:
+[PROCEED: CATEGORY_NAME]
+(مثال: [PROCEED: REGISTRATION] أو [PROCEED: QA] أو [PROCEED: FINANCE])
+
+ممنوع كتابة أي شيء آخر غير هذه الصيغ.
 """)
 
-router_prompt = ChatPromptTemplate.from_template("""
-You are a precise Routing Agent...
-[INSERT YOUR FULL ROUTER PROMPT HERE]
+# 2. REGISTRATION EXPERT PROMPT
+registration_prompt = ChatPromptTemplate.from_template("""
+أنت "مرشد" 🎓، المستشار الأكاديمي المحترف لجامعة الزيتونة.
+بناءً على خطة الطالب والسياق المرفق أدناه، قم بإنشاء خطة فصلية أو الرد على استفسار التسجيل.
+
+السياق (Context):
+{context}
+
+سؤال الطالب:
+{question}
+
+قواعد التنسيق (WOW Factor):
+1. استخدم صيغة Markdown لإنشاء جداول احترافية للمواد المقترحة.
+   مثال:
+   | 📘 رمز المادة | 📝 اسم المادة | 📊 الساعات | ⚠️ المتطلب السابق |
+   |--------------|---------------|------------|-------------------|
+2. استخدم الإيموجي المناسبة الأكاديمية (📚، 🎯، 💡).
+3. اكتب بخط عريض (Bold) الملاحظات الهامة.
+4. إذا لم تجد المادة في السياق، قل بوضوح "لا أملك بيانات عن هذه المادة" ولا تخترع بيانات.
 """)
 
+# 3. FINANCE EXPERT PROMPT
+finance_prompt = ChatPromptTemplate.from_template("""
+أنت "مرشد" 💰، المحلل المالي الأكاديمي لجامعة الزيتونة.
+قم بحساب التكاليف والرسوم بدقة متناهية بناءً على السياق المرفق فقط.
+
+السياق (Context):
+{context}
+
+سؤال الطالب:
+{question}
+
+قواعد التنسيق (WOW Factor):
+1. قم بعرض الحسابات بخطوات واضحة (Step-by-Step).
+2. استخدم صيغة فاتورة أو جدول مرتب:
+   - 💳 سعر الساعة: X دينار
+   - 🔢 عدد الساعات: Y
+   - 🏛️ رسوم التسجيل/الخدمات: Z دينار
+   - 💵 **المجموع الكلي: (X * Y) + Z دينار**
+3. استخدم الإيموجي المالي والأكاديمي.
+4. لا تخمن أي أسعار غير موجودة في السياق.
+""")
+
+# 4. QA EXPERT PROMPT
 qa_prompt = ChatPromptTemplate.from_template("""
-أنت "مرشد"، المستشار الأكاديمي الذكي لجامعة الزيتونة الأردنية...
-[INSERT YOUR FULL QA PROMPT HERE]
+أنت "مرشد" 🏛️، الدليل الشامل لقوانين وأنظمة جامعة الزيتونة الأردنية.
+أجب عن سؤال الطالب بناءً على دليل الجامعة والسياق المرفق فقط.
+
+السياق (Context):
+{context}
+
+سؤال الطالب:
+{question}
+
+قواعد التنسيق (WOW Factor):
+1. استخدم النقاط المرتبة (Bullet points) لتسهيل القراءة.
+2. أبرز الكلمات المفتاحية بالخط العريض (**Bold**).
+3. استخدم الإيموجي المناسبة.
+4. إذا كانت الإجابة غير موجودة في السياق، قل نصاً: "عذراً، لم أجد إجابة دقيقة في دليل الطالب المعاير لدي. يرجى مراجعة القبول والتسجيل."
 """)
 
 def format_chat_history(messages: List[Message]):
-    recent_messages = messages[-4:] if len(messages) > 4 else messages
+    recent_messages = messages[-6:] if len(messages) > 6 else messages
     history = ""
     for msg in recent_messages:
         role = "Student" if msg.role == "user" else "Advisor"
@@ -169,10 +217,11 @@ def parse_thinking_blocks(text):
         parts = text.split("### END THINKING", 1)
         thinking_part = parts[0].replace("### THINKING", "").strip()
         answer_part = parts[1].strip()
-        if not answer_part: return thinking_part, "عذراً، لم أتمكن من صياغة الإجابة النهائية بشكل صحيح."
+        if not answer_part: return thinking_part, text
         return thinking_part, answer_part
     arabic_start = text.find("أهلاً")
     if arabic_start == -1: arabic_start = text.find("مرحباً")
+    if arabic_start == -1: arabic_start = text.find("عذراً")
     if arabic_start != -1 and arabic_start > 10:  
         thinking_part = text[:arabic_start].strip()
         thinking_part = re.sub(r'^### THINKING|^<(?:think|thinking)>|^thinking\s*', '', thinking_part, flags=re.IGNORECASE).strip()
@@ -180,60 +229,79 @@ def parse_thinking_blocks(text):
     return None, text
 
 # --- Routing Engine ---
-def route_and_execute(query, chat_history_str, uploaded_file_name, threshold=0.15, uploaded_context=None):
-    analyzer_chain = analyze_intent_prompt | llm | StrOutputParser()
-    analyzed_query = analyzer_chain.invoke({"chat_history": chat_history_str, "uploaded_file_name": uploaded_file_name, "question": query}).strip()
-    
-    catalog_str = "\n".join([f"- {k}: {v}" for k, v in DOCUMENT_CATALOG.items()])
-    router_chain = router_prompt | llm | StrOutputParser()
-    target_file = router_chain.invoke({"catalog": catalog_str, "question": analyzed_query, "chat_history": chat_history_str}).strip().replace('"', '').replace("'", "")
-    
-    if "GREETING" in target_file.upper():
-        return "مرحباً! أنا مرشدك الأكاديمي. يرجى تحديد تخصصك وسنتك الدراسية لنبدأ التخطيط.", "Chitchat Route", "None", ""
-
-    faq_results = faq_store.similarity_search_with_score(analyzed_query, k=1)
+def route_and_execute(query, chat_history_str, uploaded_file_name, threshold=0.4, uploaded_context=None):
+    # 1. FAQ PRE-CHECK (Instant Response)
+    faq_results = faq_store.similarity_search_with_score(query, k=1)
     if faq_results and faq_results[0][1] < threshold:  
-        return faq_results[0][0].metadata["answer"], "FAQ Match", "FAQ DB", ""
+        return "💡 **إجابة سريعة من الأسئلة الشائعة:**\n\n" + faq_results[0][0].metadata["answer"], "FAQ Pipeline", "FAQ DB", None
 
-    combined_context = ""
-    is_direct_csv = False
-
-    if target_file.endswith('.csv') and target_file in DOCUMENT_CATALOG:
-        csv_path = os.path.join(DATA_DIRECTORY, target_file)
-        if os.path.exists(csv_path):
-            with open(csv_path, 'r', encoding='utf-8') as f:
-                combined_context = f.read()
-            is_direct_csv = True
-
-    if not is_direct_csv and pdf_store is not None:
-        if target_file in DOCUMENT_CATALOG:
-            exact_source_path = f"{DATA_DIRECTORY}{target_file}"
-            pdf_retriever = pdf_store.as_retriever(search_kwargs={"k": 15, "filter": {"source": exact_source_path}})
-        else:
-            pdf_retriever = pdf_store.as_retriever(search_kwargs={"k": 15})
-        docs = pdf_retriever.invoke(analyzed_query)
-        if docs:
-            combined_context = "\n\n---\n\n".join([doc.page_content for doc in docs[:6]])
-
-    if "[FINANCIAL_QUERY: TRUE]" in analyzed_query:
-        for fee_file in ["Unversity_Fees.csv", "Facility_Fees.csv"]:
-            fee_path = os.path.join(DATA_DIRECTORY, fee_file)
-            if os.path.exists(fee_path):
-                with open(fee_path, 'r', encoding='utf-8') as fee_f:
-                    combined_context += f"\n\n--- Data from {fee_file} ---\n" + fee_f.read()
-
-    upload_section = f"بيانات المستند المرفق:\n{uploaded_context}\n\n" if uploaded_context else ""
-
-    qa_chain = qa_prompt | llm | StrOutputParser()
-    full_text = qa_chain.invoke({
-        "upload_section": upload_section,
+    # 2. RUN SUPERVISOR
+    supervisor_chain = supervisor_prompt | llm | StrOutputParser()
+    supervisor_output = supervisor_chain.invoke({
         "chat_history": chat_history_str, 
+        "question": query
+    }).strip()
+
+    # 3. HANDLE CLARIFICATION (Zero Hallucination)
+    if "[CLARIFICATION_NEEDED]" in supervisor_output:
+        clarification_msg = supervisor_output.replace("[CLARIFICATION_NEEDED]", "").replace("### THINKING", "").strip()
+        # Clean up any leftover thinking tags if the model outputs them
+        _, final_msg = parse_thinking_blocks(clarification_msg)
+        if not final_msg or final_msg == clarification_msg:
+             # Just a fallback cleanup
+             final_msg = re.sub(r'<think>.*?</think>', '', clarification_msg, flags=re.DOTALL).strip()
+             if not final_msg: final_msg = clarification_msg
+             
+        return final_msg, "Clarification Pipeline", "None", None
+
+    # 4. FETCH CONTEXT BASED ON CATEGORY
+    combined_context = ""
+    target_prompt = qa_prompt # Default
+    route_name = "QA Pipeline"
+    
+    if "[PROCEED: REGISTRATION]" in supervisor_output:
+        target_prompt = registration_prompt
+        route_name = "Registration Pipeline"
+        # We fetch all CSV files roughly related to plans
+        for f in glob.glob(os.path.join(DATA_DIRECTORY, "*Plan*.csv")) + glob.glob(os.path.join(DATA_DIRECTORY, "*Guide*.csv")):
+            try:
+                with open(f, 'r', encoding='utf-8') as file:
+                    combined_context += f"\n--- {os.path.basename(f)} ---\n" + file.read()[:2000] # Cap to prevent overflow
+            except: pass
+            
+    elif "[PROCEED: FINANCE]" in supervisor_output:
+        target_prompt = finance_prompt
+        route_name = "Finance Pipeline"
+        for f in glob.glob(os.path.join(DATA_DIRECTORY, "*Fees*.csv")):
+            try:
+                with open(f, 'r', encoding='utf-8') as file:
+                    combined_context += f"\n--- {os.path.basename(f)} ---\n" + file.read()
+            except: pass
+            
+    else: # QA or Default
+        if pdf_store is not None:
+            pdf_retriever = pdf_store.as_retriever(search_kwargs={"k": 8})
+            docs = pdf_retriever.invoke(query)
+            if docs:
+                combined_context = "\n\n---\n\n".join([doc.page_content for doc in docs])
+
+    if uploaded_context:
+         combined_context += f"\n\n--- بيانات الملف المرفق ---\n{uploaded_context}"
+
+    # 5. EXECUTE EXPERT PROMPT
+    expert_chain = target_prompt | llm | StrOutputParser()
+    full_text = expert_chain.invoke({
         "context": combined_context, 
-        "question": analyzed_query 
+        "question": query 
     })
     
     thinking_process, final_ans = parse_thinking_blocks(full_text)
-    return final_ans, target_file, "Processed", thinking_process
+    
+    # Clean up standard response if parse failed
+    if not thinking_process and "<think>" in final_ans:
+        final_ans = re.sub(r'<think>.*?</think>', '', final_ans, flags=re.DOTALL).strip()
+
+    return final_ans, route_name, "Processed", thinking_process
 
 # --- API ENDPOINTS ---
 
