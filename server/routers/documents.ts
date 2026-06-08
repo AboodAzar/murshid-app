@@ -92,7 +92,11 @@ export const documentsRouter = router({
         const runpodUrl = process.env.RUNPOD_API_URL;
         if (runpodUrl) {
           const formData = new FormData();
-          formData.append("file", new Blob([buffer]), input.title);
+          const filename = input.title.endsWith(`.${input.fileType}`) 
+            ? input.title 
+            : `${input.title}.${input.fileType}`;
+            
+          formData.append("file", new Blob([buffer]), filename);
           
           const response = await fetch(`${runpodUrl.replace(/\/$/, '')}/upload_document`, {
             method: "POST",
