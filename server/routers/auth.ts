@@ -160,11 +160,12 @@ export const authRouter = router({
       }
 
       const db = await getDb();
-      if (!db)
+      if (!db) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Database unavailable",
+          message: process.env.DATABASE_URL ? "Database connection failed! Check your DB password and ensure Cloud SQL allows public IP connections." : "DATABASE_URL environment variable is missing in Google Cloud Run!",
         });
+      }
 
       try {
         const existing = await db
