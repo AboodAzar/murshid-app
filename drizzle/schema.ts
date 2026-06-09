@@ -188,6 +188,16 @@ export const chatMessages = mysqlTable("chatMessages", {
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type InsertChatMessage = typeof chatMessages.$inferInsert;
 
+export const chatMessagesRelations = relations(
+  chatMessages,
+  ({ one }: { one: any }) => ({
+    conversation: one(aiConversations, {
+      fields: [chatMessages.conversationId],
+      references: [aiConversations.id],
+    }),
+  })
+);
+
 /**
  * FAQs managed by advisors
  */
