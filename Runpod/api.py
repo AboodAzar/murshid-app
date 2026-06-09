@@ -274,7 +274,7 @@ def route_and_execute(query, chat_history_str, uploaded_file_name, threshold=0.4
 # --- API ENDPOINTS ---
 
 @app.post("/chat")
-async def chat_endpoint(request: ChatRequest):
+def chat_endpoint(request: ChatRequest):
     chat_history_str = format_chat_history(request.chat_history)
     answer, route, src, thinking = route_and_execute(
         query=request.query, 
@@ -289,7 +289,7 @@ async def chat_endpoint(request: ChatRequest):
     }
 
 @app.post("/upload_document")
-async def upload_document(file: UploadFile = File(...)):
+def upload_document(file: UploadFile = File(...)):
     """Uploads a PDF or CSV to /workspace/data/ and updates ChromaDB"""
     if not file.filename.endswith(('.pdf', '.csv')):
         raise HTTPException(status_code=400, detail="Only PDF and CSV files are allowed.")
@@ -317,7 +317,7 @@ async def upload_document(file: UploadFile = File(...)):
     return {"message": f"Successfully uploaded {file.filename} and added to Knowledge Base."}
 
 @app.post("/add_faq")
-async def add_faq(faq: FAQRequest):
+def add_faq(faq: FAQRequest):
     """Adds an FAQ to SQLite and updates the ChromaDB FAQ Store dynamically"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
