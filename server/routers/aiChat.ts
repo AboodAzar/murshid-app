@@ -269,4 +269,36 @@ export const aiChatRouter = router({
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
     }),
+
+  rateMessage: protectedProcedure
+    .input(
+      z.object({
+        messageId: z.number(),
+        feedback: z.enum(["up", "down", "none"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Database unavailable",
+        });
+
+      if (!ctx.user || ctx.user.role !== "student") {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      try {
+        await db
+          .update(chatMessages)
+          .set({ feedback: input.feedback })
+          .where(eq(chatMessages.id, input.messageId));
+
+        return { success: true };
+      } catch (error) {
+        console.error("[AI Chat] Failed to rate message:", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      }
+    }),
 });

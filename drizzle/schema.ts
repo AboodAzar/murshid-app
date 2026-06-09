@@ -182,6 +182,7 @@ export const chatMessages = mysqlTable("chatMessages", {
   role: mysqlEnum("role", ["user", "assistant"]).notNull(),
   content: longtext("content").notNull(),
   tokens: int("tokens").default(0),
+  feedback: mysqlEnum("feedback", ["up", "down", "none"]).default("none"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
