@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
+// Safely initialize Resend only if the API key is provided
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 export async function sendVerificationEmail(to: string, otp: string) {
   if (!process.env.RESEND_API_KEY) {
     console.warn(
