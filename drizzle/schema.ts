@@ -368,7 +368,8 @@ export type InsertAIStatistic = typeof aiStatistics.$inferInsert;
 export const usersRelations = relations(
   users,
   ({ many, one }: { many: any; one: any }) => ({
-    studyPlans: many(studyPlans),
+    studyPlans: many(studyPlans, { relationName: "studentStudyPlans" }),
+    advisedStudyPlans: many(studyPlans, { relationName: "advisorStudyPlans" }),
     aiConversations: many(aiConversations),
     notifications: many(notifications),
     studentCourses: many(studentCourses),
@@ -397,8 +398,24 @@ export const coursesRelations = relations(
       fields: [courses.departmentId],
       references: [departments.id],
     }),
-    prerequisites: many(coursePrerequisites),
+    prerequisites: many(coursePrerequisites, { relationName: "coursePrerequisites" }),
     studentCourses: many(studentCourses),
+  })
+);
+
+export const coursePrerequisitesRelations = relations(
+  coursePrerequisites,
+  ({ one }: { one: any }) => ({
+    course: one(courses, {
+      fields: [coursePrerequisites.courseId],
+      references: [courses.id],
+      relationName: "coursePrerequisites",
+    }),
+    prerequisite: one(courses, {
+      fields: [coursePrerequisites.prerequisiteId],
+      references: [courses.id],
+      relationName: "prerequisiteCourse",
+    }),
   })
 );
 
@@ -408,9 +425,35 @@ export const studyPlansRelations = relations(
     student: one(users, {
       fields: [studyPlans.studentId],
       references: [users.id],
+      relationName: "studentStudyPlans",
     }),
     advisor: one(users, {
       fields: [studyPlans.advisorId],
+      references: [users.id],
+      relationName: "advisorStudyPlans",
+    }),
+  })
+);
+
+export const studentCoursesRelations = relations(
+  studentCourses,
+  ({ one }: { one: any }) => ({
+    student: one(users, {
+      fields: [studentCourses.studentId],
+      references: [users.id],
+    }),
+    course: one(courses, {
+      fields: [studentCourses.courseId],
+      references: [courses.id],
+    }),
+  })
+);
+
+export const notificationsRelations = relations(
+  notifications,
+  ({ one }: { one: any }) => ({
+    user: one(users, {
+      fields: [notifications.userId],
       references: [users.id],
     }),
   })
