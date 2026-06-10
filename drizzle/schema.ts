@@ -30,6 +30,7 @@ export const users = mysqlTable(
     role: mysqlEnum("role", ["student", "advisor", "admin"])
       .default("student")
       .notNull(),
+    advisorId: int("advisorId"), // for students: assigned advisor
     departmentId: int("departmentId"),
     profilePicture: varchar("profilePicture", { length: 500 }),
     bio: text("bio"),
@@ -44,6 +45,7 @@ export const users = mysqlTable(
   (table: any) => ({
     emailIdx: index("idx_users_email").on(table.email),
     roleIdx: index("idx_users_role").on(table.role),
+    advisorIdIdx: index("idx_users_advisorId").on(table.advisorId),
     departmentIdIdx: index("idx_users_departmentId").on(table.departmentId),
   })
 );
@@ -84,6 +86,7 @@ export const courses = mysqlTable(
     credits: int("credits").notNull(),
     departmentId: int("departmentId").notNull(),
     minGPA: decimal("minGPA", { precision: 3, scale: 2 }).default("0.00"),
+    instructorId: int("instructorId"), // lecturer / instructor user id
     semester: int("semester").notNull(), // 1-8
     isRequired: boolean("isRequired").default(false).notNull(),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -469,3 +472,381 @@ export const emailVerificationTokensRelations = relations(
     }),
   })
 );
+
+/**
+ * Course schedules (lecture times)
+ */
+export const courseSchedules = mysqlTable(
+  "courseSchedules",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    courseId: int("courseId").notNull(),
+    dayOfWeek: int("dayOfWeek").notNull(), // 0=Sunday, 1=Monday, ... 6=Saturday
+    startTime: varchar("startTime", { length: 8 }).notNull(), // HH:MM format
+    endTime: varchar("endTime", { length: 8 }).notNull(), // HH:MM format
+    roomId: int("roomId").notNull(),
+    instructorId: int("instructorId"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (table: any) => ({
+    courseIdIdx: index("idx_courseSchedules_courseId").on(table.courseId),
+    dayOfWeekIdx: index("idx_courseSchedules_dayOfWeek").on(table.dayOfWeek),
+  })
+);
+
+export type CourseSchedule = typeof courseSchedules.$inferSelect;
+export type InsertCourseSchedule = typeof courseSchedules.$inferInsert;
+
+/**
+ * Attendance records
+ */
+export const attendance = mysqlTable(
+  "attendance",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    studentId: int("studentId").notNull(),
+    courseId: int("courseId").notNull(),
+    scheduleId: int("scheduleId").notNull(),
+    date: timestamp("date").notNull(),
+    status: mysqlEnum("status", ["present", "absent", "excused", "late"])
+      .default("present")
+      .notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (table: any) => ({
+    studentIdIdx: index("idx_attendance_studentId").on(table.studentId),
+    courseIdIdx: index("idx_attendance_courseId").on(table.courseId),
+    dateIdx: index("idx_attendance_date").on(table.date),
+  })
+);
+
+export type Attendance = typeof attendance.$inferSelect;
+export type InsertAttendance = typeof attendance.$inferInsert;
+
+/**
+ * Assignments
+ */
+export const assignments = mysqlTable(
+  "assignments",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    courseId: int("courseId").notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    titleAr: varchar("titleAr", { length: 255 }).notNull(),
+    description: text("description"),
+    descriptionAr: text("descriptionAr"),
+    dueDate: timestamp("dueDate").notNull(),
+    totalPoints: int("totalPoints").notNull().default(100),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (table: any) => ({
+    courseIdIdx: index("idx_assignments_courseId").on(table.courseId),
+    dueDateIdx: index("idx_assignments_dueDate").on(table.dueDate),
+  })
+);
+
+export type Assignment = typeof assignments.$inferSelect;
+export type InsertAssignment = typeof assignments.$inferInsert;
+
+/**
+ * Student assignments (submissions)
+ */
+export const studentAssignments = mysqlTable(
+  "studentAssignments",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    studentId: int("studentId").notNull(),
+    assignmentId: int("assignmentId").notNull(),
+    status: mysqlEnum("status", ["submitted", "graded", "overdue", "pending"])
+      .default("pending")
+      .notNull(),
+    score: int("score"),
+    submittedAt: timestamp("submittedAt"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (table: any) => ({
+    studentIdIdx: index("idx_studentAssignments_studentId").on(table.studentId),
+    assignmentIdIdx: index("idx_studentAssignments_assignmentId").on(table.assignmentId),
+  })
+);
+
+export type StudentAssignment = typeof studentAssignments.$inferSelect;
+export type InsertStudentAssignment = typeof studentAssignments.$inferInsert;
+
+/**
+ * Relations for new tables
+ */
+export const courseSchedulesRelations = relations(
+  courseSchedules,
+  ({ one }: { one: any }) => ({
+    course: one(courses, {
+      fields: [courseSchedules.courseId],
+      references: [courses.id],
+    }),
+    room: one(rooms, {
+      fields: [courseSchedules.roomId],
+      references: [rooms.id],
+    }),
+  })
+);
+
+export const attendanceRelations = relations(
+  attendance,
+  ({ one }: { one: any }) => ({
+    student: one(users, {
+      fields: [attendance.studentId],
+      references: [users.id],
+    }),
+    course: one(courses, {
+      fields: [attendance.courseId],
+      references: [courses.id],
+    }),
+    schedule: one(courseSchedules, {
+      fields: [attendance.scheduleId],
+      references: [courseSchedules.id],
+    }),
+  })
+);
+
+export const assignmentsRelations = relations(
+  assignments,
+  ({ one, many }: { one: any; many: any }) => ({
+    course: one(courses, {
+      fields: [assignments.courseId],
+      references: [courses.id],
+    }),
+    studentAssignments: many(studentAssignments),
+  })
+);
+
+export const studentAssignmentsRelations = relations(
+  studentAssignments,
+  ({ one }: { one: any }) => ({
+    student: one(users, {
+      fields: [studentAssignments.studentId],
+      references: [users.id],
+    }),
+    assignment: one(assignments, {
+      fields: [studentAssignments.assignmentId],
+      references: [assignments.id],
+    }),
+  })
+);
+
+/**
+ * Achievements / Badges
+ */
+export const achievements = mysqlTable("achievements", {
+  id: int("id").autoincrement().primaryKey(),
+  key: varchar("key", { length: 64 }).notNull().unique(),
+  title: varchar("title", { length: 255 }).notNull(),
+  titleAr: varchar("titleAr", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  descriptionAr: text("descriptionAr").notNull(),
+  icon: varchar("icon", { length: 64 }).notNull(),
+  color: varchar("color", { length: 50 }).default("#3b82f6").notNull(),
+  conditionType: mysqlEnum("conditionType", [
+    "courses_completed",
+    "gpa_reached",
+    "attendance_streak",
+    "assignments_submitted",
+    "credits_earned",
+    "semester_completed",
+  ]).notNull(),
+  conditionValue: int("conditionValue").default(0).notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Achievement = typeof achievements.$inferSelect;
+export type InsertAchievement = typeof achievements.$inferInsert;
+
+/**
+ * Student achievements (unlocks)
+ */
+export const studentAchievements = mysqlTable(
+  "studentAchievements",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    studentId: int("studentId").notNull(),
+    achievementId: int("achievementId").notNull(),
+    unlockedAt: timestamp("unlockedAt").defaultNow().notNull(),
+    progress: int("progress").default(0).notNull(), // current progress toward unlock
+    metadata: text("metadata"), // JSON string for extra data
+  },
+  (table: any) => ({
+    studentIdIdx: index("idx_studentAchievements_studentId").on(table.studentId),
+    achievementIdIdx: index("idx_studentAchievements_achievementId").on(table.achievementId),
+  })
+);
+
+export type StudentAchievement = typeof studentAchievements.$inferSelect;
+export type InsertStudentAchievement = typeof studentAchievements.$inferInsert;
+
+/**
+ * Advisor notes about students
+ */
+export const advisorNotes = mysqlTable(
+  "advisorNotes",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    advisorId: int("advisorId").notNull(),
+    studentId: int("studentId").notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    content: text("content").notNull(),
+    category: mysqlEnum("category", [
+      "general",
+      "academic",
+      "behavioral",
+      "career",
+      "attendance",
+      "gpa",
+    ]).default("general").notNull(),
+    isPrivate: boolean("isPrivate").default(false).notNull(), // if true, only advisor sees it
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (table: any) => ({
+    advisorIdIdx: index("idx_advisorNotes_advisorId").on(table.advisorId),
+    studentIdIdx: index("idx_advisorNotes_studentId").on(table.studentId),
+    categoryIdx: index("idx_advisorNotes_category").on(table.category),
+  })
+);
+
+export type AdvisorNote = typeof advisorNotes.$inferSelect;
+export type InsertAdvisorNote = typeof advisorNotes.$inferInsert;
+
+/**
+ * Academic alerts / warnings created by advisors for students
+ */
+export const academicAlerts = mysqlTable(
+  "academicAlerts",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    advisorId: int("advisorId").notNull(),
+    studentId: int("studentId").notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    message: text("message").notNull(),
+    severity: mysqlEnum("severity", ["low", "medium", "high", "critical"])
+      .default("medium")
+      .notNull(),
+    type: mysqlEnum("type", [
+      "attendance",
+      "gpa_drop",
+      "missing_assignments",
+      "at_risk",
+      "probation",
+      "custom",
+    ]).default("custom").notNull(),
+    isResolved: boolean("isResolved").default(false).notNull(),
+    resolvedAt: timestamp("resolvedAt"),
+    resolvedBy: int("resolvedBy"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (table: any) => ({
+    advisorIdIdx: index("idx_academicAlerts_advisorId").on(table.advisorId),
+    studentIdIdx: index("idx_academicAlerts_studentId").on(table.studentId),
+    severityIdx: index("idx_academicAlerts_severity").on(table.severity),
+    isResolvedIdx: index("idx_academicAlerts_isResolved").on(table.isResolved),
+  })
+);
+
+export type AcademicAlert = typeof academicAlerts.$inferSelect;
+export type InsertAcademicAlert = typeof academicAlerts.$inferInsert;
+
+/**
+ * Course / study recommendations from advisors to students
+ */
+export const recommendations = mysqlTable(
+  "recommendations",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    advisorId: int("advisorId").notNull(),
+    studentId: int("studentId").notNull(),
+    courseId: int("courseId"), // optional: specific course recommendation
+    title: varchar("title", { length: 255 }).notNull(),
+    description: text("description").notNull(),
+    priority: mysqlEnum("priority", ["low", "medium", "high"])
+      .default("medium")
+      .notNull(),
+    status: mysqlEnum("status", ["pending", "accepted", "rejected", "completed"])
+      .default("pending")
+      .notNull(),
+    dueDate: timestamp("dueDate"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (table: any) => ({
+    advisorIdIdx: index("idx_recommendations_advisorId").on(table.advisorId),
+    studentIdIdx: index("idx_recommendations_studentId").on(table.studentId),
+    statusIdx: index("idx_recommendations_status").on(table.status),
+  })
+);
+
+export type Recommendation = typeof recommendations.$inferSelect;
+export type InsertRecommendation = typeof recommendations.$inferInsert;
+
+/**
+ * Appointments between advisors and students
+ */
+export const appointments = mysqlTable(
+  "appointments",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    advisorId: int("advisorId").notNull(),
+    studentId: int("studentId").notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    description: text("description"),
+    scheduledAt: timestamp("scheduledAt").notNull(),
+    durationMinutes: int("durationMinutes").default(30).notNull(),
+    location: varchar("location", { length: 255 }), // office, online, etc.
+    meetingLink: varchar("meetingLink", { length: 500 }),
+    status: mysqlEnum("status", ["scheduled", "confirmed", "completed", "cancelled", "no_show"])
+      .default("scheduled")
+      .notNull(),
+    notes: text("notes"), // post-meeting notes
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (table: any) => ({
+    advisorIdIdx: index("idx_appointments_advisorId").on(table.advisorId),
+    studentIdIdx: index("idx_appointments_studentId").on(table.studentId),
+    scheduledAtIdx: index("idx_appointments_scheduledAt").on(table.scheduledAt),
+    statusIdx: index("idx_appointments_status").on(table.status),
+  })
+);
+
+export type Appointment = typeof appointments.$inferSelect;
+export type InsertAppointment = typeof appointments.$inferInsert;
+
+/**
+ * Advisor-generated academic reports
+ */
+export const advisorReports = mysqlTable(
+  "advisorReports",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    advisorId: int("advisorId").notNull(),
+    studentId: int("studentId").notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    summary: text("summary").notNull(),
+    gpaAtReport: decimal("gpaAtReport", { precision: 3, scale: 2 }),
+    creditsAtReport: int("creditsAtReport"),
+    attendanceRateAtReport: decimal("attendanceRateAtReport", { precision: 5, scale: 2 }),
+    riskLevel: mysqlEnum("riskLevel", ["none", "low", "medium", "high"])
+      .default("none")
+      .notNull(),
+    semester: int("semester"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (table: any) => ({
+    advisorIdIdx: index("idx_advisorReports_advisorId").on(table.advisorId),
+    studentIdIdx: index("idx_advisorReports_studentId").on(table.studentId),
+  })
+);
+
+export type AdvisorReport = typeof advisorReports.$inferSelect;
+export type InsertAdvisorReport = typeof advisorReports.$inferInsert;

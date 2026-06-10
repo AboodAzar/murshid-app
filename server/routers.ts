@@ -14,6 +14,8 @@ import { studentRouter } from "./routers/student";
 import { announcementsRouter } from "./routers/announcements";
 import { navigationRouter } from "./routers/navigation";
 import { adminRouter } from "./routers/admin";
+import { advisorRouter } from "./routers/advisor";
+import { analyticsRouter } from "./routers/analytics";
 
 export const appRouter = router({
   system: systemRouter,
@@ -41,6 +43,10 @@ export const appRouter = router({
   navigation: navigationRouter,
 
   admin: adminRouter,
+
+  advisor: advisorRouter,
+
+  analytics: analyticsRouter,
 
   // Legacy logout endpoint for backward compatibility
   logout: publicProcedure.mutation(({ ctx }) => {
