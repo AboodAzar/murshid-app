@@ -200,10 +200,38 @@ def parse_thinking_blocks(text):
         return thinking_part, text[arabic_start:].strip()
     return None, text
 
+def clean_arabic_query(query: str) -> str:
+    stopwords = set([
+        "أنا", "انا", "انت", "أنت", "هو", "هي", "نحن", "هم", "هن",
+        "طالب", "طالبة", "طالبي", "طلاب",
+        "في", "من", "على", "إلى", "الى", "عن", "ب", "ل", "ك", "مع",
+        "ما", "ماذا", "متى", "أين", "كيف", "هل", "لماذا", "أي", "ايش", "شو", "مين", "ليش",
+        "عندي", "لدي", "عندنا", "اريد", "أريد", "ابغى", "ودي", "بدي",
+        "تخصص", "جامعة", "الزيتونة", "كلية", "قسم", "مادة", "مواد", "دكتور", "دكاترة",
+        "سنة", "فصل", "دراسة", "دراسات", "هذا", "هذه", "هؤلاء", "ذلك", "تلك", "هيك",
+        "ال", "يا", "بس", "ممكن", "لو", "سمحت", "اعمل", "أسوي", "عشان", "عشانها",
+        "علم", "طالبة", "علمت", "عشان", "أنزل", "انزل"
+    ])
+    
+    # Remove punctuation
+    translator = str.maketrans('', '', string.punctuation + '؟،؛.')
+    cleaned = query.translate(translator)
+    
+    words = cleaned.split()
+    filtered_words = [w for w in words if w not in stopwords]
+    
+    # Fallback to original if stripping removes everything
+    if not filtered_words:
+        return query
+        
+    return " ".join(filtered_words)
+
 # --- Routing Engine ---
 def route_and_execute(query, chat_history_str, uploaded_file_name, student_context=None, threshold=0.4, uploaded_context=None):
+    cleaned_query = clean_arabic_query(query)
+    
     # 1. FAQ PRE-CHECK (Instant Response)
-    faq_results = faq_store.similarity_search_with_score(query, k=1)
+    faq_results = faq_store.similarity_search_with_score(cleaned_query, k=1)
     if faq_results and faq_results[0][1] < threshold:  
         return faq_results[0][0].metadata["answer"], "FAQ Pipeline", "FAQ DB", None
 
@@ -256,7 +284,7 @@ def route_and_execute(query, chat_history_str, uploaded_file_name, student_conte
     else: # QA or Default
         if pdf_store is not None:
             pdf_retriever = pdf_store.as_retriever(search_kwargs={"k": 8})
-            docs = pdf_retriever.invoke(query)
+            docs = pdf_retriever.invoke(cleaned_query)
             if docs:
                 combined_context = "\n\n---\n\n".join([doc.page_content for doc in docs])
 

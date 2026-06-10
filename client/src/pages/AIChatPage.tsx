@@ -17,8 +17,9 @@ import {
   BookOpen, GraduationCap, Calendar, Clock, Award, Briefcase,
   Lightbulb, ShieldAlert, ArrowRight, BarChart3, Compass, FlaskConical,
   Layers, Star, ClipboardList, PenLine, Bell, ChevronRight, Mic, Hash,
-  Download, Share2, RefreshCw, Info, Frown, Smile, Meh,
+  Download, Share2, RefreshCw, Info, Frown, Smile, Meh, ThumbsUp, ThumbsDown
 } from "lucide-react";
+import { toast } from "sonner";
 
 const fadeInUp = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.4 } };
 const staggerContainer = { animate: { transition: { staggerChildren: 0.06 } } };
@@ -81,7 +82,7 @@ const SUGGESTED_PROMPTS = [
   "Explain my academic health score",
 ];
 
-interface Message { id?: number; role: "user" | "assistant"; content: string; createdAt?: Date; }
+interface Message { id?: number; role: "user" | "assistant"; content: string; createdAt?: Date; feedback?: "up" | "down" | "none"; }
 
 export default function AIChatPage() {
   const { t } = useI18n();
@@ -121,6 +122,7 @@ export default function AIChatPage() {
   const createConv = trpc.aiChat.createConversation.useMutation();
   const sendMsg = trpc.aiChat.sendMessage.useMutation();
   const deleteConv = trpc.aiChat.deleteConversation.useMutation();
+  const rateMsg = trpc.aiChat.rateMessage.useMutation();
 
   useEffect(() => {
     if (conversationsData) {
@@ -161,6 +163,16 @@ export default function AIChatPage() {
   const handleDeleteConversation = async (id: number) => {
     try { await deleteConv.mutateAsync(id); if (selectedConversation === id) { setSelectedConversation(null); setMessages([]); } }
     catch (e) { console.error(e); }
+  };
+
+  const handleRateMessage = async (messageId: number, feedback: "up" | "down") => {
+    try {
+      await rateMsg.mutateAsync({ messageId, feedback });
+      setMessages(prev => prev.map(m => m.id === messageId ? { ...m, feedback } : m));
+      toast.success(feedback === "up" ? "Thanks! Added to verified answers." : "Thanks for the feedback. An advisor will review this.");
+    } catch (e) {
+      toast.error("Failed to submit feedback");
+    }
   };
 
   const openChatWithPrompt = (prompt: string) => {
@@ -523,6 +535,16 @@ export default function AIChatPage() {
                                   <span className="text-[10px] opacity-70">{msg.role === "assistant" ? "Murshid AI" : "You"}</span>
                                 </div>
                                 {msg.role === "assistant" ? <Streamdown>{msg.content}</Streamdown> : <p className="text-sm">{msg.content}</p>}
+                                {msg.role === "assistant" && msg.id && (
+                                  <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-end gap-2">
+                                    <button onClick={() => handleRateMessage(msg.id!, "up")} disabled={msg.feedback === "up" || rateMsg.isPending} className={`p-1.5 rounded-md transition-colors ${msg.feedback === "up" ? "bg-emerald-500/20 text-emerald-400" : "hover:bg-white/10 text-slate-400 hover:text-emerald-400"}`} title="Good response">
+                                      <ThumbsUp className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button onClick={() => handleRateMessage(msg.id!, "down")} disabled={msg.feedback === "down" || rateMsg.isPending} className={`p-1.5 rounded-md transition-colors ${msg.feedback === "down" ? "bg-red-500/20 text-red-400" : "hover:bg-white/10 text-slate-400 hover:text-red-400"}`} title="Bad response">
+                                      <ThumbsDown className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             </motion.div>
                           ))}

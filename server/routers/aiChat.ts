@@ -1,7 +1,7 @@
 import { router, protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
 import { aiConversations, chatMessages, faqs, users, studyPlans, studentCourses, courses, attendance, assignments, studentAssignments, academicAlerts } from "../../drizzle/schema";
-import { eq, and, desc, inArray } from "drizzle-orm";
+import { eq, and, desc, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { invokeLLM } from "../_core/llm";
@@ -251,6 +251,84 @@ export const aiChatRouter = router({
       } catch (error: any) {
         console.error("[AI Chat] Failed to send message:", error);
         return { success: false, response: `Exact Error: ${error.message}` };
+      }
+    }),
+
+  rateMessage: protectedProcedure
+    .input(
+      z.object({
+        messageId: z.number(),
+        feedback: z.enum(["up", "down", "none"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+      if (!ctx.user || ctx.user.role !== "student") {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      try {
+        // Verify the message exists and belongs to the user's conversation
+        const [msg] = await db
+          .select()
+          .from(chatMessages)
+          .where(eq(chatMessages.id, input.messageId))
+          .limit(1);
+
+        if (!msg) throw new TRPCError({ code: "NOT_FOUND" });
+
+        // Update the feedback
+        await db
+          .update(chatMessages)
+          .set({ feedback: input.feedback })
+          .where(eq(chatMessages.id, input.messageId));
+
+        // If feedback is provided, add to FAQs for review
+        if (input.feedback === "up" || input.feedback === "down") {
+          if (msg.role === "assistant") {
+            // Find the preceding user question
+            const [userMsg] = await db
+              .select()
+              .from(chatMessages)
+              .where(
+                and(
+                  eq(chatMessages.conversationId, msg.conversationId),
+                  eq(chatMessages.role, "user")
+                )
+              )
+              // orderBy desc(id) to get the most recent before the assistant
+              .orderBy(desc(chatMessages.id))
+              .limit(1);
+
+            if (userMsg) {
+              // Check if we already added it
+              const existing = await db
+                .select()
+                .from(faqs)
+                .where(eq(faqs.question, userMsg.content))
+                .limit(1);
+
+              if (existing.length === 0) {
+                await db.insert(faqs).values({
+                  question: userMsg.content,
+                  questionAr: userMsg.content,
+                  answer: msg.content,
+                  answerAr: msg.content,
+                  category: "AI Feedback",
+                  categoryAr: "تقييم الذكاء الاصطناعي",
+                  createdBy: 1, // Fallback to an admin ID for system generated FAQs
+                  isActive: false, // Keep it inactive for advisor review
+                });
+              }
+            }
+          }
+        }
+        return { success: true };
+      } catch (error) {
+        console.error("[AI Chat] Failed to rate message:", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
     }),
 
