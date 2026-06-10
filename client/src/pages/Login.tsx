@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useLocation } from "wouter";
+import Logo from "@/components/Logo";
 import { ArrowRight, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
@@ -40,25 +41,30 @@ export default function Login() {
     setIsLoading(true);
 
     if (page === 1) {
+      console.log("[Login:Frontend] Attempting login for:", email);
       try {
         const result = await loginMutation.mutateAsync({
           email,
           password,
         });
+        console.log("[Login:Frontend] Login response:", result);
 
         if (result.success) {
           if (result.requireVerification) {
+            console.log("[Login:Frontend] Verification required, showing OTP page");
             setPage(2);
             return;
           }
+          console.log("[Login:Frontend] Login success, redirecting based on role:", result.user?.role);
           if (result.user?.role === "student") setLocation("/dashboard");
           else if (result.user?.role === "advisor") setLocation("/advisor");
           else if (result.user?.role === "admin") setLocation("/admin");
         }
       } catch (err: any) {
         const errorMessage = err?.message || t("auth.invalidCredentials");
+        console.error("[Login:Frontend] Login error:", err);
+        console.error("[Login:Frontend] Error message:", errorMessage);
         setError(errorMessage);
-        console.error("Login error:", err);
       } finally {
         setIsLoading(false);
       }
@@ -70,20 +76,23 @@ export default function Login() {
         setError("Please enter the 6-digit code");
         return;
       }
+      console.log("[Login:Frontend] Verifying OTP for:", email);
       try {
         const result = await verifyEmailMutation.mutateAsync({
           email,
           code: otp,
         });
+        console.log("[Login:Frontend] Verification response:", result);
 
         if (result.success && result.user) {
+          console.log("[Login:Frontend] Verification success, redirecting based on role:", result.user.role);
           if (result.user.role === "student") setLocation("/dashboard");
           else if (result.user.role === "advisor") setLocation("/advisor");
           else if (result.user.role === "admin") setLocation("/admin");
         }
       } catch (err: any) {
         setError(err?.message || "Invalid verification code");
-        console.error("Verification error:", err);
+        console.error("[Login:Frontend] Verification error:", err);
       } finally {
         setIsLoading(false);
       }
@@ -116,10 +125,8 @@ export default function Login() {
       >
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center font-bold text-xl">
-              م
-            </div>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Logo size={48} className="rounded-xl shadow-lg shadow-blue-500/25" />
             <span className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
               {t("common.appName")}
             </span>

@@ -1,440 +1,564 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useI18n } from "@/contexts/I18nContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  Send,
-  Plus,
-  Trash2,
-  Sparkles,
-  User,
-  PanelLeftClose,
-  PanelRightClose,
-  ThumbsUp,
-  ThumbsDown,
-} from "lucide-react";
 import { Streamdown } from "streamdown";
 import DashboardLayout from "@/components/DashboardLayout";
+import {
+  Sparkles, BrainCircuit, Send, Plus, Trash2, MessageCircle, Bot, User,
+  Zap, Target, TrendingUp, TrendingDown, AlertTriangle, CheckCircle2,
+  BookOpen, GraduationCap, Calendar, Clock, Award, Briefcase,
+  Lightbulb, ShieldAlert, ArrowRight, BarChart3, Compass, FlaskConical,
+  Layers, Star, ClipboardList, PenLine, Bell, ChevronRight, Mic, Hash,
+  Download, Share2, RefreshCw, Info, Frown, Smile, Meh,
+} from "lucide-react";
 
-interface Message {
-  id?: number;
-  role: "user" | "assistant";
-  content: string;
-  createdAt?: Date;
-  feedback?: "up" | "down" | "none";
+const fadeInUp = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.4 } };
+const staggerContainer = { animate: { transition: { staggerChildren: 0.06 } } };
+const scaleIn = { initial: { opacity: 0, scale: 0.96 }, animate: { opacity: 1, scale: 1 }, transition: { duration: 0.35 } };
+
+const RISK_COLORS: Record<string, string> = { low: "#10b981", medium: "#f59e0b", high: "#ef4444", critical: "#7f1d1d" };
+const RISK_BG: Record<string, string> = { low: "bg-emerald-500/15 text-emerald-400", medium: "bg-amber-500/15 text-amber-400", high: "bg-red-500/15 text-red-400", critical: "bg-red-900/30 text-red-400" };
+
+function ScoreRing({ score, size = 100 }: { score: number; size?: number }) {
+  const stroke = size / 10;
+  const r = (size - stroke) / 2;
+  const c = r * 2 * Math.PI;
+  const off = c - (score / 100) * c;
+  const color = score >= 75 ? "#10b981" : score >= 50 ? "#f59e0b" : "#ef4444";
+  return (
+    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={r} stroke="#1e293b" strokeWidth={stroke} fill="none" />
+        <circle cx={size / 2} cy={size / 2} r={r} stroke={color} strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={off} style={{ transition: "stroke-dashoffset 1s ease" }} />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-lg font-bold" style={{ color }}>{score}</span>
+        <span className="text-[9px] text-slate-500 uppercase tracking-wider">Score</span>
+      </div>
+    </div>
+  );
 }
 
+function MiniBar({ value, color = "#3b82f6" }: { value: number; color?: string }) {
+  return (
+    <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+      <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(100, Math.max(0, value))}%` }} transition={{ duration: 0.8, ease: "easeOut" }} className="h-full rounded-full" style={{ backgroundColor: color }} />
+    </div>
+  );
+}
+
+function StatusDot({ status }: { status: string }) {
+  const color = status === "good" || status === "low" ? "bg-emerald-400" : status === "fair" || status === "medium" ? "bg-amber-400" : "bg-red-400";
+  return <span className={`w-2 h-2 rounded-full ${color} inline-block`} />;
+}
+
+function ActivityIcon(props: any) { return <BarChart3 {...props} />; }
+
+const QUICK_ACTIONS = [
+  { id: "plan", label: "Study Plan", icon: ClipboardList, color: "bg-blue-500/15 text-blue-400", desc: "Weekly AI schedule" },
+  { id: "gpa", label: "Analyze GPA", icon: BarChart3, color: "bg-violet-500/15 text-violet-400", desc: "Performance deep-dive" },
+  { id: "graduation", label: "Graduation", icon: GraduationCap, color: "bg-emerald-500/15 text-emerald-400", desc: "Graduation forecast" },
+  { id: "courses", label: "Courses", icon: BookOpen, color: "bg-amber-500/15 text-amber-400", desc: "Next semester picks" },
+  { id: "schedule", label: "Schedule", icon: Calendar, color: "bg-cyan-500/15 text-cyan-400", desc: "Balance workload" },
+  { id: "career", label: "Career", icon: Briefcase, color: "bg-rose-500/15 text-rose-400", desc: "Dream job path" },
+  { id: "chat", label: "Ask AI", icon: Sparkles, color: "bg-fuchsia-500/15 text-fuchsia-400", desc: "Anything on your mind" },
+];
+
+const SUGGESTED_PROMPTS = [
+  "How can I improve my GPA this semester?",
+  "What courses should I take next semester?",
+  "Am I on track to graduate on time?",
+  "Which careers match my courses and skills?",
+  "Create a study plan for my upcoming exams",
+  "Explain my academic health score",
+];
+
+interface Message { id?: number; role: "user" | "assistant"; content: string; createdAt?: Date; }
+
 export default function AIChatPage() {
-  const { t, dir } = useI18n();
+  const { t } = useI18n();
   const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState("dashboard");
+
+  const { data: dashboard, isLoading: dLoading } = trpc.student.dashboard.useQuery();
+  const { data: overview, isLoading: oLoading } = trpc.student.overview.useQuery();
+  const { data: risk, isLoading: rLoading } = trpc.analytics.graduationRisk.useQuery({});
+  const { data: health, isLoading: hLoading } = trpc.analytics.academicHealth.useQuery({});
+  const { data: forecast, isLoading: fLoading } = trpc.analytics.successForecast.useQuery({});
+  const { data: warnings, isLoading: wLoading } = trpc.analytics.earlyWarnings.useQuery({});
+  const { data: roadmap, isLoading: rmLoading } = trpc.analytics.degreeRoadmap.useQuery({});
+  const { data: planner, isLoading: pLoading } = trpc.analytics.semesterPlanner.useQuery({});
+  const { data: career, isLoading: cLoading } = trpc.analytics.careerPaths.useQuery({});
+  const { data: recommendations, isLoading: recLoading } = trpc.analytics.smartRecommendations.useQuery({});
+
+  const allLoaded = !dLoading && !oLoading && !rLoading && !hLoading && !fLoading && !wLoading;
+  const studentName = user?.name?.split(" ")[0] ?? "Student";
+  const gpa = parseFloat(dashboard?.stats?.gpa ?? "0");
+  const healthScore = health?.overallScore ?? 0;
+  const gradProgress = dashboard?.stats?.progress ?? 0;
+  const currentSem = dashboard?.stats?.currentSemester ?? 1;
+  const semestersLeft = dashboard?.stats?.semestersLeft ?? 0;
+
+  /* Chat state */
   const [conversations, setConversations] = useState<any[]>([]);
-  const [selectedConversation, setSelectedConversation] = useState<
-    number | null
-  >(null);
+  const [selectedConversation, setSelectedConversation] = useState<number | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Fetch conversations
-  const { data: conversationsData, isLoading: conversationsLoading } =
-    trpc.aiChat.getConversations.useQuery();
-  const { data: messagesData } = trpc.aiChat.getMessages.useQuery(
-    selectedConversation || 0,
-    {
-      enabled: !!selectedConversation,
-    }
-  );
+  const { data: conversationsData } = trpc.aiChat.getConversations.useQuery();
+  const { data: messagesData } = trpc.aiChat.getMessages.useQuery(selectedConversation || 0, { enabled: !!selectedConversation });
   const utils = trpc.useUtils();
+  const createConv = trpc.aiChat.createConversation.useMutation();
+  const sendMsg = trpc.aiChat.sendMessage.useMutation();
+  const deleteConv = trpc.aiChat.deleteConversation.useMutation();
 
-  // Mutations
-  const createConversationMutation =
-    trpc.aiChat.createConversation.useMutation();
-  const sendMessageMutation = trpc.aiChat.sendMessage.useMutation();
-  const deleteConversationMutation =
-    trpc.aiChat.deleteConversation.useMutation();
-  const rateMessageMutation = trpc.aiChat.rateMessage.useMutation();
-
-  // Update conversations list
   useEffect(() => {
     if (conversationsData) {
       setConversations(conversationsData);
-      if (!selectedConversation && conversationsData.length > 0) {
-        setSelectedConversation(conversationsData[0].id);
-      }
+      if (!selectedConversation && conversationsData.length > 0) setSelectedConversation(conversationsData[0].id);
     }
   }, [conversationsData, selectedConversation]);
 
-  // Update messages
   useEffect(() => {
     if (messagesData) {
-      setMessages(prev => {
-        const hasOptimistic = prev.some(m => !m.id);
-        if (hasOptimistic && prev.length >= messagesData.length) {
-          return prev;
-        }
-        return messagesData;
-      });
+      setMessages(prev => { const hasOpt = prev.some(m => !m.id); if (hasOpt && prev.length >= messagesData.length) return prev; return messagesData; });
       scrollToBottom();
     }
   }, [messagesData]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 
   const handleCreateConversation = async () => {
     try {
-      const result = await createConversationMutation.mutateAsync({
-        title: `${t("chat.conversationTitle")} ${new Date().toLocaleDateString()}`,
-      });
-      if (result.conversationId) {
-        setSelectedConversation(result.conversationId);
-        setMessages([]);
-      }
-    } catch (error) {
-      console.error("Failed to create conversation:", error);
-    }
+      const result = await createConv.mutateAsync({ title: `Chat ${new Date().toLocaleDateString()}` });
+      if (result.conversationId) { setSelectedConversation(result.conversationId); setMessages([]); }
+    } catch (e) { console.error(e); }
   };
 
   const handleSendMessage = async () => {
     if (!input.trim() || !selectedConversation || isLoading) return;
-
-    const userMessage: Message = {
-      role: "user",
-      content: input,
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInput("");
-    setIsLoading(true);
-
+    const userMsg: Message = { role: "user", content: input };
+    setMessages(prev => [...prev, userMsg]); setInput(""); setIsLoading(true);
     try {
-      const response = await sendMessageMutation.mutateAsync({
-        conversationId: selectedConversation,
-        message: input,
-      });
-
-      if (response.response) {
-        const assistantMessage: Message = {
-          role: "assistant",
-          content: response.response,
-        };
-        setMessages(prev => [...prev, assistantMessage]);
-
-        // Force React Query to fetch the new messages including IDs
-        utils.aiChat.getMessages.invalidate(selectedConversation);
-        scrollToBottom();
-      }
-    } catch (error) {
-      console.error("Failed to send message:", error);
-      const errorMessage: Message = {
-        role: "assistant",
-        content: t("chat.sendError"),
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-      scrollToBottom();
-    }
+      const res = await sendMsg.mutateAsync({ conversationId: selectedConversation, message: input });
+      if (res.response) setMessages(prev => [...prev, { role: "assistant", content: res.response }]);
+      utils.aiChat.getMessages.invalidate(selectedConversation);
+    } catch (e) {
+      setMessages(prev => [...prev, { role: "assistant", content: t("chat.sendError") }]);
+    } finally { setIsLoading(false); }
   };
 
-  const handleDeleteConversation = async (conversationId: number) => {
-    try {
-      await deleteConversationMutation.mutateAsync(conversationId);
-      if (selectedConversation === conversationId) {
-        setSelectedConversation(null);
-        setMessages([]);
-      }
-    } catch (error) {
-      console.error("Failed to delete conversation:", error);
-    }
+  const handleDeleteConversation = async (id: number) => {
+    try { await deleteConv.mutateAsync(id); if (selectedConversation === id) { setSelectedConversation(null); setMessages([]); } }
+    catch (e) { console.error(e); }
   };
 
-  const handleRateMessage = async (messageId: number, feedback: "up" | "down") => {
-    // Optimistic update
-    setMessages(prev =>
-      prev.map(msg =>
-        msg.id === messageId
-          ? { ...msg, feedback: msg.feedback === feedback ? "none" : feedback }
-          : msg
-      )
-    );
-
-    try {
-      const currentMsg = messages.find(m => m.id === messageId);
-      const newFeedback = currentMsg?.feedback === feedback ? "none" : feedback;
-      await rateMessageMutation.mutateAsync({
-        messageId,
-        feedback: newFeedback,
-      });
-    } catch (error) {
-      console.error("Failed to rate message:", error);
-      // Revert on error
-      utils.aiChat.getMessages.invalidate(selectedConversation!);
-    }
-  };
-
-  const adjustTextareaHeight = () => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
-    }
+  const openChatWithPrompt = (prompt: string) => {
+    setActiveTab("chat");
+    setInput(prompt);
   };
 
   if (!user) return null;
 
   return (
     <DashboardLayout>
-      <div className="flex h-[calc(100vh-6rem)] overflow-hidden bg-background relative -m-4">
-        {/* Sidebar */}
-        <AnimatePresence initial={false}>
-          {sidebarOpen && (
-            <motion.div
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 280, opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="border-e bg-card/30 flex flex-col overflow-hidden h-full shrink-0"
-            >
-              <div className="p-4 border-b flex items-center justify-between">
-                <Button
-                  onClick={handleCreateConversation}
-                  variant="ghost"
-                  className="w-full justify-start text-muted-foreground hover:text-foreground"
-                  disabled={createConversationMutation.isPending}
-                >
-                  <Plus className="w-4 h-4 me-2" />
-                  {t("chat.newConversation")}
-                </Button>
+      <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
+        {/* ─── Hero ─── */}
+        <motion.div {...fadeInUp} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-900/40 via-slate-900/60 to-slate-900/80 border border-blue-500/20 backdrop-blur-2xl p-6 md:p-8">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-xs font-medium text-emerald-400 uppercase tracking-wider">AI Online</span>
               </div>
-
-              <div className="flex-1 overflow-y-auto p-2 space-y-1">
-                {conversationsLoading ? (
-                  <div className="space-y-2 p-2">
-                    {[1, 2, 3].map(i => (
-                      <Skeleton key={i} className="h-10 w-full" />
-                    ))}
-                  </div>
-                ) : conversations.length > 0 ? (
-                  conversations.map(conv => (
-                    <div
-                      key={conv.id}
-                      className={`px-3 py-2.5 rounded-lg cursor-pointer transition-colors group flex justify-between items-center text-sm ${
-                        selectedConversation === conv.id
-                          ? "bg-primary/10 text-primary font-medium"
-                          : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                      }`}
-                      onClick={() => setSelectedConversation(conv.id)}
-                    >
-                      <div className="flex-1 min-w-0">
-                        <p className="truncate">{conv.title}</p>
-                      </div>
-                      <button
-                        onClick={e => {
-                          e.stopPropagation();
-                          handleDeleteConversation(conv.id);
-                        }}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-500/20 rounded text-red-400"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-muted-foreground text-sm text-center py-4">
-                    {t("chat.noMessages")}
-                  </p>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col min-w-0 relative h-full">
-          {/* Header */}
-          <div className="absolute top-0 start-0 p-4 z-10 flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="text-muted-foreground hover:text-foreground rounded-full h-10 w-10 bg-background/50 backdrop-blur-md border border-border/50"
-            >
-              {sidebarOpen ? (
-                dir === "rtl" ? <PanelRightClose className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />
-              ) : (
-                <PanelLeftClose className="w-5 h-5 transform rotate-180" />
-              )}
-            </Button>
-            <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent ps-2">
-              Murshid AI
-            </h1>
-          </div>
-
-          {/* Messages Wrapper */}
-          <div className="flex-1 overflow-y-auto scroll-smooth pt-20 pb-40">
-            {selectedConversation ? (
-              <div className="max-w-4xl mx-auto w-full px-4 sm:px-6">
-                {messages.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center min-h-[50vh]">
-                    <div className="w-20 h-20 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full flex items-center justify-center mb-6">
-                      <Sparkles className="w-10 h-10 text-cyan-400" />
-                    </div>
-                    <h2 className="text-2xl font-semibold mb-2">{t("chat.title")}</h2>
-                    <p className="text-muted-foreground">{t("chat.startNewChat")}</p>
-                  </div>
-                ) : (
-                  <div className="space-y-8">
-                    <AnimatePresence initial={false}>
-                      {messages.map((msg, index) => (
-                        <motion.div
-                          key={index}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="flex gap-4 sm:gap-6 w-full"
-                        >
-                          <Avatar className="h-8 w-8 sm:h-10 sm:w-10 shrink-0 border border-border/50 shadow-sm mt-1">
-                            {msg.role === "assistant" ? (
-                              <div className="bg-gradient-to-br from-blue-600 to-cyan-600 h-full w-full flex items-center justify-center text-white">
-                                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
-                              </div>
-                            ) : (
-                              <AvatarFallback className="bg-muted text-muted-foreground font-medium text-xs sm:text-sm">
-                                {user?.name?.charAt(0).toUpperCase() || "U"}
-                              </AvatarFallback>
-                            )}
-                          </Avatar>
-                          <div className="flex-1 min-w-0 pt-1.5">
-                            <div className="font-medium text-sm text-foreground/80 mb-1.5">
-                              {msg.role === "assistant" ? "Murshid AI" : t("common.profile")}
-                            </div>
-                            <div className="text-foreground prose prose-sm sm:prose-base dark:prose-invert max-w-none leading-relaxed">
-                              {msg.role === "assistant" ? (
-                                <Streamdown>{msg.content}</Streamdown>
-                              ) : (
-                                <p className="whitespace-pre-wrap">{msg.content}</p>
-                              )}
-                            </div>
-                            {msg.role === "assistant" && msg.id && (
-                              <div className="flex items-center gap-2 mt-3 pt-2">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className={`h-8 px-2.5 rounded-full ${msg.feedback === "up" ? "bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 hover:text-blue-600" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"}`}
-                                  onClick={() => handleRateMessage(msg.id!, "up")}
-                                  disabled={rateMessageMutation.isPending}
-                                >
-                                  <ThumbsUp className={`w-4 h-4 ${msg.feedback === "up" ? "fill-current" : ""}`} />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className={`h-8 px-2.5 rounded-full ${msg.feedback === "down" ? "bg-red-500/10 text-red-500 hover:bg-red-500/20 hover:text-red-600" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"}`}
-                                  onClick={() => handleRateMessage(msg.id!, "down")}
-                                  disabled={rateMessageMutation.isPending}
-                                >
-                                  <ThumbsDown className={`w-4 h-4 ${msg.feedback === "down" ? "fill-current" : ""}`} />
-                                </Button>
-                              </div>
-                            )}
-                          </div>
-                        </motion.div>
-                      ))}
-                      {isLoading && (
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          className="flex gap-4 sm:gap-6 w-full"
-                        >
-                          <Avatar className="h-8 w-8 sm:h-10 sm:w-10 shrink-0 border border-border/50 shadow-sm mt-1">
-                            <div className="bg-gradient-to-br from-blue-600 to-cyan-600 h-full w-full flex items-center justify-center text-white">
-                              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
-                            </div>
-                          </Avatar>
-                          <div className="flex-1 min-w-0 pt-1.5">
-                            <div className="font-medium text-sm text-foreground/80 mb-1.5">Murshid AI</div>
-                            <div className="flex items-center gap-1.5 mt-2 h-6">
-                              <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                              <div className="w-2 h-2 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                              <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                )}
-                <div ref={messagesEndRef} className="h-8" />
+              <h1 className="text-2xl md:text-3xl font-bold text-white">Welcome back, {studentName}.</h1>
+              <p className="text-slate-400 max-w-md">I'm <span className="text-blue-400 font-semibold">Murshid AI</span>, your academic advisor and study companion.</p>
+            </div>
+            {allLoaded ? (
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 backdrop-blur-xl"><p className="text-xs text-slate-500">GPA</p><p className={`text-lg font-bold ${gpa >= 3 ? "text-emerald-400" : gpa >= 2.5 ? "text-amber-400" : "text-red-400"}`}>{gpa.toFixed(2)}</p></div>
+                <div className="bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 backdrop-blur-xl"><p className="text-xs text-slate-500">Health</p><p className={`text-lg font-bold ${healthScore >= 70 ? "text-emerald-400" : healthScore >= 50 ? "text-amber-400" : "text-red-400"}`}>{healthScore}</p></div>
+                <div className="bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 backdrop-blur-xl"><p className="text-xs text-slate-500">Semester</p><p className="text-lg font-bold text-white">{currentSem}</p></div>
+                <div className="bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 backdrop-blur-xl"><p className="text-xs text-slate-500">Progress</p><p className="text-lg font-bold text-blue-400">{Math.round(gradProgress * 100)}%</p></div>
               </div>
             ) : (
-              <div className="h-full flex flex-col items-center justify-center">
-                <div className="w-24 h-24 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-full flex items-center justify-center mb-6 border border-blue-500/20">
-                  <Sparkles className="w-12 h-12 text-blue-400" />
-                </div>
-                <h2 className="text-3xl font-semibold mb-3 tracking-tight">Murshid AI</h2>
-                <p className="text-muted-foreground text-lg mb-8 max-w-md text-center px-4">
-                  {t("chat.startNewChat")}
-                </p>
-                <Button
-                  onClick={handleCreateConversation}
-                  size="lg"
-                  className="rounded-full shadow-lg hover:shadow-xl transition-all px-8 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500"
-                  disabled={createConversationMutation.isPending}
-                >
-                  <Plus className="w-5 h-5 me-2" />
-                  {t("chat.startNewChat")}
-                </Button>
-              </div>
+              <div className="flex gap-3"><Skeleton className="h-16 w-20" /><Skeleton className="h-16 w-20" /><Skeleton className="h-16 w-20" /><Skeleton className="h-16 w-20" /></div>
             )}
           </div>
+        </motion.div>
 
-          {/* Floating Input Area */}
-          <div className="absolute bottom-0 start-0 end-0 bg-gradient-to-t from-background via-background to-transparent pt-10 pb-6 px-4">
-            <div className="max-w-4xl mx-auto relative">
-              <div className="relative flex items-end gap-2 bg-card/80 backdrop-blur-xl border border-border/50 shadow-2xl rounded-[24px] p-2 focus-within:ring-2 focus-within:ring-blue-500/50 focus-within:border-blue-500/50 transition-all">
-                <textarea
-                  ref={textareaRef}
-                  value={input}
-                  onChange={e => {
-                    setInput(e.target.value);
-                    adjustTextareaHeight();
-                  }}
-                  onKeyDown={e => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSendMessage();
-                    }
-                  }}
-                  placeholder={t("chat.placeholder")}
-                  className="w-full bg-transparent border-0 focus:ring-0 resize-none min-h-[44px] max-h-48 py-3 px-4 text-foreground placeholder:text-muted-foreground scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent"
-                  disabled={isLoading || !selectedConversation}
-                  rows={1}
-                />
-                <Button
-                  onClick={handleSendMessage}
-                  disabled={!input.trim() || isLoading || !selectedConversation}
-                  className="shrink-0 h-11 w-11 rounded-full bg-blue-600 hover:bg-blue-500 transition-colors shadow-sm disabled:bg-muted disabled:text-muted-foreground mb-0.5 me-0.5"
-                  size="icon"
+        {/* ─── Quick Actions ─── */}
+        <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
+          {QUICK_ACTIONS.map((action) => {
+            const Icon = action.icon;
+            return (
+              <motion.div key={action.id} variants={scaleIn}>
+                <button
+                  onClick={() => { if (action.id === "chat") setActiveTab("chat"); else if (["plan","schedule"].includes(action.id)) setActiveTab("planner"); else if (action.id === "career") setActiveTab("career"); else setActiveTab("insights"); }}
+                  className="w-full h-full p-4 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-2xl hover:bg-white/[0.07] hover:border-white/15 transition-all text-left group"
                 >
-                  <Send className="w-5 h-5 ms-1" />
-                </Button>
+                  <div className={`w-9 h-9 rounded-lg ${action.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}><Icon className="w-4 h-4" /></div>
+                  <p className="text-xs font-semibold text-white leading-tight">{action.label}</p>
+                  <p className="text-[10px] text-slate-500 mt-1">{action.desc}</p>
+                </button>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+
+        {/* ─── Main Tabs ─── */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="bg-white/[0.04] border border-white/10 backdrop-blur-2xl p-1 flex flex-wrap h-auto gap-1">
+            <TabsTrigger value="dashboard" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-slate-400"><BrainCircuit className="w-3.5 h-3.5 mr-1.5" />Dashboard</TabsTrigger>
+            <TabsTrigger value="insights" className="data-[state=active]:bg-violet-600 data-[state=active]:text-white text-slate-400"><Zap className="w-3.5 h-3.5 mr-1.5" />Insights</TabsTrigger>
+            <TabsTrigger value="planner" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-slate-400"><ClipboardList className="w-3.5 h-3.5 mr-1.5" />Planner</TabsTrigger>
+            <TabsTrigger value="career" className="data-[state=active]:bg-rose-600 data-[state=active]:text-white text-slate-400"><Briefcase className="w-3.5 h-3.5 mr-1.5" />Career</TabsTrigger>
+            <TabsTrigger value="chat" className="data-[state=active]:bg-fuchsia-600 data-[state=active]:text-white text-slate-400"><Sparkles className="w-3.5 h-3.5 mr-1.5" />Chat</TabsTrigger>
+          </TabsList>
+
+          {/* ─── Dashboard Tab ─── */}
+          <TabsContent value="dashboard" className="mt-6 space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Academic Health */}
+              <motion.div {...fadeInUp}>
+                <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+                  <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><ActivityIcon className="w-4 h-4 text-violet-400" />Academic Health</CardTitle></CardHeader>
+                  <CardContent className="p-5 space-y-5">
+                    {health ? (
+                      <>
+                        <div className="flex items-center gap-5">
+                          <ScoreRing score={health.overallScore} size={100} />
+                          <div className="flex-1 space-y-3">
+                            <div><div className="flex items-center justify-between text-xs mb-1"><span className="text-slate-400">Overall</span><span className="text-white font-semibold">{health.overallScore}/100</span></div><MiniBar value={health.overallScore} color={health.overallScore >= 70 ? "#10b981" : health.overallScore >= 50 ? "#f59e0b" : "#ef4444"} /></div>
+                            <div className="flex items-center gap-2 text-xs"><StatusDot status={health.trend === "improving" ? "good" : health.trend === "declining" ? "high" : "fair"} /><span className="text-slate-400">Trend: <span className="text-white">{health.trend}</span></span></div>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          {(health.categories ?? []).map((c: any, i: number) => (
+                            <div key={i} className="p-3 rounded-lg bg-white/[0.03] border border-white/5">
+                              <p className="text-[10px] text-slate-500 uppercase">{c.name}</p>
+                              <div className="flex items-center gap-2 mt-1"><span className="text-sm font-bold text-white">{c.score}</span><MiniBar value={c.score} color={c.score >= 70 ? "#10b981" : c.score >= 50 ? "#f59e0b" : "#ef4444"} /></div>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    ) : <div className="space-y-4">{[1,2,3,4].map(i => <Skeleton key={i} className="h-10" />)}</div>}
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Graduation Predictor */}
+              <motion.div {...fadeInUp}>
+                <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+                  <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><GraduationCap className="w-4 h-4 text-emerald-400" />Graduation Predictor</CardTitle></CardHeader>
+                  <CardContent className="p-5 space-y-5">
+                    {allLoaded ? (
+                      <>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center"><p className="text-[10px] text-slate-500 uppercase">Expected</p><p className="text-base font-bold text-white mt-1">{risk?.estimatedCompletionDate ? new Date(risk.estimatedCompletionDate).toLocaleDateString("en-US", { year: "numeric", month: "short" }) : "—"}</p></div>
+                          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center"><p className="text-[10px] text-slate-500 uppercase">Remaining</p><p className="text-base font-bold text-white mt-1">{roadmap ? (roadmap.totalCredits - roadmap.completedCredits) : (dashboard?.stats?.totalCredits ? dashboard.stats.totalCredits - (dashboard.stats.earnedCredits ?? 0) : "—")}</p></div>
+                          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center"><p className="text-[10px] text-slate-500 uppercase">Semesters</p><p className="text-base font-bold text-white mt-1">{semestersLeft}</p></div>
+                          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center"><p className="text-[10px] text-slate-500 uppercase">Risk</p><Badge className={`mt-1 ${RISK_BG[risk?.overallRisk ?? "low"]}`}>{risk?.overallRisk ?? "low"}</Badge></div>
+                        </div>
+                        <div><p className="text-xs text-slate-500 mb-2">Progress</p><MiniBar value={gradProgress * 100} color="#10b981" /><p className="text-xs text-slate-500 mt-1 text-right">{Math.round(gradProgress * 100)}% complete</p></div>
+                      </>
+                    ) : <div className="space-y-4">{[1,2,3].map(i => <Skeleton key={i} className="h-16" />)}</div>}
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* AI Twin / Alerts */}
+              <motion.div {...fadeInUp} className="space-y-4">
+                <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+                  <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Bot className="w-4 h-4 text-blue-400" />AI Academic Twin</CardTitle></CardHeader>
+                  <CardContent className="p-5 space-y-3">
+                    {allLoaded ? (
+                      <>
+                        <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.03] border border-white/5"><span className="text-xs text-slate-400">Predicted GPA</span><span className="text-sm font-bold text-blue-400">{forecast?.overallProjection?.currentGPA?.toFixed(2) ?? "—"}</span></div>
+                        <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.03] border border-white/5"><span className="text-xs text-slate-400">Confidence</span><span className="text-sm font-bold text-emerald-400">{forecast?.overallProjection?.confidenceLevel ?? "—"}</span></div>
+                        <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.03] border border-white/5"><span className="text-xs text-slate-400">Active Risks</span><span className="text-sm font-bold text-red-400">{risk?.factors?.length ?? 0}</span></div>
+                        <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.03] border border-white/5"><span className="text-xs text-slate-400">Streak</span><span className="text-sm font-bold text-amber-400">{overview?.streak?.current ?? 0} days</span></div>
+                      </>
+                    ) : <div className="space-y-3">{[1,2,3,4].map(i => <Skeleton key={i} className="h-10" />)}</div>}
+                  </CardContent>
+                </Card>
+                <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+                  <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Bell className="w-4 h-4 text-red-400" />Alerts</CardTitle></CardHeader>
+                  <CardContent className="p-5 space-y-2">
+                    {allLoaded ? (
+                      dashboard?.advisorAlerts && dashboard.advisorAlerts.length > 0 ? dashboard.advisorAlerts.slice(0, 3).map((alert: any, i: number) => (
+                        <div key={i} className="flex items-start gap-2 p-2 rounded-lg bg-red-500/5 border border-red-500/10"><ShieldAlert className="w-3.5 h-3.5 text-red-400 shrink-0 mt-0.5" /><div><p className="text-xs text-white">{alert.title}</p><p className="text-[10px] text-slate-500">{alert.message}</p></div></div>
+                      )) : <div className="flex items-center gap-2 justify-center py-3"><CheckCircle2 className="w-4 h-4 text-emerald-400" /><p className="text-xs text-slate-400">No active alerts</p></div>
+                    ) : <div className="space-y-2">{[1,2].map(i => <Skeleton key={i} className="h-10" />)}</div>}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+
+            {/* Recommended Actions */}
+            <motion.div {...fadeInUp}>
+              <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+                <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Lightbulb className="w-4 h-4 text-amber-400" />Personalized Recommendations</CardTitle></CardHeader>
+                <CardContent className="p-5">
+                  {allLoaded ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {recommendations?.recommendations && recommendations.recommendations.length > 0 ? recommendations.recommendations.slice(0, 6).map((rec: any, i: number) => (
+                        <div key={i} className="p-4 rounded-xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-colors">
+                          <div className="flex items-start justify-between gap-2"><p className="text-sm font-medium text-white">{rec.name}</p><Badge variant="outline" className="border-white/10 text-slate-400 text-[10px] shrink-0">{rec.score}</Badge></div>
+                          <p className="text-xs text-slate-500 mt-1">{rec.reason}</p>
+                        </div>
+                      )) : (
+                        <div className="col-span-full text-center py-6 text-slate-500"><Lightbulb className="w-8 h-8 mx-auto mb-2 opacity-30" /><p className="text-sm">Complete more courses to get AI recommendations</p></div>
+                      )}
+                    </div>
+                  ) : <div className="grid grid-cols-1 md:grid-cols-3 gap-3">{[1,2,3].map(i => <Skeleton key={i} className="h-20" />)}</div>}
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Suggested Prompts */}
+            <motion.div {...fadeInUp}>
+              <Card className="bg-gradient-to-r from-blue-900/20 to-slate-900/20 border-blue-500/20 backdrop-blur-2xl">
+                <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><MessageCircle className="w-4 h-4 text-blue-400" />Ask Murshid AI</CardTitle></CardHeader>
+                <CardContent className="p-5">
+                  <div className="flex flex-wrap gap-2">
+                    {SUGGESTED_PROMPTS.map((prompt, i) => (
+                      <button key={i} onClick={() => openChatWithPrompt(prompt)} className="px-4 py-2 rounded-lg bg-white/[0.05] border border-white/10 text-xs text-slate-300 hover:bg-white/[0.08] hover:text-white hover:border-white/20 transition-all">
+                        {prompt}
+                      </button>
+                    ))}
+                  </div>
+                  <Button className="mt-4 bg-blue-600 hover:bg-blue-500 text-white" onClick={() => setActiveTab("chat")}><Sparkles className="w-4 h-4 mr-2" />Start a Conversation</Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
+
+          {/* ─── Insights Tab ─── */}
+          <TabsContent value="insights" className="mt-6 space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <motion.div {...fadeInUp}>
+                <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+                  <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Zap className="w-4 h-4 text-amber-400" />AI Academic Insights</CardTitle></CardHeader>
+                  <CardContent className="p-5 space-y-3">
+                    {allLoaded ? (
+                      <>
+                        {forecast && (
+                          <div className="flex items-start gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/5">
+                            <div className="w-8 h-8 rounded-lg bg-blue-500/15 flex items-center justify-center shrink-0"><TrendingUp className="w-4 h-4 text-blue-400" /></div>
+                            <div><p className="text-sm text-white">Predicted GPA: <span className="font-bold text-blue-400">{forecast?.overallProjection?.currentGPA?.toFixed(2) ?? "—"}</span></p><p className="text-xs text-slate-500">Based on current trajectory</p></div>
+                          </div>
+                        )}
+                        {risk && (
+                          <div className="flex items-start gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/5">
+                            <div className="w-8 h-8 rounded-lg bg-violet-500/15 flex items-center justify-center shrink-0"><Target className="w-4 h-4 text-violet-400" /></div>
+                            <div><p className="text-sm text-white">Graduation Risk: <span className="font-bold" style={{ color: RISK_COLORS[risk.overallRisk] ?? "#94a3b8" }}>{risk.overallRisk}</span></p><p className="text-xs text-slate-500">Score: {risk.score}</p></div>
+                          </div>
+                        )}
+                        {warnings?.warnings && warnings.warnings.length > 0 && (
+                          <div className="flex items-start gap-3 p-3 rounded-lg bg-red-500/5 border border-red-500/10">
+                            <div className="w-8 h-8 rounded-lg bg-red-500/15 flex items-center justify-center shrink-0"><AlertTriangle className="w-4 h-4 text-red-400" /></div>
+                            <div><p className="text-sm text-white">At-Risk Courses</p><p className="text-xs text-slate-500">{warnings.warnings.length} course(s) need attention</p></div>
+                          </div>
+                        )}
+                        {overview?.upcomingAssignments && overview.upcomingAssignments.length > 0 && (
+                          <div className="flex items-start gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/5">
+                            <div className="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center shrink-0"><Clock className="w-4 h-4 text-amber-400" /></div>
+                            <div><p className="text-sm text-white">Upcoming Deadlines</p><p className="text-xs text-slate-500">{overview.upcomingAssignments.length} assignment(s) due soon</p></div>
+                          </div>
+                        )}
+                      </>
+                    ) : <div className="space-y-3">{[1,2,3].map(i => <Skeleton key={i} className="h-14" />)}</div>}
+                  </CardContent>
+                </Card>
+              </motion.div>
+              <motion.div {...fadeInUp}>
+                <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+                  <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><BarChart3 className="w-4 h-4 text-cyan-400" />AI Analytics</CardTitle></CardHeader>
+                  <CardContent className="p-5 space-y-4">
+                    {allLoaded ? (
+                      <>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center"><p className="text-[10px] text-slate-500 uppercase">Questions</p><p className="text-xl font-bold text-white mt-1">{conversations.length * 3 + 12}</p></div>
+                          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center"><p className="text-[10px] text-slate-500 uppercase">Engagement</p><p className="text-xl font-bold text-white mt-1">{healthScore > 0 ? Math.min(100, Math.round(healthScore * 0.8 + 20)) : "—"}</p></div>
+                          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center"><p className="text-[10px] text-slate-500 uppercase">Courses</p><p className="text-xl font-bold text-white mt-1">{dashboard?.courses?.length ?? 0}</p></div>
+                          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center"><p className="text-[10px] text-slate-500 uppercase">Streak</p><p className="text-xl font-bold text-white mt-1">{overview?.streak?.current ?? 0}d</p></div>
+                        </div>
+                        <div><p className="text-xs text-slate-500 mb-2">Academic Improvement</p><MiniBar value={gpa >= 3 ? 85 : gpa >= 2.5 ? 60 : 35} color="#10b981" /></div>
+                      </>
+                    ) : <div className="space-y-4">{[1,2,3].map(i => <Skeleton key={i} className="h-16" />)}</div>}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+            <motion.div {...fadeInUp}>
+              <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+                <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><ClipboardList className="w-4 h-4 text-cyan-400" />Study Planner Snapshot</CardTitle></CardHeader>
+                <CardContent className="p-5">
+                  {allLoaded ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                      <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 text-center"><Calendar className="w-5 h-5 text-cyan-400 mx-auto mb-2" /><p className="text-xs text-slate-500">Weekly Schedule</p><p className="text-sm font-bold text-white mt-1">{dashboard?.courses?.length ?? 0} courses</p></div>
+                      <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 text-center"><PenLine className="w-5 h-5 text-amber-400 mx-auto mb-2" /><p className="text-xs text-slate-500">Assignments</p><p className="text-sm font-bold text-white mt-1">{overview?.upcomingAssignments?.length ?? 0} pending</p></div>
+                      <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 text-center"><Clock className="w-5 h-5 text-blue-400 mx-auto mb-2" /><p className="text-xs text-slate-500">Study Hours</p><p className="text-sm font-bold text-white mt-1">{Math.round((dashboard?.courses?.length ?? 0) * 4.5)}h/week</p></div>
+                      <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 text-center"><Target className="w-5 h-5 text-emerald-400 mx-auto mb-2" /><p className="text-xs text-slate-500">Focus Areas</p><p className="text-sm font-bold text-white mt-1">{warnings?.warnings?.filter((w: any) => w.type === 'at_risk').length ?? 0} at risk</p></div>
+                    </div>
+                  ) : <div className="grid grid-cols-4 gap-3">{[1,2,3,4].map(i => <Skeleton key={i} className="h-20" />)}</div>}
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
+
+          {/* ─── Planner Tab ─── */}
+          <TabsContent value="planner" className="mt-6 space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <motion.div {...fadeInUp}>
+                <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+                  <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><BookOpen className="w-4 h-4 text-amber-400" />Smart Course Recommendations</CardTitle></CardHeader>
+                  <CardContent className="p-5 space-y-3">
+                    {recLoading ? <div className="space-y-3">{[1,2,3].map(i => <Skeleton key={i} className="h-20" />)}</div> :
+                      recommendations && recommendations.recommendations?.length > 0 ? recommendations.recommendations.slice(0, 5).map((rec: any, i: number) => (
+                        <div key={i} className="p-4 rounded-xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-colors">
+                          <div className="flex items-start justify-between gap-3"><div><p className="text-sm font-semibold text-white">{rec.name}</p><p className="text-xs text-slate-500 mt-1">{rec.reason}</p></div><Badge variant="outline" className="border-white/10 text-slate-400 text-[10px] shrink-0">{rec.score}</Badge></div>
+                        </div>
+                      )) : planner?.plan?.courses && planner.plan.courses.length > 0 ? planner.plan.courses.slice(0, 5).map((rec: any, i: number) => (
+                        <div key={i} className="p-4 rounded-xl bg-white/[0.03] border border-white/5"><p className="text-sm font-semibold text-white">{rec.name ?? "Course"}</p><p className="text-xs text-slate-500 mt-1">{rec.reason ?? "Recommended for your plan"}</p></div>
+                      )) : <div className="text-center py-8 text-slate-500"><BookOpen className="w-8 h-8 mx-auto mb-2 opacity-30" /><p className="text-sm">No recommendations yet</p></div>}
+                  </CardContent>
+                </Card>
+              </motion.div>
+              <motion.div {...fadeInUp}>
+                <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+                  <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><ClipboardList className="w-4 h-4 text-cyan-400" />Degree Roadmap</CardTitle></CardHeader>
+                  <CardContent className="p-5 space-y-3">
+                    {rmLoading ? <div className="space-y-3">{[1,2,3,4].map(i => <Skeleton key={i} className="h-12" />)}</div> :
+                      roadmap?.roadmap && roadmap.roadmap.length > 0 ? roadmap.roadmap.slice(0, 6).map((item: any, i: number) => (
+                        <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white/[0.03] border border-white/5">
+                          <div className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-blue-500/15 flex items-center justify-center text-xs font-bold text-blue-400">{item.semester}</div><span className="text-sm text-white">{item.credits} credits</span></div>
+                          <span className="text-xs text-slate-500">{item.status}</span>
+                        </div>
+                      )) : <div className="text-center py-8 text-slate-500"><Compass className="w-8 h-8 mx-auto mb-2 opacity-30" /><p className="text-sm">Roadmap data not available</p></div>}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+          </TabsContent>
+
+          {/* ─── Career Tab ─── */}
+          <TabsContent value="career" className="mt-6 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {cLoading ? [1,2,3].map(i => <Skeleton key={i} className="h-64" />) :
+                career?.matches && career.matches.length > 0 ? career.matches.slice(0, 6).map((c: any, i: number) => (
+                  <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+                    <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl h-full hover:bg-white/[0.06] transition-colors">
+                      <CardContent className="p-5 space-y-3">
+                        <div className="flex items-start justify-between"><div className={`w-10 h-10 rounded-lg ${i % 2 === 0 ? "bg-rose-500/15 text-rose-400" : "bg-blue-500/15 text-blue-400"} flex items-center justify-center`}><Briefcase className="w-5 h-5" /></div><Badge variant="outline" className="border-white/10 text-slate-400 text-[10px]">{c.matchPercentage ?? 0}% match</Badge></div>
+                        <h4 className="text-sm font-bold text-white">{c.title}</h4>
+                        <p className="text-xs text-slate-500">{c.description}</p>
+                        <div className="space-y-1"><p className="text-[10px] text-slate-500 uppercase">Skills</p><div className="flex flex-wrap gap-1">{(c.requiredSkills ?? []).slice(0, 4).map((s: string, j: number) => <Badge key={j} variant="outline" className="border-white/10 text-slate-400 text-[10px]">{s}</Badge>)}</div></div>
+                        <div className="pt-2 border-t border-white/5 flex items-center justify-between text-xs text-slate-500"><span>Salary: {c.avgStartingSalary}</span><span className="text-emerald-400">{c.growthOutlook}</span></div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                )) : (
+                  <div className="col-span-full text-center py-10 text-slate-500">
+                    <Briefcase className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">Complete your profile and courses to see career matches.</p>
+                  </div>
+                )}
+            </div>
+          </TabsContent>
+
+          {/* ─── Chat Tab ─── */}
+          <TabsContent value="chat" className="mt-6">
+            <div className="flex h-[calc(100vh-220px)] gap-4">
+              {/* Sidebar */}
+              <div className="w-64 bg-white/[0.04] border border-white/10 rounded-xl p-4 flex flex-col backdrop-blur-2xl">
+                <Button onClick={handleCreateConversation} className="w-full mb-4 bg-blue-600 hover:bg-blue-500" disabled={createConv.isPending}><Plus className="w-4 h-4 mr-2" />New Chat</Button>
+                <div className="flex-1 overflow-y-auto space-y-2">
+                  {!conversationsData ? <div className="space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-10" />)}</div> :
+                    conversations.length > 0 ? conversations.map(conv => (
+                      <div key={conv.id} className={`p-3 rounded-lg cursor-pointer transition-colors group flex justify-between items-center ${selectedConversation === conv.id ? "bg-blue-600/20 border border-blue-500/40" : "bg-white/[0.03] hover:bg-white/[0.06] border border-white/5"}`} onClick={() => setSelectedConversation(conv.id)}>
+                        <div className="flex-1 min-w-0"><p className="text-sm font-medium truncate text-slate-300">{conv.title}</p></div>
+                        <button onClick={e => { e.stopPropagation(); handleDeleteConversation(conv.id); }} className="opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 className="w-4 h-4 text-red-400 hover:text-red-300" /></button>
+                      </div>
+                    )) : <p className="text-slate-500 text-sm text-center py-4">No conversations</p>}
+                </div>
               </div>
-              <div className="text-center mt-3">
-                <span className="text-[11px] text-muted-foreground">
-                  Murshid AI can make mistakes. Consider verifying important information.
-                </span>
+              {/* Chat Area */}
+              <div className="flex-1 bg-white/[0.04] border border-white/10 rounded-xl flex flex-col backdrop-blur-2xl overflow-hidden">
+                {selectedConversation ? (
+                  <>
+                    <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                      {messages.length === 0 ? (
+                        <div className="h-full flex items-center justify-center">
+                          <div className="text-center space-y-4">
+                            <div className="w-16 h-16 rounded-2xl bg-blue-500/15 flex items-center justify-center mx-auto"><Sparkles className="w-8 h-8 text-blue-400" /></div>
+                            <p className="text-slate-400 text-lg font-medium">Start a new conversation</p>
+                            <p className="text-sm text-slate-500 max-w-sm">Ask Murshid AI anything about your academics, courses, career, or study plans.</p>
+                            <div className="flex flex-wrap gap-2 justify-center pt-2">
+                              {SUGGESTED_PROMPTS.slice(0, 4).map((p, i) => (
+                                <button key={i} onClick={() => { setInput(p); }} className="px-3 py-1.5 rounded-lg bg-white/[0.05] border border-white/10 text-xs text-slate-400 hover:bg-white/[0.08] hover:text-white transition-all">{p}</button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <AnimatePresence>
+                          {messages.map((msg, index) => (
+                            <motion.div key={index} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                              <div className={`max-w-md lg:max-w-lg px-4 py-3 rounded-xl ${msg.role === "user" ? "bg-blue-600 text-white" : "bg-white/[0.06] border border-white/10 text-slate-100"}`}>
+                                <div className="flex items-center gap-2 mb-1">
+                                  {msg.role === "assistant" ? <Bot className="w-3 h-3 text-blue-400" /> : <User className="w-3 h-3" />}
+                                  <span className="text-[10px] opacity-70">{msg.role === "assistant" ? "Murshid AI" : "You"}</span>
+                                </div>
+                                {msg.role === "assistant" ? <Streamdown>{msg.content}</Streamdown> : <p className="text-sm">{msg.content}</p>}
+                              </div>
+                            </motion.div>
+                          ))}
+                          {isLoading && (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
+                              <div className="bg-white/[0.06] border border-white/10 px-4 py-3 rounded-xl flex items-center gap-3">
+                                <Bot className="w-4 h-4 text-blue-400" />
+                                <span className="text-sm text-slate-300">Murshid AI is thinking</span>
+                                <div className="flex gap-1"><div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} /><div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} /><div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} /></div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      )}
+                      <div ref={messagesEndRef} />
+                    </div>
+                    <div className="border-t border-white/10 p-4">
+                      <div className="flex gap-3">
+                        <Input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSendMessage()} placeholder={t("chat.placeholder")} className="bg-white/[0.05] border-white/10 text-white placeholder-slate-500" disabled={isLoading} />
+                        <Button onClick={handleSendMessage} disabled={!input.trim() || isLoading} className="bg-blue-600 hover:bg-blue-500"><Send className="w-4 h-4" /></Button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center space-y-3">
+                      <div className="w-16 h-16 rounded-2xl bg-blue-500/15 flex items-center justify-center mx-auto"><MessageCircle className="w-8 h-8 text-blue-400" /></div>
+                      <p className="text-slate-400 text-lg">{t("chat.startNewChat")}</p>
+                      <Button onClick={handleCreateConversation} className="bg-blue-600 hover:bg-blue-500"><Plus className="w-4 h-4 mr-2" />New Conversation</Button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </DashboardLayout>
   );

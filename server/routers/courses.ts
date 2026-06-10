@@ -153,8 +153,8 @@ export const coursesRouter = router({
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
 
-      // Allow students and admins to view student courses
-      if (ctx.user.role !== "student" && ctx.user.role !== "admin") {
+      // Allow students, advisors, and admins to view student courses
+      if (ctx.user.role !== "student" && ctx.user.role !== "advisor" && ctx.user.role !== "admin") {
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
 
@@ -243,8 +243,8 @@ export const coursesRouter = router({
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
 
-    // Allow students and admins to view recommendations
-    if (ctx.user.role !== "student" && ctx.user.role !== "admin") {
+    // Allow students, advisors, and admins to view recommendations
+    if (ctx.user.role !== "student" && ctx.user.role !== "advisor" && ctx.user.role !== "admin") {
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
 

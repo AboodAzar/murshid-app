@@ -1,4 +1,4 @@
-import { router, protectedProcedure, publicProcedure } from "../_core/trpc";
+import { router, protectedProcedure, publicProcedure, advisorProcedure } from "../_core/trpc";
 import { getDb } from "../db";
 import { faqs } from "../../drizzle/schema";
 import { eq, and } from "drizzle-orm";
@@ -97,7 +97,7 @@ export const faqsRouter = router({
     }
   }),
 
-  create: protectedProcedure
+  create: advisorProcedure
     .input(
       z.object({
         question: z.string().min(10),
@@ -115,10 +115,6 @@ export const faqsRouter = router({
           code: "INTERNAL_SERVER_ERROR",
           message: "Database unavailable",
         });
-
-      if (!ctx.user || ctx.user.role !== "advisor") {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
 
       try {
         await db.insert(faqs).values({
@@ -156,7 +152,7 @@ export const faqsRouter = router({
       }
     }),
 
-  update: protectedProcedure
+  update: advisorProcedure
     .input(
       z.object({
         id: z.number(),
@@ -176,10 +172,6 @@ export const faqsRouter = router({
           code: "INTERNAL_SERVER_ERROR",
           message: "Database unavailable",
         });
-
-      if (!ctx.user || ctx.user.role !== "advisor") {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
 
       try {
         const updateData: any = {};
@@ -202,7 +194,7 @@ export const faqsRouter = router({
       }
     }),
 
-  delete: protectedProcedure
+  delete: advisorProcedure
     .input(z.number())
     .mutation(async ({ ctx, input: faqId }) => {
       const db = await getDb();
@@ -211,10 +203,6 @@ export const faqsRouter = router({
           code: "INTERNAL_SERVER_ERROR",
           message: "Database unavailable",
         });
-
-      if (!ctx.user || ctx.user.role !== "advisor") {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
 
       try {
         await db.delete(faqs).where(eq(faqs.id, faqId));
