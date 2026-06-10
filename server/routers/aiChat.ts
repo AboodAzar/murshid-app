@@ -248,9 +248,9 @@ export const aiChatRouter = router({
         }
 
         return { success: true, response: aiMessage };
-      } catch (error) {
+      } catch (error: any) {
         console.error("[AI Chat] Failed to send message:", error);
-        return { success: false, response: "An internal server error occurred while contacting the AI." };
+        return { success: false, response: `Exact Error: ${error.message}` };
       }
     }),
 

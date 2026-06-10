@@ -5,6 +5,7 @@ import torch
 import pypdf
 import re
 import shutil
+import threading
 from fastapi import FastAPI, UploadFile, File, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -46,6 +47,7 @@ class Message(BaseModel):
 class ChatRequest(BaseModel):
     query: str
     chat_history: List[Message] = []
+    student_context: dict = {}
     uploaded_file_name: Optional[str] = "None"
     uploaded_file_context: Optional[str] = None
 
@@ -110,7 +112,8 @@ def get_vectorstores():
 pdf_store, faq_store = get_vectorstores()
 
 # --- LLM and Prompts ---
-llm = OllamaLLM(model=MODEL_NAME, base_url="http://localhost:11434", num_ctx=32768)
+llm_lock = threading.Lock()
+llm = OllamaLLM(model=MODEL_NAME, base_url="http://localhost:11434", num_ctx=16384)
 
 # 1. THE SUPERVISOR PROMPT
 supervisor_prompt = ChatPromptTemplate.from_messages([
@@ -144,8 +147,9 @@ registration_prompt = ChatPromptTemplate.from_messages([
 قواعد التنسيق (WOW Factor):
 1. استخدم صيغة Markdown لإنشاء جداول احترافية للمواد المقترحة.
 2. استخدم الإيموجي المناسبة الأكاديمية (📚، 🎯، 💡).
-3. إذا لم تجد المادة في السياق، قل بوضوح "لا أملك بيانات عن هذه المادة"."""),
-    ("human", "السياق (Context):\n{context}\n\nسؤال الطالب:\n{question}")
+3. إذا لم تجد المادة في السياق، قل بوضوح "لا أملك بيانات عن هذه المادة".
+4. قاعدة حاسمة جداً لأرقام المواد: يجب أن تتكون أرقام المواد دائماً من 7 أرقام (خانات). إذا وجدت في السياق رقم مادة يتكون من 6 أرقام فقط، يجب عليك إضافة الرقم صفر (0) في بداية الرقم ليصبح 7 أرقام (مثال: 130231 يصبح 0130231)."""),
+    ("human", "السياق (Context):\n{context}\n\nالتاريخ السابق للمحادثة:\n{chat_history}\n\nسؤال الطالب:\n{question}")
 ])
 
 # 3. FINANCE EXPERT PROMPT
@@ -157,7 +161,7 @@ finance_prompt = ChatPromptTemplate.from_messages([
 1. قم بعرض الحسابات بخطوات واضحة ومفصلة.
 2. استخدم الإيموجي المالي والأكاديمي.
 3. لا تخمن أي أسعار غير موجودة في السياق."""),
-    ("human", "السياق (Context):\n{context}\n\nسؤال الطالب:\n{question}")
+    ("human", "السياق (Context):\n{context}\n\nالتاريخ السابق للمحادثة:\n{chat_history}\n\nسؤال الطالب:\n{question}")
 ])
 
 # 4. QA EXPERT PROMPT
@@ -169,7 +173,7 @@ qa_prompt = ChatPromptTemplate.from_messages([
 1. استخدم النقاط المرتبة (Bullet points) لتسهيل القراءة.
 2. أبرز الكلمات المفتاحية بالخط العريض (**Bold**).
 3. إذا كانت الإجابة غير موجودة في السياق، قل نصاً: "عذراً، لم أجد إجابة دقيقة في دليل الطالب. يرجى مراجعة القبول والتسجيل." """),
-    ("human", "السياق (Context):\n{context}\n\nسؤال الطالب:\n{question}")
+    ("human", "السياق (Context):\n{context}\n\nالتاريخ السابق للمحادثة:\n{chat_history}\n\nسؤال الطالب:\n{question}")
 ])
 
 def format_chat_history(messages: List[Message]):
@@ -197,18 +201,21 @@ def parse_thinking_blocks(text):
     return None, text
 
 # --- Routing Engine ---
-def route_and_execute(query, chat_history_str, uploaded_file_name, threshold=0.4, uploaded_context=None):
+def route_and_execute(query, chat_history_str, uploaded_file_name, student_context=None, threshold=0.4, uploaded_context=None):
     # 1. FAQ PRE-CHECK (Instant Response)
     faq_results = faq_store.similarity_search_with_score(query, k=1)
     if faq_results and faq_results[0][1] < threshold:  
-        return "💡 **إجابة سريعة من الأسئلة الشائعة:**\n\n" + faq_results[0][0].metadata["answer"], "FAQ Pipeline", "FAQ DB", None
+        return faq_results[0][0].metadata["answer"], "FAQ Pipeline", "FAQ DB", None
 
     # 2. RUN SUPERVISOR
-    supervisor_chain = supervisor_prompt | llm | StrOutputParser()
-    supervisor_output = supervisor_chain.invoke({
-        "chat_history": chat_history_str, 
-        "question": query
-    }).strip()
+    try:
+        supervisor_chain = supervisor_prompt | llm | StrOutputParser()
+        supervisor_output = supervisor_chain.invoke({
+            "chat_history": chat_history_str, 
+            "question": query
+        }).strip()
+    except Exception as e:
+        return f"🚨 GPU Error during Supervisor Phase: {str(e)}", "Error", "None", None
 
     # 3. HANDLE CLARIFICATION (Zero Hallucination)
     if "[CLARIFICATION_NEEDED]" in supervisor_output:
@@ -234,7 +241,7 @@ def route_and_execute(query, chat_history_str, uploaded_file_name, threshold=0.4
         for f in glob.glob(os.path.join(DATA_DIRECTORY, "*Plan*.csv")) + glob.glob(os.path.join(DATA_DIRECTORY, "*Guide*.csv")):
             try:
                 with open(f, 'r', encoding='utf-8') as file:
-                    combined_context += f"\n--- {os.path.basename(f)} ---\n" + file.read()[:2000] # Cap to prevent overflow
+                    combined_context += f"\n--- {os.path.basename(f)} ---\n" + file.read()[:15000] # Increased back up to ensure full years are visible
             except: pass
             
     elif "[PROCEED: FINANCE]" in supervisor_output:
@@ -243,7 +250,7 @@ def route_and_execute(query, chat_history_str, uploaded_file_name, threshold=0.4
         for f in glob.glob(os.path.join(DATA_DIRECTORY, "*Fees*.csv")):
             try:
                 with open(f, 'r', encoding='utf-8') as file:
-                    combined_context += f"\n--- {os.path.basename(f)} ---\n" + file.read()
+                    combined_context += f"\n--- {os.path.basename(f)} ---\n" + file.read()[:6000]
             except: pass
             
     else: # QA or Default
@@ -256,12 +263,19 @@ def route_and_execute(query, chat_history_str, uploaded_file_name, threshold=0.4
     if uploaded_context:
          combined_context += f"\n\n--- بيانات الملف المرفق ---\n{uploaded_context}"
 
+    if student_context:
+         combined_context += f"\n\n--- بيانات الطالب الحالية ---\n{student_context}"
+
     # 5. EXECUTE EXPERT PROMPT
     expert_chain = target_prompt | llm | StrOutputParser()
-    full_text = expert_chain.invoke({
-        "context": combined_context, 
-        "question": query 
-    })
+    try:
+        full_text = expert_chain.invoke({
+            "context": combined_context,
+            "chat_history": chat_history_str,
+            "question": query 
+        })
+    except Exception as e:
+        return f"🚨 GPU Error during Expert Phase: {str(e)}", "Error", "None", None
     
     thinking_process, final_ans = parse_thinking_blocks(full_text)
     
@@ -275,13 +289,16 @@ def route_and_execute(query, chat_history_str, uploaded_file_name, threshold=0.4
 
 @app.post("/chat")
 def chat_endpoint(request: ChatRequest):
+    print("🔥 RECEIVED CHAT REQUEST from frontend!")
     chat_history_str = format_chat_history(request.chat_history)
-    answer, route, src, thinking = route_and_execute(
-        query=request.query, 
-        chat_history_str=chat_history_str, 
-        uploaded_file_name=request.uploaded_file_name,
-        uploaded_context=request.uploaded_file_context
-    )
+    with llm_lock:
+        answer, route, src, thinking = route_and_execute(
+            query=request.query, 
+            chat_history_str=chat_history_str, 
+            uploaded_file_name=request.uploaded_file_name,
+            uploaded_context=request.uploaded_file_context,
+            student_context=request.student_context
+        )
     return {
         "answer": answer,
         "thinking_process": thinking,

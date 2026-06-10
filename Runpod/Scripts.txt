@@ -1,6 +1,8 @@
 Install project libraries, run:
 python3 -m pip install torch streamlit langchain-ollama langchain-community langchain-chroma langchain-text-splitters pypdf sentence-transformers
 
+pip install fastapi uvicorn python-multipart pydantic torch pypdf langchain-ollama langchain-community langchain-text-splitters langchain-chroma langchain-core sentence-transformers
+
 Install Ollama, run:
 curl -fsSL https://ollama.com/install.sh | sh
 
@@ -13,6 +15,7 @@ then:
 ollama serve > ollama.log 2>&1 &
 
 Ollama pull model:
+ollama pull qwen3.54:b
 ollama pull qwen3.6:35b
 ollama pull qwen3.6:35b-a3b-q8_0
 ollama pull nemotron-3-super:120b
@@ -20,6 +23,21 @@ ollama pull nemotron-3-super:120b-a12b-q8_0
 
 run the app use:
 python3 -m streamlit run /workspace/app_v1.py --server.port 8501 --server.address 0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false
+
+to run the api file:
+python3 /workspace/api.py
+
+FAQ:
+سوال عن انه في عندي امتحانين بنفس الوقت، ايش اعمل؟
+يتم نقديم الامتحان حسب الاولويات التالية:
+اولا: الامتحان خارج الكلية
+الامتحان خارج التخصص
+الامتحان داخل التخصص
+
+fixes:
+استدراكي
+اعمل تتابع بالقصة
+ابلش من السنة الاولى الى اسجل المواد 
 
 tests scripts:
 انا طالب ذكاء اصطناعي بالسنة الاولى والفصل الاول، ايش انزل مواد؟

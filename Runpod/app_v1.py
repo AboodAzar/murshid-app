@@ -22,25 +22,18 @@ st.set_page_config(page_title="Murshid AI Advisor", layout="wide")
 
 # --- 1. Intelligent Pre-Routing Catalog ---
 DOCUMENT_CATALOG = {
-    # AI Major
     "AI_Study_Giude.csv": "AI Semester Guide (الخطة الاسترشادية). USE THIS ONLY WHEN the user asks 'What courses should I register for in Year X, Semester Y?'. It shows the basic semester-by-semester roadmap.",
-    "AI_Study_Plan_1.csv": "AI Detailed Master Plan (الخطة الدراسية). USE THIS for all needed information regarding the registering process and course details. It provides: year, semester, the name of the previous course (prerequisites), how many hours, the course name, the type of learning (online, blended, face-to-face), and the specific course category.",
-    "AI_Study_Plan_2.csv": "AI Master Plan Part 2. USE THIS for extended information regarding the registering process, prerequisites, hours, learning types, and course categories for AI.",
-    "AI_Materials_Descriptions.csv": "AI Course Syllabus Overviews. USE THIS when the user asks 'What is this course about?' or 'What will I learn in X?'.",
-    
-    # CS Major
     "CS_Study_Giude.csv": "CS Semester Guide (الخطة الاسترشادية). USE THIS ONLY WHEN the user asks 'What courses should I register for in Year X, Semester Y?'. It shows the basic semester-by-semester roadmap.",
-    "CS_Study_Plan_1.csv": "CS Detailed Master Plan (الخطة الدراسية). USE THIS for all needed information regarding the registering process and course details. It provides: year, semester, the name of the previous course (prerequisites), how many hours, the course name, the type of learning (online, blended, face-to-face), and the specific course category.",
-    "CS_Study_Plan_2.csv": "CS Master Plan Part 2. USE THIS for extended information regarding the registering process, prerequisites, hours, learning types, and course categories for CS.",
+    
+    "AI_Study_Plan_1.csv": "AI Detailed Master Plan (الخطة الدراسية). USE THIS for all needed information regarding the registering process and course details. It provides: year, semester, the name of the previous course (prerequisites), how many hours, the course name, the type of learning (online, blended, face-to-face), and the specific course category (University, Faculty, Major, Major Family, and whether it is Elective or Mandatory).",
+    "CS_Study_Plan_1.csv": "CS Detailed Master Plan (الخطة الدراسية). USE THIS for all needed information regarding the registering process and course details. It provides: year, semester, the name of the previous course (prerequisites), how many hours, the course name, the type of learning (online, blended, face-to-face), and the specific course category (University, Faculty, Major, Major Family, and whether it is Elective or Mandatory).",
+    
+    "AI_Study_Plan_2.csv": "AI Master Plan Part 2. USE THIS for extended information regarding the registering process, prerequisites, hours, learning types, and course categories (Elective/Mandatory, University/Faculty/Major) for AI.",
+    "CS_Study_Plan_2.csv": "CS Master Plan Part 2. USE THIS for extended information regarding the registering process, prerequisites, hours, learning types, and course categories (Elective/Mandatory, University/Faculty/Major) for CS.",
+    
+    "AI_Materials_Descriptions.csv": "AI Course Syllabus Overviews. USE THIS when the user asks 'What is this course about?' or 'What will I learn in X?'.",
     "CS_Materials_Descriptions.csv": "CS Course Syllabus Overviews. USE THIS when the user asks 'What is this course about?' or 'What will I learn in X?'.",
     
-    # SE Major (Software Engineering)
-    "SE_Study_Giude.csv": "Software Engineering (SE) Semester Guide (الخطة الاسترشادية). USE THIS ONLY WHEN the user asks 'What courses should I register for in Year X, Semester Y?'. It shows the basic semester-by-semester roadmap.",
-    "SE_Study_Plan_1.csv": "Software Engineering (SE) Detailed Master Plan (الخطة الدراسية). USE THIS for all needed information regarding the registering process and course details. It provides: year, semester, the name of the previous course (prerequisites), how many hours, the course name, the type of learning (online, blended, face-to-face), and the specific course category.",
-    "SE_Study_Plan_2.csv": "Software Engineering (SE) Master Plan Part 2. USE THIS for extended information regarding the registering process, prerequisites, hours, learning types, and course categories for SE.",
-    "SE_Materials_Descriptions.csv": "Software Engineering (SE) Course Syllabus Overviews. USE THIS when the user asks 'What is this course about?' or 'What will I learn in X?'.",
-    
-    # General Rules & FAQs
     "AI_Summary_Facts.csv": "Quick FAQ and procedural rules specifically for the AI major.",
     "Rules_and_Regulations.pdf": "Official 2024-2025 Rules and Regulations for Al-Zaytoonah University. USE THIS ONLY for overarching university policies, academic probation, grading systems, attendance rules, library clearance, and disciplinary regulations. NOT FOR COURSE SCHEDULES.",
     "Student_Guide_2024_2025.pdf": "Official Student Guide (دليل الطالب) 2024/2025. USE THIS for overarching university policies, admission criteria (أسس القبول), bridging (التجسير), medical insurance (التأمين الطبي), student clubs, discipline (تأديب الطلبة), and general academic regulations.",
@@ -149,22 +142,17 @@ def initialize_knowledge_base(folder_path):
 pdf_store, faq_store = initialize_knowledge_base(DATA_DIRECTORY)
 
 # --- 4. Document Processing & Chat Format Helpers ---
-def extract_text_from_upload(file_buffer, file_name):
+def extract_text_from_upload(file_buffer):
     try:
-        if file_name.lower().endswith('.pdf'):
-            reader = pypdf.PdfReader(file_buffer)
-            text = ""
-            for page in reader.pages:
-                page_text = page.extract_text()
-                if page_text:
-                    text += page_text + "\n"
-            return text
-        elif file_name.lower().endswith('.csv'):
-            return file_buffer.getvalue().decode("utf-8")
-        else:
-            return "Unsupported file type."
+        reader = pypdf.PdfReader(file_buffer)
+        text = ""
+        for page in reader.pages:
+            page_text = page.extract_text()
+            if page_text:
+                text += page_text + "\n"
+        return text
     except Exception as e:
-        return f"Error reading file: {str(e)}"
+        return f"Error reading PDF: {str(e)}"
 
 def format_chat_history(messages):
     recent_messages = messages[-4:] if len(messages) > 4 else messages
@@ -204,23 +192,20 @@ llm = OllamaLLM(model=MODEL_NAME, base_url="http://localhost:11434", num_ctx=327
 # AGENT 1: The Context & Intent Analyzer 
 analyze_intent_prompt = ChatPromptTemplate.from_template("""
 You are a brilliant Academic Intent Analyzer Agent.
-Your job is to read the chat history, uploaded file info, and the user's latest ambiguous message, and convert it into a highly explicit, standalone logical command in Arabic.
+Your job is to read the chat history and the user's latest ambiguous message, and convert it into a highly explicit, standalone logical command in Arabic.
 
 CHAT HISTORY:
 {chat_history}
 
-UPLOADED FILE NAME: {uploaded_file_name}
-
 LATEST USER MESSAGE: {question}
 
 YOUR INSTRUCTIONS:
-1. Identify the student's MAJOR, YEAR, and SEMESTER. If the user doesn't explicitly state their major, look at the UPLOADED FILE NAME.
-2. MISSING INFO RULE: If the Year or Semester is NOT explicitly stated in the chat and cannot be inferred, append: "[MISSING_INFO: TRUE]"
-3. EXPLICIT EXCLUSION RULE: Extract the exact names of any courses the user states they have already completed.
-4. GRADUATION RULE: If the user states they are in their final semester or about to graduate, append: "[GRADUATING_SEMESTER: TRUE]"
-5. FINANCIAL RULE: If the user asks about fees, prices, or costs, append: "[FINANCIAL_QUERY: TRUE]"
-6. DETAIL RULE: If the user explicitly asks for credit hours or course numbers, append: "[DETAILS_REQUESTED: TRUE]"
-7. Output ONLY the standalone command using this format:
+1. Identify the student's MAJOR, YEAR, and SEMESTER.
+2. EXPLICIT EXCLUSION RULE: Extract the exact names of any courses the user states they have already completed.
+3. GRADUATION RULE: If the user states they are in their final semester or about to graduate, append: "[GRADUATING_SEMESTER: TRUE]"
+4. FINANCIAL RULE: If the user asks about fees, prices, or costs, append: "[FINANCIAL_QUERY: TRUE]"
+5. DETAIL RULE: If the user explicitly asks for credit hours or course numbers, append: "[DETAILS_REQUESTED: TRUE]"
+6. Output ONLY the standalone command using this format:
 "تخصص [Major]، السنة [Year]، الفصل [Semester]. **المواد المنجزة والممنوع اقتراحها:** [List completed courses]. يرجى اقتراح خطة. [Append tags if applicable]"
 
 STANDALONE LOGICAL COMMAND:
@@ -236,9 +221,9 @@ CATALOG OF DOCUMENTS:
 ANALYZED COMMAND: {question}
 
 CRITICAL RULES:
-- MISSING MAJOR RULE: If the student's MAJOR is NOT explicitly stated in the command AND no uploaded file implies the major, YOU MUST reply strictly with "GREETING".
-- If the command asks for a Semester Schedule, Credit Hours, Prerequisites, or Alternatives, YOU MUST ROUTE TO the major's "_Study_Plan_1.csv" (e.g., "SE_Study_Plan_1.csv" for Software Engineering).
-- If the command is PURELY about money and fees, route to "Facility_Fees.csv" or "Unversity_Fees.csv".
+- MISSING MAJOR RULE: If the student's MAJOR is NOT explicitly stated in the command (e.g., it says "تخصص غير محدد"), YOU MUST reply strictly with "GREETING".
+- If the command asks for a Semester Schedule, Credit Hours, Prerequisites, or Alternatives, YOU MUST ROUTE TO the major's "_Study_Plan_1.csv".
+- If the command is PURELY about money and fees with no schedule requested, route to "Facility_Fees.csv" or "Unversity_Fees.csv".
 - Only route to "_Study_Giude.csv" if the user explicitly asks for the "Guidance Plan" (الخطة الاسترشادية) by name.
 - NEVER route course selection to Rules_and_Regulations.pdf, Student_Guide_2024_2025.pdf, or Faculty_Guide_3.pdf.
 - If it is a greeting, reply "GREETING". If general chat, reply "GENERAL_CHAT".
@@ -257,32 +242,28 @@ STRICT EXCLUSION PROTOCOL: NEVER suggest courses the user has already completed.
 
 ### THINKING
 1. Identify Major, Semester, and FORBIDDEN COMPLETED COURSES.
-2. MISSING INFO CHECK (CRITICAL): Does the command contain [MISSING_INFO: TRUE]? If YES, skip steps 3-7. Do not extract courses. Move directly to the output and ask the user for their Year, Semester, and completed courses.
-3. Extract the semester courses from the Context or the Upload Section. FILTER out the completed ones.
-4. SPECIAL COURSE RULE (CRITICAL): The course "العلوم العسكرية" (Military Sciences) is STRICTLY reserved for the student's final graduating semester. If it appears in your extracted list, you MUST REMOVE IT from the schedule unless the command contains [GRADUATING_SEMESTER: TRUE].
-5. LEGAL LIMITS (CRITICAL RULE): 
+2. Extract the semester courses from the Context. FILTER out the completed ones.
+3. SPECIAL COURSE RULE (CRITICAL): The course "العلوم العسكرية" (Military Sciences) is STRICTLY reserved for the student's final graduating semester. If it appears in your extracted list, you MUST REMOVE IT from the schedule unless the command contains [GRADUATING_SEMESTER: TRUE].
+4. LEGAL LIMITS (CRITICAL RULE): 
    - Non-Graduating Students: Maximum 18 credit hours per semester.
    - Graduating Students (has [GRADUATING_SEMESTER: TRUE]): Maximum 21 credit hours.
    - CALCULATE the total hours of your filtered list. If it exceeds the limit, you MUST TRIM the list down by removing university requirements or optional courses.
-6. Substitutions: If you removed a completed course (or Military Sciences), find a forward-looking major requirement or a university elective to replace it, keeping the timeline logical.
-7. Formatting Check: Does the command contain [DETAILS_REQUESTED: TRUE]? If NO, hide all credit hours and course numbers in the final output.
-8. Financial Calculation: Does the command contain [FINANCIAL_QUERY: TRUE]? 
+5. Substitutions: If you removed a completed course (or Military Sciences), find a forward-looking major requirement or a university elective to replace it, keeping the timeline logical.
+6. Formatting Check: Does the command contain [DETAILS_REQUESTED: TRUE]? If NO, hide all credit hours and course numbers in the final output.
+7. Financial Calculation: Does the command contain [FINANCIAL_QUERY: TRUE]? 
    - Scan the provided Context data for the exact 'Semester Fee' and the 'Credit Hour Rate' for the student's specific major.
    - Formula: Total = (Total_Hours * Hour_Rate * (1 - Discount)) + Semester_Fee
    - Calculate the exact total cost in your head. DO NOT show the formula or mathematical steps in the final output.
 ### END THINKING
 
 [CONVERSATIONAL OUTPUT RULES - ARABIC]
-- If [MISSING_INFO: TRUE]: Start with a friendly greeting and explicitly ask: "لكي أستطيع تجهيز خطتك بأفضل شكل وتجنب المواد التي درستها، هل يمكنك إخباري في أي سنة وأي فصل أنت الآن؟ وما هي المواد الأخرى التي أنهيتها؟". DO NOT output any courses.
-- Otherwise, start with a very short, direct, and friendly greeting. DO NOT write long introductory paragraphs.
+- Start with a very short, direct, and friendly greeting. DO NOT write long introductory paragraphs.
 - DO NOT use large rigid tables or the old Visual Template. Use a simple, clean bulleted list for the schedule.
 - Format: "- [اسم المادة] (المتطلب السابق: [اسم المتطلب أو 'لا يوجد'])". DO NOT include hours or numbers unless [DETAILS_REQUESTED: TRUE].
 - If there are multiple choices for an elective or replacement, list 2 or 3 valid options and ASK the user: "أي من هذه المواد تفضل أن تسجل؟"
 - If [FINANCIAL_QUERY: TRUE]: State ONLY the final calculated total directly. (e.g., "إجمالي تكلفة الفصل لـ 15 ساعة هي 1475 دينار."). Do NOT explain how you calculated it.
 - If [FINANCIAL_QUERY: TRUE] and the user DID NOT provide a discount percentage, append this exact question immediately after the total: "هل لديك خصم جامعي؟ يرجى تزويدي بنسبة الخصم لأقوم بتعديل المجموع."
 - Keep the tone highly supportive but concise. Ensure they finish on time without exceeding the legal 18-hour limit.
-
-{upload_section}
 
 سجل المحادثة:
 {chat_history}
@@ -296,13 +277,9 @@ STRICT EXCLUSION PROTOCOL: NEVER suggest courses the user has already completed.
 الإجابة الذكية:
 """)
 
-def get_analyzed_intent(query, chat_history_str, uploaded_file_name):
+def get_analyzed_intent(query, chat_history_str):
     analyzer_chain = analyze_intent_prompt | llm | StrOutputParser()
-    return analyzer_chain.invoke({
-        "chat_history": chat_history_str, 
-        "uploaded_file_name": uploaded_file_name, 
-        "question": query
-    }).strip()
+    return analyzer_chain.invoke({"chat_history": chat_history_str, "question": query}).strip()
 
 def get_pre_routing_decision(analyzed_query, chat_history_str):
     catalog_str = "\n".join([f"- {k}: {v}" for k, v in DOCUMENT_CATALOG.items()])
@@ -315,11 +292,11 @@ def get_pre_routing_decision(analyzed_query, chat_history_str):
         
     return decision
 
-def route_and_execute(query, chat_history_str, uploaded_file_name, doc_index=0, threshold=0.15, uploaded_context=None) -> tuple[str, str, str, dict, str]:
+def route_and_execute(query, chat_history_str, doc_index=0, threshold=0.15, uploaded_context=None) -> tuple[str, str, str, dict, str]:
     debug_info = {"router_decision": "N/A", "standalone_query": "N/A", "is_escape_hatch": False, "chunks_used": 0, "sources": []}
     
     # 1. RUN INTENT ANALYZER FIRST
-    analyzed_query = get_analyzed_intent(query, chat_history_str, uploaded_file_name)
+    analyzed_query = get_analyzed_intent(query, chat_history_str)
     debug_info["standalone_query"] = analyzed_query
     
     # 2. RUN ROUTER
@@ -327,12 +304,11 @@ def route_and_execute(query, chat_history_str, uploaded_file_name, doc_index=0, 
     debug_info["router_decision"] = target_file
 
     if "GREETING" in target_file.upper():
-        return "مرحباً! أنا مرشدك الأكاديمي. يرجى تحديد تخصصك (هندسة برمجيات، ذكاء اصطناعي، علم بيانات، أو علم حاسوب) وسنتك الدراسية لنبدأ التخطيط.", "Chitchat Route", "None", debug_info, ""
+        return "مرحباً! أنا مرشدك الأكاديمي. يرجى تحديد تخصصك (ذكاء اصطناعي، علم بيانات، أو علم حاسوب) وسنتك الدراسية لنبدأ التخطيط.", "Chitchat Route", "None", debug_info, ""
 
     if "GENERAL_CHAT" in target_file.upper():
         qa_chain = qa_prompt | llm | StrOutputParser()
         full_text = qa_chain.invoke({
-            "upload_section": "",
             "chat_history": chat_history_str,
             "context": "", 
             "question": analyzed_query
@@ -451,13 +427,13 @@ st.caption("Al-Zaytoonah University of Jordan - Multi-Agent Architecture")
 with st.sidebar:
     st.header("Document Context Panel")
     st.write("Upload any digital university form or document (e.g., QF01/0407) to help Murshid analyze it.")
-    uploaded_file = st.file_uploader("Choose a file (PDF/CSV)", type=["pdf", "csv"])
+    uploaded_file = st.file_uploader("Choose a PDF file", type=["pdf"])
     
     if uploaded_file:
         if "last_uploaded_name" not in st.session_state or st.session_state.last_uploaded_name != uploaded_file.name:
             st.session_state.last_uploaded_name = uploaded_file.name
             with st.spinner("Extracting structural text data..."):
-                st.session_state.uploaded_text = extract_text_from_upload(uploaded_file, uploaded_file.name)
+                st.session_state.uploaded_text = extract_text_from_upload(uploaded_file)
         st.success(f"Successfully processed: {uploaded_file.name}")
         with st.expander("View Extracted Text Strings"):
             st.text(st.session_state.uploaded_text[:1000] + "...")
@@ -491,12 +467,11 @@ if user_query:
     with st.chat_message("assistant"):
         with st.status("Thinking Process Active...", expanded=True) as status:
             st.write("Extracting chat history context...")
-            uploaded_file_name = st.session_state.get("last_uploaded_name", "None")
             uploaded_ctx = st.session_state.get("uploaded_text", None)
             chat_history_str = format_chat_history(st.session_state.messages[:-1])
             
             st.write("Routing query to database segments...")
-            ans, route, src, debug, thinking = route_and_execute(user_query, chat_history_str, uploaded_file_name, 0, uploaded_context=uploaded_ctx)
+            ans, route, src, debug, thinking = route_and_execute(user_query, chat_history_str, 0, uploaded_context=uploaded_ctx)
             
             status.update(label="Reasoning Complete", state="complete", expanded=False)
             
@@ -552,10 +527,9 @@ if st.session_state.pending_feedback:
         if st.button("👎 إجابة خاطئة (البحث في مستندات أخرى)"):
             st.session_state.current_attempt += 1
             with st.spinner("Activating Escape Hatch and searching globally..."):
-                uploaded_file_name = st.session_state.get("last_uploaded_name", "None")
                 uploaded_ctx = st.session_state.get("uploaded_text", None)
                 chat_history_str = format_chat_history(st.session_state.messages[:-2])
-                ans, route, src, debug, thinking = route_and_execute(st.session_state.current_query, chat_history_str, uploaded_file_name, st.session_state.current_attempt, uploaded_context=uploaded_ctx)
+                ans, route, src, debug, thinking = route_and_execute(st.session_state.current_query, chat_history_str, st.session_state.current_attempt, uploaded_context=uploaded_ctx)
                 
                 st.session_state.messages[-1] = {
                     "role": "assistant", 
