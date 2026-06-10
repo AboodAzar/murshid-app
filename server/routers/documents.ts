@@ -1,4 +1,4 @@
-import { router, protectedProcedure, advisorProcedure } from "../_core/trpc";
+import { router, protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
 import { documents } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
@@ -7,7 +7,7 @@ import { TRPCError } from "@trpc/server";
 import { storagePut } from "../storage";
 
 export const documentsRouter = router({
-  list: advisorProcedure
+  list: protectedProcedure
     .input(
       z
         .object({
@@ -24,22 +24,26 @@ export const documentsRouter = router({
           message: "Database unavailable",
         });
 
+      if (!ctx.user || ctx.user.role !== "advisor") {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
       try {
         const page = input?.page || 1;
         const limit = input?.limit || 20;
         const offset = (page - 1) * limit;
 
-        // Admin sees all documents; advisors see only their own
-        const isAdmin = ctx.user.role === "admin";
-        const query = isAdmin
-          ? db.select().from(documents)
-          : db.select().from(documents).where(eq(documents.uploadedBy, ctx.user.id));
+        const query = db
+          .select()
+          .from(documents)
+          .where(eq(documents.uploadedBy, ctx.user.id));
         const results = await query.limit(limit).offset(offset);
 
         // Get total count for pagination metadata
-        const allResults = isAdmin
-          ? await db.select().from(documents)
-          : await db.select().from(documents).where(eq(documents.uploadedBy, ctx.user.id));
+        const allResults = await db
+          .select()
+          .from(documents)
+          .where(eq(documents.uploadedBy, ctx.user.id));
         const total = allResults.length;
 
         return {
@@ -59,7 +63,7 @@ export const documentsRouter = router({
       }
     }),
 
-  upload: advisorProcedure
+  upload: protectedProcedure
     .input(
       z.object({
         title: z.string(),
@@ -75,6 +79,10 @@ export const documentsRouter = router({
           code: "INTERNAL_SERVER_ERROR",
           message: "Database unavailable",
         });
+
+      if (!ctx.user || ctx.user.role !== "advisor") {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
 
       try {
         // Convert base64 to buffer
@@ -128,7 +136,7 @@ export const documentsRouter = router({
       }
     }),
 
-  delete: advisorProcedure
+  delete: protectedProcedure
     .input(z.number())
     .mutation(async ({ ctx, input: documentId }) => {
       const db = await getDb();
@@ -138,15 +146,18 @@ export const documentsRouter = router({
           message: "Database unavailable",
         });
 
+      if (!ctx.user || ctx.user.role !== "advisor") {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
       try {
-        // Verify ownership (admin can delete any document)
+        // Verify ownership
         const doc = await db
           .select()
           .from(documents)
           .where(eq(documents.id, documentId))
           .limit(1);
-        const isAdmin = ctx.user.role === "admin";
-        if (!doc[0] || (!isAdmin && doc[0].uploadedBy !== ctx.user.id)) {
+        if (!doc[0] || doc[0].uploadedBy !== ctx.user.id) {
           throw new TRPCError({ code: "FORBIDDEN" });
         }
 
@@ -159,7 +170,7 @@ export const documentsRouter = router({
       }
     }),
 
-  getByCategory: advisorProcedure
+  getByCategory: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input: category }) => {
       const db = await getDb();
@@ -168,6 +179,10 @@ export const documentsRouter = router({
           code: "INTERNAL_SERVER_ERROR",
           message: "Database unavailable",
         });
+
+      if (!ctx.user || ctx.user.role !== "advisor") {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
 
       try {
         const result = await db

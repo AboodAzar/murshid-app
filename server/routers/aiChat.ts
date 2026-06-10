@@ -1,7 +1,7 @@
 import { router, protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
-import { aiConversations, chatMessages, faqs, users, studyPlans, studentCourses, courses, attendance, assignments, studentAssignments, academicAlerts } from "../../drizzle/schema";
-import { eq, and, desc, inArray } from "drizzle-orm";
+import { aiConversations, chatMessages, faqs } from "../../drizzle/schema";
+import { eq, and } from "drizzle-orm";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { invokeLLM } from "../_core/llm";
@@ -157,36 +157,6 @@ export const aiChatRouter = router({
           content: msg.content
         }));
 
-        // Fetch student academic context for personalized AI responses
-        const [student] = await db.select({ id: users.id, name: users.name, email: users.email }).from(users).where(eq(users.id, ctx.user.id)).limit(1);
-        const [plan] = await db.select().from(studyPlans).where(eq(studyPlans.studentId, ctx.user.id)).limit(1);
-        const enrollments = await db.select().from(studentCourses).where(eq(studentCourses.studentId, ctx.user.id));
-        const courseIds = enrollments.map((e: any) => e.courseId);
-        const courseDetails = courseIds.length > 0 ? await db.select().from(courses).where(inArray(courses.id, courseIds)) : [];
-        const attRows = await db.select({ status: attendance.status }).from(attendance).where(eq(attendance.studentId, ctx.user.id));
-        const attTotal = attRows.length;
-        const attPresent = attRows.filter((r: any) => r.status === "present" || r.status === "excused").length;
-        const attRate = attTotal > 0 ? Math.round((attPresent / attTotal) * 100) : 100;
-        const pendingAssignments = await db.select({ id: studentAssignments.id, dueDate: assignments.dueDate, title: assignments.title })
-          .from(studentAssignments)
-          .leftJoin(assignments, eq(studentAssignments.assignmentId, assignments.id))
-          .where(and(eq(studentAssignments.studentId, ctx.user.id), eq(studentAssignments.status, "pending")));
-        const activeAlerts = await db.select().from(academicAlerts)
-          .where(and(eq(academicAlerts.studentId, ctx.user.id), eq(academicAlerts.isResolved, false)))
-          .orderBy(desc(academicAlerts.createdAt))
-          .limit(5);
-
-        const studentContext = {
-          name: student?.name || "Student",
-          gpa: plan?.currentGPA ?? "0.00",
-          completedCredits: plan?.completedCredits ?? 0,
-          totalCredits: plan?.totalCredits ?? 132,
-          attendanceRate: attRate,
-          currentCourses: courseDetails.map((c: any) => ({ name: c.name, code: c.code, credits: c.credits, status: enrollments.find((e: any) => e.courseId === c.id)?.status ?? "planned" })),
-          pendingAssignments: pendingAssignments.length,
-          activeAlerts: activeAlerts.map((a: any) => ({ title: a.title, severity: a.severity })),
-        };
-
         // Generate AI response via Runpod
         const runpodUrl = process.env.RUNPOD_API_URL;
         if (!runpodUrl) {
@@ -199,7 +169,6 @@ export const aiChatRouter = router({
         const runpodPayload = {
           query: input.message,
           chat_history: chat_history,
-          student_context: studentContext,
           uploaded_file_name: "None",
           uploaded_file_context: null
         };

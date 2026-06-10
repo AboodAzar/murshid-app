@@ -20,60 +20,26 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/useMobile";
-import Logo from "@/components/Logo";
-import {
-  LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, CalendarDays,
-  FileText, Award, BarChart3, Target, Megaphone, MapPin,
-  Clock, CheckCircle2, Activity, MessageSquare, BrainCircuit,
-  GraduationCap, Shield, FolderOpen, Cpu, ClipboardList, School, UserCheck,
-} from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 import { Button } from "./ui/button";
 import { useI18n } from "@/contexts/I18nContext";
 
-type MenuItem = {
-  icon: React.ForwardRefExoticComponent<Omit<React.ComponentProps<"svg">, "ref"> & React.RefAttributes<SVGSVGElement>>;
-  labelKey: string;
-  path: string;
-  tab?: string;
-};
-
-const menuItemsByRole: Record<string, MenuItem[]> = {
+const menuItemsByRole = {
   student: [
     { icon: LayoutDashboard, labelKey: "student.dashboard", path: "/dashboard" },
-    { icon: BookOpen, labelKey: "student.myCourses", path: "/courses" },
-    { icon: CalendarDays, labelKey: "student.schedule", path: "/schedule" },
-    { icon: FileText, labelKey: "student.assignments", path: "/assignments" },
-    { icon: Award, labelKey: "student.grades", path: "/grades" },
-    { icon: CheckCircle2, labelKey: "student.attendance", path: "/attendance" },
-    { icon: Megaphone, labelKey: "student.announcements", path: "/announcements" },
-    { icon: BarChart3, labelKey: "student.achievements", path: "/achievements" },
-    { icon: Target, labelKey: "student.progress", path: "/progress" },
-    { icon: BrainCircuit, labelKey: "analytics.title", path: "/analytics" },
-    { icon: Clock, labelKey: "student.studyPlan", path: "/study-plan" },
-    { icon: MapPin, labelKey: "map.title", path: "/campus" },
     { icon: Users, labelKey: "chat.title", path: "/chat" },
   ],
   advisor: [
     { icon: LayoutDashboard, labelKey: "advisor.dashboard", path: "/advisor" },
-    { icon: Users, labelKey: "advisor.myStudents", path: "/advisor/students" },
-    { icon: Activity, labelKey: "advisor.studentProfile", path: "/advisor/student-profile" },
-    { icon: CalendarDays, labelKey: "advisor.appointments", path: "/advisor/appointments" },
-    { icon: MessageSquare, labelKey: "advisor.aiReview", path: "/advisor/ai-review" },
-    { icon: BrainCircuit, labelKey: "analytics.title", path: "/analytics" },
-    { icon: MapPin, labelKey: "map.title", path: "/campus" },
+    { icon: Users, labelKey: "chat.title", path: "/chat" },
   ],
   admin: [
     { icon: LayoutDashboard, labelKey: "admin.dashboard", path: "/admin" },
-    { icon: Users, labelKey: "admin.userManagement", path: "/admin", tab: "users" },
-    { icon: BookOpen, labelKey: "admin.academicManagement", path: "/admin", tab: "courses" },
-    { icon: UserCheck, labelKey: "admin.advisorManagement", path: "/admin", tab: "advisors" },
-    { icon: MapPin, labelKey: "admin.campusManagement", path: "/campus" },
-    { icon: Megaphone, labelKey: "admin.contentManagement", path: "/admin", tab: "content" },
-    { icon: BrainCircuit, labelKey: "admin.aiManagement", path: "/admin", tab: "aiStats" },
-    { icon: BarChart3, labelKey: "admin.reportsAnalytics", path: "/admin", tab: "reports" },
+    { icon: Users, labelKey: "student.dashboard", path: "/dashboard" },
+    { icon: Users, labelKey: "chat.title", path: "/chat" },
   ],
 };
 
@@ -170,13 +136,7 @@ function DashboardLayoutContent({
     ...item,
     label: t(item.labelKey),
   }));
-  const activeMenuItem = localizedMenuItems.find(item => {
-    if (item.path !== location) return false;
-    if (user?.role === "admin" && item.tab) {
-      return window.location.hash.replace("#", "") === item.tab;
-    }
-    return true;
-  }) || localizedMenuItems.find(item => item.path === location);
+  const activeMenuItem = localizedMenuItems.find(item => item.path === location);
 
   useEffect(() => {
     if (isCollapsed) {
@@ -233,9 +193,8 @@ function DashboardLayoutContent({
               </button>
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
-                  <Logo size={24} />
                   <span className="font-semibold tracking-tight truncate">
-                    Murshid AI
+                    {t("common.navigation")}
                   </span>
                 </div>
               ) : null}
@@ -245,19 +204,12 @@ function DashboardLayoutContent({
           <SidebarContent className="gap-0">
             <SidebarMenu className="px-2 py-1">
               {localizedMenuItems.map(item => {
-                const isActive = location === item.path && (user?.role !== "admin" || !item.tab || window.location.hash.replace("#", "") === item.tab);
+                const isActive = location === item.path;
                 return (
-                  <SidebarMenuItem key={item.labelKey}>
+                  <SidebarMenuItem key={item.path}>
                     <SidebarMenuButton
                       isActive={isActive}
-                      onClick={() => {
-                        if (user?.role === "admin" && item.tab) {
-                          setLocation("/admin");
-                          window.location.hash = item.tab;
-                        } else {
-                          setLocation(item.path);
-                        }
-                      }}
+                      onClick={() => setLocation(item.path)}
                       tooltip={item.label}
                       className={`h-10 transition-all font-normal`}
                     >

@@ -1,7 +1,6 @@
 ﻿import { Button } from "@/components/ui/button";
 import { useI18n } from "@/contexts/I18nContext";
 import { motion, useMotionValue, useTransform } from "framer-motion";
-import Logo from "@/components/Logo";
 import {
   ArrowRight,
   Bot,
@@ -246,7 +245,7 @@ export default function Landing() {
 
       <nav className="fixed left-0 right-0 top-0 z-40 border-b border-white/10 bg-slate-950/40 backdrop-blur-2xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
-          <a href="/" className="flex items-center gap-3"><Logo size={40} className="rounded-2xl shadow-[0_0_45px_rgba(59,130,246,.35)]" /><span className="text-lg font-semibold tracking-tight">Murshid AI</span></a>
+          <a href="/" className="flex items-center gap-3"><div className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-slate-950 shadow-[0_0_45px_rgba(255,255,255,.28)]"><Sparkles className="h-5 w-5" /></div><span className="text-lg font-semibold tracking-tight">Murshid AI</span></a>
           <div className="hidden items-center gap-8 text-sm text-slate-300 md:flex"><a href="#platform" className="hover:text-white">{t("landing.nav.platform")}</a><a href="#roadmap" className="hover:text-white">{t("landing.nav.roadmap")}</a><a href="#campus" className="hover:text-white">{t("landing.nav.campus")}</a></div>
           <div className="flex items-center gap-3"><button onClick={() => setLanguage(language === "en" ? "ar" : "en")} className="group flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.07] px-4 py-2 text-sm text-slate-200 shadow-lg backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-cyan-200/30 hover:bg-white/12 hover:text-white"><Globe2 className="h-4 w-4 text-cyan-200 transition group-hover:rotate-12" />{language === "en" ? t("common.arabic") : t("common.english")}</button><Button asChild className="rounded-full bg-white text-slate-950 hover:bg-cyan-100"><a href="/login">{t("landing.nav.enterApp")}</a></Button></div>
         </div>

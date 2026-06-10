@@ -11,7 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useLocation } from "wouter";
-import Logo from "@/components/Logo";
 import { ArrowRight, Mail, Lock, User } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
@@ -63,30 +62,27 @@ export default function Register() {
       }
 
       setIsLoading(true);
-      console.log("[Register:Frontend] Submitting registration for:", formData.email);
       try {
         const result = await registerMutation.mutateAsync({
           email: formData.email,
           password: formData.password,
           name: formData.name,
         });
-        console.log("[Register:Frontend] Registration response:", result);
 
         if (result.success) {
           if (result.requireVerification) {
-            console.log("[Register:Frontend] Verification required, showing OTP page");
             setPage(3);
             return;
           }
-          // Registration successful without verification — redirect to login
-          console.log("[Register:Frontend] Registration success, redirecting to login");
-          setLocation("/login");
+          // Redirect based on role if no verification needed
+          if (result.user?.role === "student") setLocation("/dashboard");
+          else if (result.user?.role === "advisor") setLocation("/advisor");
+          else if (result.user?.role === "admin") setLocation("/admin");
         }
       } catch (err: any) {
         const errorMessage = err?.message || t("auth.registrationFailed");
-        console.error("[Register:Frontend] Registration error:", err);
-        console.error("[Register:Frontend] Error message:", errorMessage);
         setError(errorMessage);
+        console.error("Registration error:", err);
       } finally {
         setIsLoading(false);
       }
@@ -100,23 +96,20 @@ export default function Register() {
       }
 
       setIsLoading(true);
-      console.log("[Register:Frontend] Verifying OTP for:", formData.email);
       try {
         const result = await verifyEmailMutation.mutateAsync({
           email: formData.email,
           code: otp,
         });
-        console.log("[Register:Frontend] Verification response:", result);
 
         if (result.success && result.user) {
-          console.log("[Register:Frontend] Verification success, redirecting based on role:", result.user.role);
           if (result.user.role === "student") setLocation("/dashboard");
           else if (result.user.role === "advisor") setLocation("/advisor");
           else if (result.user.role === "admin") setLocation("/admin");
         }
       } catch (err: any) {
         setError(err?.message || "Invalid verification code");
-        console.error("[Register:Frontend] Verification error:", err);
+        console.error("Verification error:", err);
       } finally {
         setIsLoading(false);
       }
@@ -149,8 +142,10 @@ export default function Register() {
       >
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Logo size={48} className="rounded-xl shadow-lg shadow-blue-500/25" />
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center font-bold text-xl">
+              م
+            </div>
             <span className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
               {t("common.appName")}
             </span>
