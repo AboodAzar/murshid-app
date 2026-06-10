@@ -91,7 +91,7 @@ export function createRateLimiter(options: RateLimitOptions) {
 // Pre-configured rate limiters for different use cases
 export const authRateLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: process.env.NODE_ENV === "production" ? 50 : 1000,
+  maxRequests: 5000, // Increased drastically for presentation/demo purposes
   keyGenerator: req => {
     // Use IP address as key, but could also use email for more specific limiting
     return req.ip || "unknown";

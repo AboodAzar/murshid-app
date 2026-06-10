@@ -1,7 +1,7 @@
 import { router, protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
 import { aiConversations, chatMessages, faqs, users, studyPlans, studentCourses, courses, attendance, assignments, studentAssignments, academicAlerts } from "../../drizzle/schema";
-import { eq, and, desc, inArray, sql } from "drizzle-orm";
+import { eq, and, desc, inArray, sql, lt } from "drizzle-orm";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { invokeLLM } from "../_core/llm";
@@ -295,7 +295,8 @@ export const aiChatRouter = router({
               .where(
                 and(
                   eq(chatMessages.conversationId, msg.conversationId),
-                  eq(chatMessages.role, "user")
+                  eq(chatMessages.role, "user"),
+                  lt(chatMessages.id, msg.id)
                 )
               )
               // orderBy desc(id) to get the most recent before the assistant
@@ -379,35 +380,4 @@ export const aiChatRouter = router({
       }
     }),
 
-  rateMessage: protectedProcedure
-    .input(
-      z.object({
-        messageId: z.number(),
-        feedback: z.enum(["up", "down", "none"]),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      const db = await getDb();
-      if (!db)
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Database unavailable",
-        });
-
-      if (!ctx.user || ctx.user.role !== "student") {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
-
-      try {
-        await db
-          .update(chatMessages)
-          .set({ feedback: input.feedback })
-          .where(eq(chatMessages.id, input.messageId));
-
-        return { success: true };
-      } catch (error) {
-        console.error("[AI Chat] Failed to rate message:", error);
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-      }
-    }),
 });
