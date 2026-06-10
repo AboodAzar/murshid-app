@@ -1,0 +1,1 @@
+ALTER TABLE `chatMessages` ADD `feedback` enum('up','down','none') DEFAULT 'none';
