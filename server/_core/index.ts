@@ -20,6 +20,9 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
+  // Trust the first proxy (Render's load balancer) to get correct client IPs for rate limiting
+  app.set("trust proxy", 1);
+
   // Security headers middleware
   app.use((req, res, next) => {
     // Content Security Policy

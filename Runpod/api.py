@@ -5,6 +5,7 @@ import torch
 import pypdf
 import re
 import shutil
+import string
 import threading
 from fastapi import FastAPI, UploadFile, File, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -127,8 +128,11 @@ supervisor_prompt = ChatPromptTemplate.from_messages([
 
 *** قاعدة حاسمة جداً (منع الهلوسة): ***
 - إذا كانت الفئة [REGISTRATION] أو [FINANCE]، **يجب** أن تعرف "تخصص الطالب" (مثلاً AI، CS، SE).
-- إذا لم يذكر الطالب تخصصه في السؤال أو في التاريخ السابق، يمنع التخمين! يجب أن ترد حصراً بكلمة [CLARIFICATION_NEEDED] متبوعة بسؤال مهذب.
-- إذا كانت كل المعلومات متوفرة، أو كانت الفئة [QA]، رد بـ: [PROCEED: CATEGORY_NAME]"""),
+- إذا لم يذكر الطالب تخصصه في السؤال الحالي أو في التاريخ السابق للمحادثة، يمنع التخمين! يجب أن ترد حصراً بكلمة [CLARIFICATION_NEEDED] متبوعة بسؤال مهذب.
+- إذا كانت كل المعلومات متوفرة (عرفت التخصص من السؤال أو من تاريخ المحادثة)، رد بالصيغة التالية تماماً:
+[PROCEED: CATEGORY_NAME] [MAJOR: التخصص الذي عرفته]
+(مثال: [PROCEED: REGISTRATION] [MAJOR: علم حاسوب])
+- إذا كانت الفئة [QA] ولا يوجد تخصص، يمكنك الرد بـ: [PROCEED: QA] [MAJOR: NONE]"""),
     ("human", "التاريخ السابق للمحادثة:\n{chat_history}\n\nسؤال الطالب الحالي:\n{question}")
 ])
 
@@ -148,7 +152,7 @@ registration_prompt = ChatPromptTemplate.from_messages([
 1. استخدم صيغة Markdown لإنشاء جداول احترافية للمواد المقترحة.
 2. استخدم الإيموجي المناسبة الأكاديمية (📚، 🎯، 💡).
 3. إذا لم تجد المادة في السياق، قل بوضوح "لا أملك بيانات عن هذه المادة".
-4. قاعدة حاسمة جداً لأرقام المواد: يجب أن تتكون أرقام المواد دائماً من 7 أرقام (خانات). إذا وجدت في السياق رقم مادة يتكون من 6 أرقام فقط، يجب عليك إضافة الرقم صفر (0) في بداية الرقم ليصبح 7 أرقام (مثال: 130231 يصبح 0130231)."""),
+4. قاعدة حاسمة جداً لأرقام المواد: يجب أن تتكون أرقام المواد دائماً من 7 أرقام (خانات). إذا وجدت في السياق رقم مادة يتكون من 6 أرقام فقط، يجب عليك إضافة الرقم صفر (0) في بداية الرقم ليصبح 7 أرقام (مثال: 130231 يصبح 0130231). **مهم جداً: قم بتعديل الأرقام بصمت ولا تذكر هذه القاعدة أو تبرر التعديل للطالب أبداً في إجابتك.**"""),
     ("human", "السياق (Context):\n{context}\n\nالتاريخ السابق للمحادثة:\n{chat_history}\n\nسؤال الطالب:\n{question}")
 ])
 
@@ -160,7 +164,8 @@ finance_prompt = ChatPromptTemplate.from_messages([
 قواعد التنسيق (WOW Factor):
 1. قم بعرض الحسابات بخطوات واضحة ومفصلة.
 2. استخدم الإيموجي المالي والأكاديمي.
-3. لا تخمن أي أسعار غير موجودة في السياق."""),
+3. لا تخمن أي أسعار غير موجودة في السياق.
+4. قاعدة حاسمة جداً للخصومات: الخصومات أو المنح (مثل خصم 45%) تُطبق حصراً على "رسوم الساعات المعتمدة" فقط، ولا تُطبق أبداً على "الرسوم الفصلية" الثابتة. (مثال: احسب خصم الساعات أولاً، ثم اجمع الناتج مع الرسوم الفصلية كاملة بدون خصم)."""),
     ("human", "السياق (Context):\n{context}\n\nالتاريخ السابق للمحادثة:\n{chat_history}\n\nسؤال الطالب:\n{question}")
 ])
 
@@ -177,7 +182,8 @@ qa_prompt = ChatPromptTemplate.from_messages([
 ])
 
 def format_chat_history(messages: List[Message]):
-    recent_messages = messages[-6:] if len(messages) > 6 else messages
+    # Keep the last 20 messages instead of 6 to prevent the AI from forgetting the major in longer conversations
+    recent_messages = messages[-20:] if len(messages) > 20 else messages
     history = ""
     for msg in recent_messages:
         role = "Student" if msg.role == "user" else "Advisor"
@@ -256,6 +262,23 @@ def route_and_execute(query, chat_history_str, uploaded_file_name, student_conte
              if not final_msg: final_msg = clarification_msg
              
         return final_msg, "Clarification Pipeline", "None", None
+
+    # 3.5 EXTRACT MAJOR AND INJECT
+    major_match = re.search(r'\[MAJOR:\s*(.*?)\]', supervisor_output)
+    if major_match:
+        extracted_major = major_match.group(1).strip()
+        if extracted_major.upper() != "NONE" and extracted_major:
+            # Append major to ChromaDB semantic search
+            cleaned_query += " " + extracted_major
+            
+            # Also manually inject the major into the student's live context (which is a dict)
+            # so the Registration/Finance expert models don't hallucinate a different major!
+            if student_context is None:
+                student_context = {}
+            elif isinstance(student_context, str):
+                student_context = {"Context": student_context}
+                
+            student_context["التخصص_المستخرج_من_السياق"] = extracted_major
 
     # 4. FETCH CONTEXT BASED ON CATEGORY
     combined_context = ""
