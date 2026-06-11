@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const fadeInUp = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.35 } };
 const severityColors: Record<string, string> = {
@@ -166,28 +167,37 @@ export default function AdvisorStudentProfile() {
                 <h3 className="text-lg font-semibold text-white">{t("advisor.academicAlerts")}</h3>
                 <Button onClick={() => setShowAlertForm(true)} size="sm" className="bg-rose-600 hover:bg-rose-700"><Plus className="w-4 h-4 mr-1" />{t("advisor.createAlert")}</Button>
               </div>
-              {alerts.length === 0 ? <p className="text-slate-400 text-center py-8">{t("advisor.noAlerts")}</p> : (
-                <div className="space-y-3">
-                  {alerts.map((alert: any) => (
-                    <div key={alert.id} className={`p-4 rounded-xl border bg-white/[0.04] ${alert.isResolved ? "opacity-60" : ""}`}>
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded border ${severityColors[alert.severity]}`}>{alert.severity}</span>
-                          <span className="text-xs text-slate-500">{alert.type}</span>
+              {(() => {
+                const uniqueAlerts = alerts.filter((alert: any, index: number, self: any[]) =>
+                  index === self.findIndex((a: any) => a.title === alert.title)
+                );
+                return uniqueAlerts.length === 0 ? (
+                  <p className="text-slate-400 text-center py-8">{t("advisor.noAlerts")}</p>
+                ) : (
+                  <ScrollArea className="h-[400px]">
+                    <div className="space-y-3 pr-2">
+                      {uniqueAlerts.map((alert: any) => (
+                        <div key={alert.id} className={`p-4 rounded-xl border bg-white/[0.04] ${alert.isResolved ? "opacity-60" : ""}`}>
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className={`text-xs font-medium px-2 py-0.5 rounded border ${severityColors[alert.severity]}`}>{alert.severity}</span>
+                              <span className="text-xs text-slate-500">{alert.type}</span>
+                            </div>
+                            {!alert.isResolved && (
+                              <button onClick={() => resolveAlert.mutate({ alertId: alert.id })} className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
+                                <CheckCircle2 className="w-3.5 h-3.5" />{t("common.resolve")}
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-sm font-medium text-white mt-2">{alert.title}</p>
+                          <p className="text-xs text-slate-400 mt-1">{alert.message}</p>
+                          <p className="text-xs text-slate-500 mt-2">{new Date(alert.createdAt).toLocaleString()}</p>
                         </div>
-                        {!alert.isResolved && (
-                          <button onClick={() => resolveAlert.mutate({ alertId: alert.id })} className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
-                            <CheckCircle2 className="w-3.5 h-3.5" />{t("common.resolve")}
-                          </button>
-                        )}
-                      </div>
-                      <p className="text-sm font-medium text-white mt-2">{alert.title}</p>
-                      <p className="text-xs text-slate-400 mt-1">{alert.message}</p>
-                      <p className="text-xs text-slate-500 mt-2">{new Date(alert.createdAt).toLocaleString()}</p>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              )}
+                  </ScrollArea>
+                );
+              })()}
             </div>
           )}
 

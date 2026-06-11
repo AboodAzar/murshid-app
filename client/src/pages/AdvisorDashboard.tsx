@@ -11,6 +11,7 @@ import {
   MessageSquare, Plus, ArrowRight, Bell, BrainCircuit, BarChart3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 16 },
@@ -48,7 +49,11 @@ export default function AdvisorDashboard() {
     .filter((a: any) => new Date(a.scheduledAt) > new Date() && a.status !== "cancelled")
     .sort((a: any, b: any) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())
     .slice(0, 5);
-  const recentAlerts = alerts.slice(0, 5);
+  const recentAlerts = alerts
+    .filter((alert: any, index: number, self: any[]) =>
+      index === self.findIndex((a: any) => a.title === alert.title)
+    )
+    .slice(0, 5);
 
   return (
     <DashboardLayout>
@@ -271,20 +276,22 @@ export default function AdvisorDashboard() {
                 <p className="text-slate-400">{t("advisor.noRecentAlerts")}</p>
               </div>
             ) : (
-              <div className="space-y-3">
-                {recentAlerts.map((alert: any) => (
-                  <div key={alert.id} className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04]">
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded border ${severityColors[alert.severity]}`}>
-                      {alert.severity}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-white">{alert.title}</p>
-                      <p className="text-xs text-slate-400 truncate">{alert.message}</p>
+              <ScrollArea className="h-[320px]">
+                <div className="space-y-3 pr-2">
+                  {recentAlerts.map((alert: any) => (
+                    <div key={alert.id} className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04]">
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded border ${severityColors[alert.severity]}`}>
+                        {alert.severity}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-white">{alert.title}</p>
+                        <p className="text-xs text-slate-400 truncate">{alert.message}</p>
+                      </div>
+                      <span className="text-xs text-slate-500 whitespace-nowrap">{new Date(alert.createdAt).toLocaleDateString()}</span>
                     </div>
-                    <span className="text-xs text-slate-500 whitespace-nowrap">{new Date(alert.createdAt).toLocaleDateString()}</span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              </ScrollArea>
             )}
           </motion.div>
 

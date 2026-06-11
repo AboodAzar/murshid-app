@@ -5,6 +5,7 @@ import { useI18n } from "@/contexts/I18nContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import DashboardLayout from "@/components/DashboardLayout";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
@@ -206,6 +207,13 @@ export default function StudentDashboard() {
       { name: "Remaining", value: Math.max(0, total - earned), color: "rgba(255,255,255,0.08)" },
     ];
   }, [dashboard]);
+
+  const uniqueAlerts = useMemo(() => {
+    const all = (alertsData ?? EMPTY_ALERTS).alerts;
+    return all.filter((alert: any, index: number, self: any[]) =>
+      index === self.findIndex((a: any) => a.title === alert.title)
+    );
+  }, [alertsData]);
 
   const gradientText = "bg-gradient-to-r from-blue-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent";
 
@@ -669,24 +677,28 @@ export default function StudentDashboard() {
                 {alertsL ? (
                   [1, 2, 3, 4].map(i => <Skeleton key={i} className="h-24 rounded-2xl bg-slate-800/50" />)
                 ) : (
-                  <AnimatePresence>
-                    {(alertsData ?? EMPTY_ALERTS).alerts.map((alert) => (
-                      <motion.div key={alert.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className={`glass-card rounded-xl p-4 border ${AlertBorder(alert.type)} hover:border-white/15 transition-all duration-300`}>
-                        <div className="flex items-start gap-3">
-                          <div className="mt-0.5"><AlertIcon type={alert.type} /></div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-white leading-tight">{dir === "rtl" && alert.titleAr ? alert.titleAr : alert.title}</p>
-                            <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">{dir === "rtl" && alert.messageAr ? alert.messageAr : alert.message}</p>
-                            {alert.action && (
-                              <button className="mt-2 text-[11px] font-medium text-blue-400 hover:text-blue-300 flex items-center gap-0.5">
-                                {dir === "rtl" && alert.actionAr ? alert.actionAr : alert.action} <ChevronRight className="w-3 h-3" />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
+                  <ScrollArea className="h-[320px]">
+                    <AnimatePresence>
+                      <div className="space-y-2 pr-2">
+                        {uniqueAlerts.map((alert) => (
+                          <motion.div key={alert.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className={`glass-card rounded-xl p-4 border ${AlertBorder(alert.type)} hover:border-white/15 transition-all duration-300`}>
+                            <div className="flex items-start gap-3">
+                              <div className="mt-0.5"><AlertIcon type={alert.type} /></div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-white leading-tight">{dir === "rtl" && alert.titleAr ? alert.titleAr : alert.title}</p>
+                                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">{dir === "rtl" && alert.messageAr ? alert.messageAr : alert.message}</p>
+                                {alert.action && (
+                                  <button className="mt-2 text-[11px] font-medium text-blue-400 hover:text-blue-300 flex items-center gap-0.5">
+                                    {dir === "rtl" && alert.actionAr ? alert.actionAr : alert.action} <ChevronRight className="w-3 h-3" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </AnimatePresence>
+                  </ScrollArea>
                 )}
               </div>
             </motion.div>
