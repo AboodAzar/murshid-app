@@ -49,6 +49,8 @@ class ChatRequest(BaseModel):
     query: str
     chat_history: List[Message] = []
     student_context: dict = {}
+    db_faqs: List[dict] = []
+    db_documents: List[dict] = []
     uploaded_file_name: Optional[str] = "None"
     uploaded_file_context: Optional[str] = None
 
@@ -126,14 +128,15 @@ supervisor_prompt = ChatPromptTemplate.from_messages([
 2. [FINANCE]: إذا كان يسأل عن حساب الرسوم، سعر الساعة، أو تكلفة الفصل الدراسي.
 3. [QA]: إذا كان يسأل عن قوانين الجامعة، التخصصات، الموقع، أو أسئلة عامة أخرى.
 
-*** قاعدة حاسمة جداً (منع الهلوسة): ***
-- إذا كانت الفئة [REGISTRATION] أو [FINANCE]، **يجب** أن تعرف "تخصص الطالب" (مثلاً AI، CS، SE).
-- إذا لم يذكر الطالب تخصصه في السؤال الحالي أو في التاريخ السابق للمحادثة، يمنع التخمين! يجب أن ترد حصراً بكلمة [CLARIFICATION_NEEDED] متبوعة بسؤال مهذب.
-- إذا كانت كل المعلومات متوفرة (عرفت التخصص من السؤال أو من تاريخ المحادثة)، رد بالصيغة التالية تماماً:
-[PROCEED: CATEGORY_NAME] [MAJOR: التخصص الذي عرفته]
+*** قاعدة التخصص التلقائي ***
+أنت تعرف تخصص الطالب مسبقاً من خلال (بيانات الطالب) المرفقة أدناه.
+يُمنع منعاً باتاً أن تسأل الطالب عن تخصصه! قم باستخراج التخصص من (بيانات الطالب) مباشرة.
+
+يجب أن ترد بالصيغة التالية تماماً:
+[PROCEED: CATEGORY_NAME] [MAJOR: التخصص المستخرج]
 (مثال: [PROCEED: REGISTRATION] [MAJOR: علم حاسوب])
-- إذا كانت الفئة [QA] ولا يوجد تخصص، يمكنك الرد بـ: [PROCEED: QA] [MAJOR: NONE]"""),
-    ("human", "التاريخ السابق للمحادثة:\n{chat_history}\n\nسؤال الطالب الحالي:\n{question}")
+إذا كانت الفئة [QA]، يمكنك الرد بـ: [PROCEED: QA] [MAJOR: NONE]"""),
+    ("human", "بيانات الطالب:\n{student_context}\n\nالتاريخ السابق للمحادثة:\n{chat_history}\n\nسؤال الطالب الحالي:\n{question}")
 ])
 
 MURSHID_SYSTEM_PROMPT = """أنت "مرشد"، المساعد الذكي الرسمي للإرشاد الأكاديمي بـ جامعة الزيتونة الأردنية.
@@ -141,7 +144,10 @@ MURSHID_SYSTEM_PROMPT = """أنت "مرشد"، المساعد الذكي الر�
 تتحدث باللغة العربية الفصحى الواضحة والمهنية والداعمة.
 لا تحل محل السجلات الرسمية، ولا تخمن معلومات غير موجودة في السياق.
 إذا كانت المعلومة غير متوفرة، صرح بذلك بوضوح ووجه الطالب للقنوات الرسمية.
-اختم إجابتك بخلاصة سريعة أو خطوات متابعة."""
+اختم إجابتك بخلاصة سريعة أو خطوات متابعة.
+
+قاعدة ذهبية للخصوصية والإيجاز:
+السياق (Context) المرفق لك يحتوي على بيانات الطالب الخاصة وجداول الجامعة. **يُمنع منعاً باتاً** تكرار هذه البيانات أو سرد وضع الطالب الأكاديمي (مثل المعدل، الساعات، أو الحضور) للمستخدم إلا إذا سأل الطالب عنها بصراحة. إذا كان السؤال مجرد تحية (مثل: كيف الحال)، فرد التحية بلطف واعرض المساعدة فوراً دون سرد أي بيانات أو سياق داخلي!"""
 
 # 2. REGISTRATION EXPERT PROMPT
 registration_prompt = ChatPromptTemplate.from_messages([
@@ -152,7 +158,9 @@ registration_prompt = ChatPromptTemplate.from_messages([
 1. استخدم صيغة Markdown لإنشاء جداول احترافية للمواد المقترحة.
 2. استخدم الإيموجي المناسبة الأكاديمية (📚، 🎯، 💡).
 3. إذا لم تجد المادة في السياق، قل بوضوح "لا أملك بيانات عن هذه المادة".
-4. قاعدة حاسمة جداً لأرقام المواد: يجب أن تتكون أرقام المواد دائماً من 7 أرقام (خانات). إذا وجدت في السياق رقم مادة يتكون من 6 أرقام فقط، يجب عليك إضافة الرقم صفر (0) في بداية الرقم ليصبح 7 أرقام (مثال: 130231 يصبح 0130231). **مهم جداً: قم بتعديل الأرقام بصمت ولا تذكر هذه القاعدة أو تبرر التعديل للطالب أبداً في إجابتك.**"""),
+4. قاعدة حاسمة جداً لأرقام المواد: يجب أن تتكون أرقام المواد دائماً من 7 أرقام (خانات). إذا وجدت في السياق رقم مادة يتكون من 6 أرقام فقط، يجب عليك إضافة الرقم صفر (0) في بداية الرقم ليصبح 7 أرقام. قم بتعديل الأرقام بصمت ولا تذكر هذه القاعدة للطالب أبداً.
+5. قاعدة حاسمة للعبء الدراسي (الحد الأقصى): الحد الأقصى للتسجيل هو (18 ساعة معتمدة) في الفصل العادي. استثناء: يُسمح بتسجيل (21 ساعة معتمدة كحد أقصى) فقط إذا كان الطالب "خريجاً" (أي يستطيع إنهاء جميع متطلبات التخرج في هذا الفصل). احسب المجموع سراً، وإذا تجاوز الحد المسموح له، قم بحذف مواد فوراً لتطبيق الحد.
+6. قاعدة "العلوم العسكرية": مادة "العلوم العسكرية" يُمنع منعاً باتاً تسجيلها في الفصول العادية. يجب تأجيلها لتُسجل حصراً في "الفصل الدراسي الأخير" (فصل التخرج كخريج)."""),
     ("human", "السياق (Context):\n{context}\n\nالتاريخ السابق للمحادثة:\n{chat_history}\n\nسؤال الطالب:\n{question}")
 ])
 
@@ -162,10 +170,12 @@ finance_prompt = ChatPromptTemplate.from_messages([
 
 أنت الآن في مسار (الشؤون المالية). قم بحساب التكاليف والرسوم بدقة متناهية بناءً على السياق المرفق فقط.
 قواعد التنسيق (WOW Factor):
-1. قم بعرض الحسابات بخطوات واضحة ومفصلة.
+1. الإيجاز المطلق: أعطِ الطالب السعر النهائي فقط (مثال: "تكلفة تسجيل الفصل هي 1250 د.أ"). يُمنع منعاً باتاً عرض خطوات الحساب أو تفاصيل الضرب والجمع للمستخدم.
 2. استخدم الإيموجي المالي والأكاديمي.
 3. لا تخمن أي أسعار غير موجودة في السياق.
-4. قاعدة حاسمة جداً للخصومات: الخصومات أو المنح (مثل خصم 45%) تُطبق حصراً على "رسوم الساعات المعتمدة" فقط، ولا تُطبق أبداً على "الرسوم الفصلية" الثابتة. (مثال: احسب خصم الساعات أولاً، ثم اجمع الناتج مع الرسوم الفصلية كاملة بدون خصم)."""),
+4. قاعدة حاسمة للخصومات: الخصومات (مثل 45%) تُطبق فقط على "رسوم الساعات المعتمدة". إياك أن تطبق الخصم على الرسوم الفصلية الثابتة. 
+5. قاعدة التفكير المخفي: قم بجميع العمليات الحسابية داخل قسم <think> حتى لا يراها الطالب. بمجرد انتهائك من الحساب المخفي، اكتب السطر النهائي فقط.
+6. قاعدة حاسمة للعملة: العملة الرسمية والوحيدة هي الدينار الأردني. استخدم دائماً كلمة (دينار أردني) أو الرمز (د.أ). يُمنع منعاً باتاً استخدام أي عملات أو رموز أخرى مثل (ج م) أو (دولار)!"""),
     ("human", "السياق (Context):\n{context}\n\nالتاريخ السابق للمحادثة:\n{chat_history}\n\nسؤال الطالب:\n{question}")
 ])
 
@@ -233,10 +243,28 @@ def clean_arabic_query(query: str) -> str:
     return " ".join(filtered_words)
 
 # --- Routing Engine ---
-def route_and_execute(query, chat_history_str, uploaded_file_name, student_context=None, threshold=0.4, uploaded_context=None):
+def route_and_execute(query, chat_history_str, uploaded_file_name, student_context=None, threshold=0.25, uploaded_context=None, db_faqs=None, db_documents=None):
     cleaned_query = clean_arabic_query(query)
     
-    # 1. FAQ PRE-CHECK (Instant Response)
+    # 0. REAL-TIME DB FAQ PRE-CHECK (Ultra-Fast Math Check)
+    if db_faqs:
+        q_words = set(cleaned_query.split())
+        if q_words:
+            best_match = None
+            best_score = 0
+            for faq in db_faqs:
+                faq_q = clean_arabic_query(faq.get("q", ""))
+                faq_q_words = set(faq_q.split())
+                if not faq_q_words: continue
+                intersection = q_words.intersection(faq_q_words)
+                score = len(intersection) / max(len(q_words), len(faq_q_words))
+                if score > best_score:
+                    best_score = score
+                    best_match = faq.get("a", "")
+            if best_score > 0.4:  # High confidence threshold
+                return best_match, "Real-Time FAQ Pipeline", "MySQL DB", None
+
+    # 1. STATIC FAQ PRE-CHECK (Instant Response)
     faq_results = faq_store.similarity_search_with_score(cleaned_query, k=1)
     if faq_results and faq_results[0][1] < threshold:  
         return faq_results[0][0].metadata["answer"], "FAQ Pipeline", "FAQ DB", None
@@ -245,6 +273,7 @@ def route_and_execute(query, chat_history_str, uploaded_file_name, student_conte
     try:
         supervisor_chain = supervisor_prompt | llm | StrOutputParser()
         supervisor_output = supervisor_chain.invoke({
+            "student_context": json.dumps(student_context, ensure_ascii=False) if student_context else "غير متوفر",
             "chat_history": chat_history_str, 
             "question": query
         }).strip()
@@ -314,6 +343,13 @@ def route_and_execute(query, chat_history_str, uploaded_file_name, student_conte
     if uploaded_context:
          combined_context += f"\n\n--- بيانات الملف المرفق ---\n{uploaded_context}"
 
+    # 5. INJECT DYNAMIC DOCUMENTS
+    if db_documents:
+        combined_context += "\n\n*** مستندات متاحة من المرشد ***\n"
+        for doc in db_documents:
+            combined_context += f"- عنوان المستند: {doc.get('title', 'بدون عنوان')} (القسم: {doc.get('category', 'عام')})\n"
+        combined_context += "إذا سأل الطالب عن مستندات، أخبره أن المرشد رفع هذه المستندات أعلاه ويمكنه تصفحها.\n"
+
     if student_context:
          combined_context += f"\n\n--- بيانات الطالب الحالية ---\n{student_context}"
 
@@ -348,7 +384,9 @@ def chat_endpoint(request: ChatRequest):
             chat_history_str=chat_history_str, 
             uploaded_file_name=request.uploaded_file_name,
             uploaded_context=request.uploaded_file_context,
-            student_context=request.student_context
+            student_context=request.student_context,
+            db_faqs=request.db_faqs,
+            db_documents=request.db_documents
         )
     return {
         "answer": answer,
