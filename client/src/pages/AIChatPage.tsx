@@ -239,17 +239,17 @@ export default function AIChatPage() {
 
         {/* ─── Main Tabs ─── */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-card border border-border backdrop-blur-2xl p-1 flex flex-wrap h-auto gap-1">
-            <TabsTrigger value="dashboard" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-muted-foreground"><BrainCircuit className="w-3.5 h-3.5 me-1.5" />Dashboard</TabsTrigger>
-            <TabsTrigger value="insights" className="data-[state=active]:bg-violet-600 data-[state=active]:text-white text-muted-foreground"><Zap className="w-3.5 h-3.5 me-1.5" />Insights</TabsTrigger>
-            <TabsTrigger value="planner" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-muted-foreground"><ClipboardList className="w-3.5 h-3.5 me-1.5" />Planner</TabsTrigger>
-            <TabsTrigger value="career" className="data-[state=active]:bg-rose-600 data-[state=active]:text-white text-muted-foreground"><Briefcase className="w-3.5 h-3.5 me-1.5" />Career</TabsTrigger>
-            <TabsTrigger value="chat" className="data-[state=active]:bg-fuchsia-600 data-[state=active]:text-white text-muted-foreground"><Sparkles className="w-3.5 h-3.5 me-1.5" />Chat</TabsTrigger>
+          <TabsList className="bg-card border border-border backdrop-blur-2xl p-1 flex flex-nowrap md:flex-wrap h-auto gap-1 overflow-x-auto md:overflow-x-visible scrollbar-hide">
+            <TabsTrigger value="dashboard" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-muted-foreground shrink-0"><BrainCircuit className="w-3.5 h-3.5 me-1.5" />Dashboard</TabsTrigger>
+            <TabsTrigger value="insights" className="data-[state=active]:bg-violet-600 data-[state=active]:text-white text-muted-foreground shrink-0"><Zap className="w-3.5 h-3.5 me-1.5" />Insights</TabsTrigger>
+            <TabsTrigger value="planner" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-muted-foreground shrink-0"><ClipboardList className="w-3.5 h-3.5 me-1.5" />Planner</TabsTrigger>
+            <TabsTrigger value="career" className="data-[state=active]:bg-rose-600 data-[state=active]:text-white text-muted-foreground shrink-0"><Briefcase className="w-3.5 h-3.5 me-1.5" />Career</TabsTrigger>
+            <TabsTrigger value="chat" className="data-[state=active]:bg-fuchsia-600 data-[state=active]:text-white text-muted-foreground shrink-0"><Sparkles className="w-3.5 h-3.5 me-1.5" />Chat</TabsTrigger>
           </TabsList>
 
           {/* ─── Dashboard Tab ─── */}
           <TabsContent value="dashboard" className="mt-6 space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Academic Health */}
               <motion.div {...fadeInUp}>
                 <Card className="bg-card border-border backdrop-blur-2xl">
@@ -367,7 +367,7 @@ export default function AIChatPage() {
 
           {/* ─── Insights Tab ─── */}
           <TabsContent value="insights" className="mt-6 space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <motion.div {...fadeInUp}>
                 <Card className="bg-card border-border backdrop-blur-2xl">
                   <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Zap className="w-4 h-4 text-amber-400" />AI Academic Insights</CardTitle></CardHeader>
@@ -441,7 +441,7 @@ export default function AIChatPage() {
 
           {/* ─── Planner Tab ─── */}
           <TabsContent value="planner" className="mt-6 space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <motion.div {...fadeInUp}>
                 <Card className="bg-card border-border backdrop-blur-2xl">
                   <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><BookOpen className="w-4 h-4 text-amber-400" />Smart Course Recommendations</CardTitle></CardHeader>
@@ -500,8 +500,8 @@ export default function AIChatPage() {
           </TabsContent>
 
           {/* ─── Chat Tab ─── */}
-          <TabsContent value="chat" className="mt-6">
-            <div className={isMobile ? "-mx-6 -mb-3 flex flex-col" : "flex h-[calc(100dvh-200px)] gap-4"} style={isMobile ? { height: "calc(100dvh - 176px)" } : {}}>
+          <TabsContent value="chat" className="mt-6 overflow-x-hidden">
+            <div className={isMobile ? "flex flex-col h-[calc(100dvh-180px)] -mx-3 sm:-mx-4" : "flex h-[calc(100dvh-220px)] gap-4"}>
               {/* Sidebar — desktop only, conditionally rendered */}
               {!isMobile && (
                 <div className="w-60 lg:w-64 bg-card border border-border rounded-xl p-3 flex-col backdrop-blur-2xl shrink-0 flex">
@@ -519,7 +519,7 @@ export default function AIChatPage() {
               )}
 
               {/* Chat Area */}
-              <div className="flex-1 bg-card border border-border rounded-xl flex flex-col backdrop-blur-2xl overflow-hidden min-w-0">
+              <div className="flex-1 bg-card border-0 md:border border-border rounded-none md:rounded-xl flex flex-col backdrop-blur-2xl overflow-hidden min-w-0">
                 {selectedConversation ? (
                   <>
                     {/* Mobile conversation strip — conditionally rendered */}
