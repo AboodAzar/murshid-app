@@ -1,3 +1,4 @@
+// AIChatPage: The main dashboard and AI advising chat interface for the student portal.
 import { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useI18n } from "@/contexts/I18nContext";
@@ -222,7 +223,7 @@ export default function AIChatPage() {
             return (
               <motion.div key={action.id} variants={scaleIn}>
                 <button
-                  onClick={() => { if (action.id === "chat") setActiveTab("chat"); else if (["plan","schedule"].includes(action.id)) setActiveTab("planner"); else if (action.id === "career") setActiveTab("career"); else setActiveTab("insights"); }}
+                  onClick={() => { if (action.id === "chat") setActiveTab("chat"); else if (["plan", "schedule"].includes(action.id)) setActiveTab("planner"); else if (action.id === "career") setActiveTab("career"); else setActiveTab("insights"); }}
                   className="w-full h-full p-4 rounded-xl bg-card border border-border backdrop-blur-2xl hover:bg-accent hover:border-border/80 transition-all text-start group"
                 >
                   <div className={`w-9 h-9 rounded-lg ${action.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}><Icon className="w-4 h-4" /></div>
@@ -270,7 +271,7 @@ export default function AIChatPage() {
                           ))}
                         </div>
                       </>
-                    ) : <div className="space-y-4">{[1,2,3,4].map(i => <Skeleton key={i} className="h-10" />)}</div>}
+                    ) : <div className="space-y-4">{[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-10" />)}</div>}
                   </CardContent>
                 </Card>
               </motion.div>
@@ -290,7 +291,7 @@ export default function AIChatPage() {
                         </div>
                         <div><p className="text-xs text-muted-foreground mb-2">Progress</p><MiniBar value={gradProgress * 100} color="#10b981" /><p className="text-xs text-muted-foreground mt-1 text-end">{Math.round(gradProgress * 100)}% complete</p></div>
                       </>
-                    ) : <div className="space-y-4">{[1,2,3].map(i => <Skeleton key={i} className="h-16" />)}</div>}
+                    ) : <div className="space-y-4">{[1, 2, 3].map(i => <Skeleton key={i} className="h-16" />)}</div>}
                   </CardContent>
                 </Card>
               </motion.div>
@@ -307,7 +308,7 @@ export default function AIChatPage() {
                         <div className="flex items-center justify-between p-3 rounded-lg bg-card border border-border"><span className="text-xs text-muted-foreground">Active Risks</span><span className="text-sm font-bold text-red-400">{risk?.factors?.length ?? 0}</span></div>
                         <div className="flex items-center justify-between p-3 rounded-lg bg-card border border-border"><span className="text-xs text-muted-foreground">Streak</span><span className="text-sm font-bold text-amber-400">{overview?.streak?.current ?? 0} days</span></div>
                       </>
-                    ) : <div className="space-y-3">{[1,2,3,4].map(i => <Skeleton key={i} className="h-10" />)}</div>}
+                    ) : <div className="space-y-3">{[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-10" />)}</div>}
                   </CardContent>
                 </Card>
                 <Card className="bg-card border-border backdrop-blur-2xl">
@@ -317,7 +318,7 @@ export default function AIChatPage() {
                       dashboard?.advisorAlerts && dashboard.advisorAlerts.length > 0 ? dashboard.advisorAlerts.slice(0, 3).map((alert: any, i: number) => (
                         <div key={i} className="flex items-start gap-2 p-2 rounded-lg bg-red-500/5 border border-red-500/10"><ShieldAlert className="w-3.5 h-3.5 text-red-400 shrink-0 mt-0.5" /><div><p className="text-xs text-white">{alert.title}</p><p className="text-[10px] text-muted-foreground">{alert.message}</p></div></div>
                       )) : <div className="flex items-center gap-2 justify-center py-3"><CheckCircle2 className="w-4 h-4 text-emerald-400" /><p className="text-xs text-muted-foreground">No active alerts</p></div>
-                    ) : <div className="space-y-2">{[1,2].map(i => <Skeleton key={i} className="h-10" />)}</div>}
+                    ) : <div className="space-y-2">{[1, 2].map(i => <Skeleton key={i} className="h-10" />)}</div>}
                   </CardContent>
                 </Card>
               </motion.div>
@@ -339,7 +340,7 @@ export default function AIChatPage() {
                         <div className="col-span-full text-center py-6 text-muted-foreground"><Lightbulb className="w-8 h-8 mx-auto mb-2 opacity-30" /><p className="text-sm">Complete more courses to get AI recommendations</p></div>
                       )}
                     </div>
-                  ) : <div className="grid grid-cols-1 md:grid-cols-3 gap-3">{[1,2,3].map(i => <Skeleton key={i} className="h-20" />)}</div>}
+                  ) : <div className="grid grid-cols-1 md:grid-cols-3 gap-3">{[1, 2, 3].map(i => <Skeleton key={i} className="h-20" />)}</div>}
                 </CardContent>
               </Card>
             </motion.div>
@@ -396,7 +397,7 @@ export default function AIChatPage() {
                           </div>
                         )}
                       </>
-                    ) : <div className="space-y-3">{[1,2,3].map(i => <Skeleton key={i} className="h-14" />)}</div>}
+                    ) : <div className="space-y-3">{[1, 2, 3].map(i => <Skeleton key={i} className="h-14" />)}</div>}
                   </CardContent>
                 </Card>
               </motion.div>
@@ -414,7 +415,7 @@ export default function AIChatPage() {
                         </div>
                         <div><p className="text-xs text-muted-foreground mb-2">Academic Improvement</p><MiniBar value={gpa >= 3 ? 85 : gpa >= 2.5 ? 60 : 35} color="#10b981" /></div>
                       </>
-                    ) : <div className="space-y-4">{[1,2,3].map(i => <Skeleton key={i} className="h-16" />)}</div>}
+                    ) : <div className="space-y-4">{[1, 2, 3].map(i => <Skeleton key={i} className="h-16" />)}</div>}
                   </CardContent>
                 </Card>
               </motion.div>
@@ -430,7 +431,7 @@ export default function AIChatPage() {
                       <div className="p-4 rounded-xl bg-card border border-border text-center"><Clock className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-xs text-muted-foreground">Study Hours</p><p className="text-sm font-bold text-white mt-1">{Math.round((dashboard?.courses?.length ?? 0) * 4.5)}h/week</p></div>
                       <div className="p-4 rounded-xl bg-card border border-border text-center"><Target className="w-5 h-5 text-emerald-400 mx-auto mb-2" /><p className="text-xs text-muted-foreground">Focus Areas</p><p className="text-sm font-bold text-white mt-1">{warnings?.warnings?.filter((w: any) => w.type === 'at_risk').length ?? 0} at risk</p></div>
                     </div>
-                  ) : <div className="grid grid-cols-4 gap-3">{[1,2,3,4].map(i => <Skeleton key={i} className="h-20" />)}</div>}
+                  ) : <div className="grid grid-cols-4 gap-3">{[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-20" />)}</div>}
                 </CardContent>
               </Card>
             </motion.div>
@@ -443,7 +444,7 @@ export default function AIChatPage() {
                 <Card className="bg-card border-border backdrop-blur-2xl">
                   <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><BookOpen className="w-4 h-4 text-amber-400" />Smart Course Recommendations</CardTitle></CardHeader>
                   <CardContent className="p-5 space-y-3">
-                    {recLoading ? <div className="space-y-3">{[1,2,3].map(i => <Skeleton key={i} className="h-20" />)}</div> :
+                    {recLoading ? <div className="space-y-3">{[1, 2, 3].map(i => <Skeleton key={i} className="h-20" />)}</div> :
                       recommendations && recommendations.recommendations?.length > 0 ? recommendations.recommendations.slice(0, 5).map((rec: any, i: number) => (
                         <div key={i} className="p-4 rounded-xl bg-card border border-border hover:bg-white/[0.05] transition-colors">
                           <div className="flex items-start justify-between gap-3"><div><p className="text-sm font-semibold text-white">{rec.name}</p><p className="text-xs text-muted-foreground mt-1">{rec.reason}</p></div><Badge variant="outline" className="border-border text-muted-foreground text-[10px] shrink-0">{rec.score}</Badge></div>
@@ -458,7 +459,7 @@ export default function AIChatPage() {
                 <Card className="bg-card border-border backdrop-blur-2xl">
                   <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><ClipboardList className="w-4 h-4 text-cyan-400" />Degree Roadmap</CardTitle></CardHeader>
                   <CardContent className="p-5 space-y-3">
-                    {rmLoading ? <div className="space-y-3">{[1,2,3,4].map(i => <Skeleton key={i} className="h-12" />)}</div> :
+                    {rmLoading ? <div className="space-y-3">{[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-12" />)}</div> :
                       roadmap?.roadmap && roadmap.roadmap.length > 0 ? roadmap.roadmap.slice(0, 6).map((item: any, i: number) => (
                         <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-card border border-border">
                           <div className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-blue-500/15 flex items-center justify-center text-xs font-bold text-primary">{item.semester}</div><span className="text-sm text-white">{item.credits} credits</span></div>
@@ -474,7 +475,7 @@ export default function AIChatPage() {
           {/* ─── Career Tab ─── */}
           <TabsContent value="career" className="mt-6 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {cLoading ? [1,2,3].map(i => <Skeleton key={i} className="h-64" />) :
+              {cLoading ? [1, 2, 3].map(i => <Skeleton key={i} className="h-64" />) :
                 career?.matches && career.matches.length > 0 ? career.matches.slice(0, 6).map((c: any, i: number) => (
                   <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
                     <Card className="bg-card border-border backdrop-blur-2xl h-full hover:bg-white/[0.06] transition-colors">
@@ -503,7 +504,7 @@ export default function AIChatPage() {
               <div className="w-64 bg-card border border-border rounded-xl p-4 flex flex-col backdrop-blur-2xl">
                 <Button onClick={handleCreateConversation} className="w-full mb-4 bg-blue-600 hover:bg-blue-500" disabled={createConv.isPending}><Plus className="w-4 h-4 me-2" />New Chat</Button>
                 <div className="flex-1 overflow-y-auto space-y-2">
-                  {!conversationsData ? <div className="space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-10" />)}</div> :
+                  {!conversationsData ? <div className="space-y-2">{[1, 2, 3].map(i => <Skeleton key={i} className="h-10" />)}</div> :
                     conversations.length > 0 ? conversations.map(conv => (
                       <div key={conv.id} className={`p-3 rounded-lg cursor-pointer transition-colors group flex justify-between items-center ${selectedConversation === conv.id ? "bg-blue-600/20 border border-blue-500/40" : "bg-card hover:bg-white/[0.06] border border-border"}`} onClick={() => setSelectedConversation(conv.id)}>
                         <div className="flex-1 min-w-0"><p className="text-sm font-medium truncate text-secondary-foreground">{conv.title}</p></div>
