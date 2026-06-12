@@ -2,6 +2,7 @@ import { router, protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
 import { aiConversations, chatMessages, faqs, users, studyPlans, studentCourses, courses, attendance, assignments, studentAssignments, academicAlerts } from "../../drizzle/schema";
 import { eq, and, desc, inArray, sql, lt } from "drizzle-orm";
+import { departments, documents } from "../../drizzle/schema";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { invokeLLM } from "../_core/llm";
@@ -158,7 +159,17 @@ export const aiChatRouter = router({
         }));
 
         // Fetch student academic context for personalized AI responses
-        const [student] = await db.select({ id: users.id, name: users.name, email: users.email }).from(users).where(eq(users.id, ctx.user.id)).limit(1);
+        const [student] = await db
+          .select({ 
+            id: users.id, 
+            name: users.name, 
+            email: users.email,
+            major: departments.nameAr 
+          })
+          .from(users)
+          .leftJoin(departments, eq(users.departmentId, departments.id))
+          .where(eq(users.id, ctx.user.id))
+          .limit(1);
         const [plan] = await db.select().from(studyPlans).where(eq(studyPlans.studentId, ctx.user.id)).limit(1);
         const enrollments = await db.select().from(studentCourses).where(eq(studentCourses.studentId, ctx.user.id));
         const courseIds = enrollments.map((e: any) => e.courseId);
@@ -176,8 +187,13 @@ export const aiChatRouter = router({
           .orderBy(desc(academicAlerts.createdAt))
           .limit(5);
 
+        // Fetch Real-Time FAQs and Documents for the RAG AI
+        const activeFaqs = await db.select({ q: faqs.questionAr, a: faqs.answerAr }).from(faqs).where(eq(faqs.isActive, true));
+        const activeDocs = await db.select({ title: documents.title, category: documents.category }).from(documents);
+
         const studentContext = {
           name: student?.name || "Student",
+          major: student?.major || "غير محدد",
           gpa: plan?.currentGPA ?? "0.00",
           completedCredits: plan?.completedCredits ?? 0,
           totalCredits: plan?.totalCredits ?? 132,
@@ -200,6 +216,8 @@ export const aiChatRouter = router({
           query: input.message,
           chat_history: chat_history,
           student_context: studentContext,
+          db_faqs: activeFaqs,
+          db_documents: activeDocs,
           uploaded_file_name: "None",
           uploaded_file_context: null
         };
