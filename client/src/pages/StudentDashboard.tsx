@@ -331,7 +331,7 @@ export default function StudentDashboard() {
             const Icon = s.icon;
             return (
               <motion.div key={i} variants={fadeInUp} whileHover="hover" initial="rest">
-                <motion.div variants={cardHover} className={`glass-card-strong rounded-2xl p-5 ${s.glow} hover:border-white/20 transition-all duration-300`}>
+                <motion.div variants={cardHover} className={`glass-card-strong rounded-2xl p-4 sm:p-5 ${s.glow} hover:border-white/20 transition-all duration-300`}>
                   <div className="flex items-center justify-between mb-3">
                     <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${s.grad} flex items-center justify-center shadow-lg`}>
                       <Icon className="w-4 h-4 text-white" />
@@ -343,7 +343,7 @@ export default function StudentDashboard() {
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wide">{s.label}</p>
-                  <p className="text-2xl font-bold text-white">{s.value}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-white">{s.value}</p>
                 </motion.div>
               </motion.div>
             );
@@ -473,7 +473,7 @@ export default function StudentDashboard() {
             {/* GPA Trend Chart + Credits */}
             <motion.div initial="initial" animate="animate" variants={staggerContainer} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* GPA Trend */}
-              <motion.div variants={fadeInUp} className="glass-card-strong rounded-2xl p-5 border border-border">
+              <motion.div variants={fadeInUp} className="glass-card-strong rounded-2xl p-4 sm:p-5 border border-border">
                 <div className="flex items-center gap-2 mb-4">
                   <TrendingUp className="w-4 h-4 text-violet-400" />
                   <h3 className="text-sm font-bold text-white">{t("student.gpaTrend")}</h3>
@@ -504,7 +504,7 @@ export default function StudentDashboard() {
               </motion.div>
 
               {/* Credits Progress */}
-              <motion.div variants={fadeInUp} className="glass-card-strong rounded-2xl p-5 border border-border flex flex-col">
+              <motion.div variants={fadeInUp} className="glass-card-strong rounded-2xl p-4 sm:p-5 border border-border flex flex-col">
                 <div className="flex items-center gap-2 mb-2">
                   <Target className="w-4 h-4 text-blue-400" />
                   <h3 className="text-sm font-bold text-white">{t("student.creditsProgress")}</h3>
@@ -594,7 +594,7 @@ export default function StudentDashboard() {
 
               {/* Featured lecture card */}
               {(nextUpcoming || currentLecture) && (
-                <motion.div variants={fadeInUp} className="glass-card-strong rounded-2xl p-5 glow-emerald border border-emerald-500/20 relative overflow-hidden">
+                <motion.div variants={fadeInUp} className="glass-card-strong rounded-2xl p-4 sm:p-5 glow-emerald border border-emerald-500/20 relative overflow-hidden">
                   <div className="absolute top-0 end-0 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                   <div className="relative z-10">
                     <div className="flex items-center gap-2 mb-2">
@@ -712,7 +712,7 @@ export default function StudentDashboard() {
 
             {/* Study Streak */}
             <motion.div initial="initial" animate="animate" variants={staggerContainer}>
-              <motion.div variants={fadeInUp} className="glass-card-strong rounded-2xl p-5 border border-orange-500/10 glow-amber">
+              <motion.div variants={fadeInUp} className="glass-card-strong rounded-2xl p-4 sm:p-5 border border-orange-500/10 glow-amber">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <Flame className="w-5 h-5 text-orange-400" />

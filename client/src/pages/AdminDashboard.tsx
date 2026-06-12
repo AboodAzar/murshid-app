@@ -500,11 +500,11 @@ export default function AdminDashboard() {
             return (
               <motion.div key={i} variants={fadeInUp}>
                 <Card className="bg-card border-border hover:border-border/80 transition-colors overflow-hidden">
-                  <CardContent className="p-5">
+                  <CardContent className="p-4 sm:p-5">
                     <div className="flex items-start justify-between">
                       <div>
                         <p className="text-xs text-muted-foreground mb-1">{stat.label}</p>
-                        <p className="text-2xl font-bold">
+                        <p className="text-xl sm:text-2xl font-bold">
                           {isLoading ? (
                             <span className="inline-block w-10 h-7 bg-slate-800 rounded animate-pulse" />
                           ) : (
@@ -528,7 +528,7 @@ export default function AdminDashboard() {
         {/* ── Main Tabs ── */}
         <motion.div initial="initial" animate="animate" variants={stagger}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 md:grid-cols-7 bg-slate-900/70 border border-border rounded-xl p-1 mb-6">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 md:grid-cols-7 bg-slate-900/70 border border-border rounded-xl p-1 mb-6">
               {[
                 { value: "users", label: t("admin.userManagement"), icon: Users },
                 { value: "advisors", label: "Advisors", icon: UserCheck },
@@ -656,7 +656,7 @@ export default function AdminDashboard() {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto_auto_auto_auto] items-center gap-3 sm:gap-4 px-6 py-4 hover:bg-accent/30 transition-colors"
+                                className="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto_auto_auto_auto] items-center gap-3 sm:gap-4 px-4 py-3 sm:px-6 sm:py-4 hover:bg-accent/30 transition-colors"
                               >
                                 {/* Avatar */}
                                 <div

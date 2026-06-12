@@ -132,7 +132,7 @@ export default function AdvisorDashboard() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 max-w-7xl mx-auto space-y-8">
+      <div className="p-3 sm:p-4 md:p-6 max-w-7xl mx-auto space-y-6 md:space-y-8">
         {/* Header */}
         <motion.div {...fadeInUp} className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
@@ -142,7 +142,7 @@ export default function AdvisorDashboard() {
                 Advisor Workspace
               </span>
             </div>
-            <h1 className="text-3xl font-bold text-white tracking-tight">{t("advisor.dashboard")}</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">{t("advisor.dashboard")}</h1>
             <p className="text-muted-foreground mt-1.5 text-sm max-w-lg">
               Manage students, guidance, documents, FAQs, and AI insights from one place.
             </p>
@@ -185,11 +185,11 @@ export default function AdvisorDashboard() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.06, duration: 0.35 }}
                 >
-                  <div className={`rounded-2xl border border-border bg-card p-5 backdrop-blur-xl ${stat.accent} hover:bg-card/80 transition-colors`}>
+                  <div className={`rounded-2xl border border-border bg-card p-4 sm:p-5 backdrop-blur-xl ${stat.accent} hover:bg-card/80 transition-colors`}>
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">
                         <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider">{stat.label}</p>
-                        <p className="text-3xl font-bold text-white tracking-tight">{stat.value}</p>
+                        <p className="text-2xl sm:text-3xl font-bold text-white tracking-tight">{stat.value}</p>
                         <p className="text-[11px] text-muted-foreground">{stat.helper}</p>
                       </div>
                       <div className={`w-11 h-11 rounded-xl ${stat.iconBg} flex items-center justify-center shrink-0`}>
@@ -208,7 +208,7 @@ export default function AdvisorDashboard() {
               <button
                 key={action.label}
                 onClick={() => setLocation(action.path)}
-                className={`flex flex-col items-center gap-2 p-4 rounded-2xl bg-gradient-to-b ${action.color} text-white shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all`}
+                className={`flex flex-col items-center gap-2 p-3 sm:p-4 rounded-2xl bg-gradient-to-b ${action.color} text-white shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all`}
               >
                 <action.icon className="w-5 h-5 opacity-90" />
                 <span className="text-xs font-semibold">{action.label}</span>

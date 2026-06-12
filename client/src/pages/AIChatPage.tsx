@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Streamdown } from "streamdown";
 import DashboardLayout from "@/components/DashboardLayout";
 import Logo from "@/components/Logo";
+import { useIsMobile } from "@/hooks/useMobile";
 import {
   Sparkles, BrainCircuit, Send, Plus, Trash2, MessageCircle, Bot, User,
   Zap, Target, TrendingUp, TrendingDown, AlertTriangle, CheckCircle2,
@@ -89,6 +90,7 @@ interface Message { id?: number; role: "user" | "assistant"; content: string; cr
 export default function AIChatPage() {
   const { t } = useI18n();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState("dashboard");
 
   const { data: dashboard, isLoading: dLoading } = trpc.student.dashboard.useQuery();
@@ -187,9 +189,9 @@ export default function AIChatPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
+      <div className="p-3 sm:p-4 md:p-6 max-w-none md:max-w-7xl mx-auto space-y-6">
         {/* ─── Hero ─── */}
-        <motion.div {...fadeInUp} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-900/40 via-slate-900/60 to-slate-900/80 border border-blue-500/20 backdrop-blur-2xl p-6 md:p-8">
+        <motion.div {...fadeInUp} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-900/40 via-slate-900/60 to-slate-900/80 border border-blue-500/20 backdrop-blur-2xl p-4 sm:p-6 md:p-8">
           <div className="absolute top-0 end-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="space-y-2">
@@ -224,7 +226,7 @@ export default function AIChatPage() {
               <motion.div key={action.id} variants={scaleIn}>
                 <button
                   onClick={() => { if (action.id === "chat") setActiveTab("chat"); else if (["plan", "schedule"].includes(action.id)) setActiveTab("planner"); else if (action.id === "career") setActiveTab("career"); else setActiveTab("insights"); }}
-                  className="w-full h-full p-4 rounded-xl bg-card border border-border backdrop-blur-2xl hover:bg-accent hover:border-border/80 transition-all text-start group"
+                  className="w-full h-full p-3 sm:p-4 rounded-xl bg-card border border-border backdrop-blur-2xl hover:bg-accent hover:border-border/80 transition-all text-start group"
                 >
                   <div className={`w-9 h-9 rounded-lg ${action.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}><Icon className="w-4 h-4" /></div>
                   <p className="text-xs font-semibold text-white leading-tight">{action.label}</p>
@@ -256,7 +258,7 @@ export default function AIChatPage() {
                     {health ? (
                       <>
                         <div className="flex items-center gap-5">
-                          <ScoreRing score={health.overallScore} size={100} />
+                          <ScoreRing score={health.overallScore} size={isMobile ? 80 : 100} />
                           <div className="flex-1 space-y-3">
                             <div><div className="flex items-center justify-between text-xs mb-1"><span className="text-muted-foreground">Overall</span><span className="text-white font-semibold">{health.overallScore}/100</span></div><MiniBar value={health.overallScore} color={health.overallScore >= 70 ? "#10b981" : health.overallScore >= 50 ? "#f59e0b" : "#ef4444"} /></div>
                             <div className="flex items-center gap-2 text-xs"><StatusDot status={health.trend === "improving" ? "good" : health.trend === "declining" ? "high" : "fair"} /><span className="text-muted-foreground">Trend: <span className="text-white">{health.trend}</span></span></div>
@@ -499,33 +501,49 @@ export default function AIChatPage() {
 
           {/* ─── Chat Tab ─── */}
           <TabsContent value="chat" className="mt-6">
-            <div className="flex h-[calc(100vh-220px)] gap-4">
-              {/* Sidebar */}
-              <div className="w-64 bg-card border border-border rounded-xl p-4 flex flex-col backdrop-blur-2xl">
-                <Button onClick={handleCreateConversation} className="w-full mb-4 bg-blue-600 hover:bg-blue-500" disabled={createConv.isPending}><Plus className="w-4 h-4 me-2" />New Chat</Button>
-                <div className="flex-1 overflow-y-auto space-y-2">
-                  {!conversationsData ? <div className="space-y-2">{[1, 2, 3].map(i => <Skeleton key={i} className="h-10" />)}</div> :
-                    conversations.length > 0 ? conversations.map(conv => (
-                      <div key={conv.id} className={`p-3 rounded-lg cursor-pointer transition-colors group flex justify-between items-center ${selectedConversation === conv.id ? "bg-blue-600/20 border border-blue-500/40" : "bg-card hover:bg-white/[0.06] border border-border"}`} onClick={() => setSelectedConversation(conv.id)}>
-                        <div className="flex-1 min-w-0"><p className="text-sm font-medium truncate text-secondary-foreground">{conv.title}</p></div>
-                        <button onClick={e => { e.stopPropagation(); handleDeleteConversation(conv.id); }} className="opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 className="w-4 h-4 text-red-400 hover:text-red-300" /></button>
-                      </div>
-                    )) : <p className="text-muted-foreground text-sm text-center py-4">No conversations</p>}
+            <div className={isMobile ? "-mx-6 -mb-3 flex flex-col" : "flex h-[calc(100dvh-200px)] gap-4"} style={isMobile ? { height: "calc(100dvh - 176px)" } : {}}>
+              {/* Sidebar — desktop only, conditionally rendered */}
+              {!isMobile && (
+                <div className="w-60 lg:w-64 bg-card border border-border rounded-xl p-3 flex-col backdrop-blur-2xl shrink-0 flex">
+                  <Button onClick={handleCreateConversation} className="w-full mb-3 bg-blue-600 hover:bg-blue-500 text-sm" disabled={createConv.isPending}><Plus className="w-4 h-4 me-2" />New Chat</Button>
+                  <div className="flex-1 overflow-y-auto space-y-1.5 min-h-0">
+                    {!conversationsData ? <div className="space-y-2">{[1, 2, 3].map(i => <Skeleton key={i} className="h-10" />)}</div> :
+                      conversations.length > 0 ? conversations.map(conv => (
+                        <div key={conv.id} className={`p-2 rounded-lg cursor-pointer transition-colors group flex justify-between items-center ${selectedConversation === conv.id ? "bg-blue-600/20 border border-blue-500/40" : "bg-card hover:bg-white/[0.06] border border-border"}`} onClick={() => setSelectedConversation(conv.id)}>
+                          <div className="flex-1 min-w-0"><p className="text-sm font-medium truncate text-secondary-foreground">{conv.title}</p></div>
+                          <button onClick={e => { e.stopPropagation(); handleDeleteConversation(conv.id); }} className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"><Trash2 className="w-4 h-4 text-red-400 hover:text-red-300" /></button>
+                        </div>
+                      )) : <p className="text-muted-foreground text-sm text-center py-4">No conversations</p>}
+                  </div>
                 </div>
-              </div>
+              )}
+
               {/* Chat Area */}
-              <div className="flex-1 bg-card border border-border rounded-xl flex flex-col backdrop-blur-2xl overflow-hidden">
+              <div className="flex-1 bg-card border border-border rounded-xl flex flex-col backdrop-blur-2xl overflow-hidden min-w-0">
                 {selectedConversation ? (
                   <>
-                    <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                    {/* Mobile conversation strip — conditionally rendered */}
+                    {isMobile && (
+                      <div className="flex items-center gap-2 px-3 py-2 border-b border-border bg-card/95 backdrop-blur overflow-x-auto shrink-0">
+                        <Button onClick={handleCreateConversation} size="sm" className="shrink-0 h-9 w-9 p-0 bg-blue-600 hover:bg-blue-500" disabled={createConv.isPending}><Plus className="w-4 h-4" /></Button>
+                        {conversations.map(conv => (
+                          <button key={conv.id} onClick={() => setSelectedConversation(conv.id)} className={`shrink-0 px-2.5 py-1 rounded-md text-[11px] border truncate max-w-[120px] ${selectedConversation === conv.id ? "bg-blue-600/20 border-blue-500/40 text-white" : "bg-card border-border text-muted-foreground"}`}>
+                            {conv.title}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Messages */}
+                    <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-5 space-y-3 md:space-y-4 min-h-0">
                       {messages.length === 0 ? (
                         <div className="h-full flex items-center justify-center">
-                          <div className="text-center space-y-4">
-                            <div className="w-16 h-16 rounded-2xl bg-blue-500/15 flex items-center justify-center mx-auto"><Sparkles className="w-8 h-8 text-primary" /></div>
+                          <div className="text-center space-y-4 px-2">
+                            <div className="w-14 h-14 rounded-2xl bg-blue-500/15 flex items-center justify-center mx-auto"><Sparkles className="w-7 h-7 text-primary" /></div>
                             <p className="text-muted-foreground text-lg font-medium">Start a new conversation</p>
-                            <p className="text-sm text-muted-foreground max-w-sm">Ask Murshid AI anything about your academics, courses, career, or study plans.</p>
-                            <div className="flex flex-wrap gap-2 justify-center pt-2">
-                              {SUGGESTED_PROMPTS.slice(0, 4).map((p, i) => (
+                            <p className="text-sm text-muted-foreground max-w-sm mx-auto">Ask Murshid AI anything about your academics, courses, career, or study plans.</p>
+                            <div className="flex flex-wrap gap-2 justify-center pt-2 max-w-xs mx-auto">
+                              {SUGGESTED_PROMPTS.slice(0, 3).map((p, i) => (
                                 <button key={i} onClick={() => { setInput(p); }} className="px-3 py-1.5 rounded-lg bg-white/[0.05] border border-border text-xs text-muted-foreground hover:bg-white/[0.08] hover:text-white transition-all">{p}</button>
                               ))}
                             </div>
@@ -535,14 +553,14 @@ export default function AIChatPage() {
                         <AnimatePresence>
                           {messages.map((msg, index) => (
                             <motion.div key={index} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                              <div className={`max-w-md lg:max-w-lg px-4 py-3 rounded-xl ${msg.role === "user" ? "bg-blue-600 text-white" : "bg-white/[0.06] border border-border text-slate-100"}`}>
+                              <div className={`max-w-[90%] sm:max-w-[80%] md:max-w-md lg:max-w-lg px-3 py-2.5 md:px-4 md:py-3 rounded-2xl ${msg.role === "user" ? "bg-blue-600 text-white rounded-br-sm" : "bg-white/[0.06] border border-border text-slate-100 rounded-bl-sm"}`}>
                                 <div className="flex items-center gap-2 mb-1">
-                                  {msg.role === "assistant" ? <Bot className="w-3 h-3 text-primary" /> : <User className="w-3 h-3" />}
+                                  {msg.role === "assistant" ? <Bot className="w-3.5 h-3.5 text-primary" /> : <User className="w-3.5 h-3.5" />}
                                   <span className="text-[10px] opacity-70">{msg.role === "assistant" ? "Murshid AI" : "You"}</span>
                                 </div>
                                 {msg.role === "assistant" ? <Streamdown>{msg.content}</Streamdown> : <p className="text-sm">{msg.content}</p>}
                                 {msg.role === "assistant" && msg.id && (
-                                  <div className="mt-3 pt-3 border-t border-border flex items-center justify-end gap-2">
+                                  <div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-end gap-2">
                                     <button onClick={() => handleRateMessage(msg.id!, "up")} disabled={msg.feedback === "up" || rateMsg.isPending} className={`p-1.5 rounded-md transition-colors ${msg.feedback === "up" ? "bg-emerald-500/20 text-emerald-400" : "hover:bg-white/10 text-muted-foreground hover:text-emerald-400"}`} title="Good response">
                                       <ThumbsUp className="w-3.5 h-3.5" />
                                     </button>
@@ -556,10 +574,10 @@ export default function AIChatPage() {
                           ))}
                           {isLoading && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-                              <div className="bg-white/[0.06] border border-border px-4 py-3 rounded-xl flex items-center gap-3">
+                              <div className="bg-white/[0.06] border border-border px-3 py-2.5 rounded-2xl flex items-center gap-2">
                                 <Bot className="w-4 h-4 text-primary" />
                                 <span className="text-sm text-secondary-foreground">Murshid AI is thinking</span>
-                                <div className="flex gap-1"><div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} /><div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} /><div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} /></div>
+                                <div className="flex gap-1"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} /><div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} /><div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} /></div>
                               </div>
                             </motion.div>
                           )}
@@ -567,16 +585,18 @@ export default function AIChatPage() {
                       )}
                       <div ref={messagesEndRef} />
                     </div>
-                    <div className="border-t border-border p-4">
-                      <div className="flex gap-3">
-                        <Input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSendMessage()} placeholder={t("chat.placeholder")} className="bg-white/[0.05] border-border text-white placeholder-slate-500" disabled={isLoading} />
-                        <Button onClick={handleSendMessage} disabled={!input.trim() || isLoading} className="bg-blue-600 hover:bg-blue-500"><Send className="w-4 h-4" /></Button>
+
+                    {/* Sticky Input */}
+                    <div className="border-t border-border p-2.5 sm:p-3 md:p-4 bg-card/95 backdrop-blur shrink-0">
+                      <div className="flex gap-2 md:gap-3 max-w-4xl mx-auto">
+                        <Input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSendMessage()} placeholder={t("chat.placeholder")} className="bg-white/[0.05] border-border text-white placeholder-slate-500 h-11 text-sm" disabled={isLoading} />
+                        <Button onClick={handleSendMessage} disabled={!input.trim() || isLoading} className="bg-blue-600 hover:bg-blue-500 h-11 w-11 p-0 shrink-0"><Send className="w-4 h-4" /></Button>
                       </div>
                     </div>
                   </>
                 ) : (
                   <div className="flex items-center justify-center h-full">
-                    <div className="text-center space-y-3">
+                    <div className="text-center space-y-4 px-4">
                       <div className="w-16 h-16 rounded-2xl bg-blue-500/15 flex items-center justify-center mx-auto"><MessageCircle className="w-8 h-8 text-primary" /></div>
                       <p className="text-muted-foreground text-lg">{t("chat.startNewChat")}</p>
                       <Button onClick={handleCreateConversation} className="bg-blue-600 hover:bg-blue-500"><Plus className="w-4 h-4 me-2" />New Conversation</Button>
