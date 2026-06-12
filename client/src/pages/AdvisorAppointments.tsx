@@ -30,13 +30,13 @@ export default function AdvisorAppointments() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 max-w-5xl mx-auto space-y-6">
-        <motion.div {...fadeInUp} className="flex items-center justify-between">
+      <div className="p-3 sm:p-6 max-w-5xl mx-auto space-y-6">
+        <motion.div {...fadeInUp} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-white">{t("advisor.appointments")}</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">{t("advisor.appointments")}</h1>
             <p className="text-slate-400 mt-1">{t("advisor.appointmentsDesc")}</p>
           </div>
-          <Button onClick={() => setShowForm(true)} className="bg-violet-600 hover:bg-violet-700"><Plus className="w-4 h-4 me-2" />{t("advisor.scheduleAppointment")}</Button>
+          <Button onClick={() => setShowForm(true)} className="bg-violet-600 hover:bg-violet-700 w-full sm:w-auto"><Plus className="w-4 h-4 me-2" />{t("advisor.scheduleAppointment")}</Button>
         </motion.div>
 
         <div className="space-y-6">
@@ -45,16 +45,16 @@ export default function AdvisorAppointments() {
             {upcoming.length === 0 ? <p className="text-slate-400 text-center py-8">{t("advisor.noUpcomingAppointments")}</p> : (
               <div className="space-y-3">
                 {upcoming.map((appt: any) => (
-                  <div key={appt.id} className="p-4 rounded-xl bg-white/[0.04] flex items-center justify-between">
+                  <div key={appt.id} className="p-4 rounded-xl bg-white/[0.04] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-violet-500/15 flex items-center justify-center"><Clock className="w-5 h-5 text-violet-400" /></div>
-                      <div>
-                        <p className="text-sm font-medium text-white">{appt.title}</p>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-white truncate">{appt.title}</p>
                         <p className="text-xs text-slate-400">{new Date(appt.scheduledAt).toLocaleString()} • {appt.durationMinutes}m</p>
-                        {appt.location && <p className="text-xs text-slate-500 flex items-center gap-1"><MapPin className="w-3 h-3" />{appt.location}</p>}
+                        {appt.location && <p className="text-xs text-slate-500 flex items-center gap-1"><MapPin className="w-3 h-3 shrink-0" />{appt.location}</p>}
                       </div>
                     </div>
-                    <Button onClick={() => cancelAppt.mutate(appt.id)} variant="outline" size="sm" className="border-white/10 text-slate-300 hover:bg-white/[0.07]">{t("common.cancel")}</Button>
+                    <Button onClick={() => cancelAppt.mutate(appt.id)} variant="outline" size="sm" className="border-white/10 text-slate-300 hover:bg-white/[0.07] w-full sm:w-auto">{t("common.cancel")}</Button>
                   </div>
                 ))}
               </div>
@@ -67,9 +67,9 @@ export default function AdvisorAppointments() {
               <div className="space-y-3">
                 {past.slice(0, 10).map((appt: any) => (
                   <div key={appt.id} className="p-4 rounded-xl bg-white/[0.04] opacity-70">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-white">{appt.title}</p>
-                      <span className={`text-xs px-2 py-0.5 rounded ${appt.status === "completed" ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"}`}>{appt.status}</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <p className="text-sm font-medium text-white truncate">{appt.title}</p>
+                      <span className={`text-xs px-2 py-0.5 rounded self-start sm:self-auto ${appt.status === "completed" ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"}`}>{appt.status}</span>
                     </div>
                     <p className="text-xs text-slate-400 mt-1">{new Date(appt.scheduledAt).toLocaleString()}</p>
                   </div>

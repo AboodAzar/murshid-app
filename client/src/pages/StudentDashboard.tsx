@@ -358,17 +358,19 @@ export default function StudentDashboard() {
 
             {/* My Courses */}
             <motion.div initial="initial" animate="animate" variants={staggerContainer} className="space-y-4">
-              <motion.div variants={fadeInUp} className="flex items-center justify-between">
+              <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
                     <Layers className="w-4 h-4 text-white" />
                   </div>
                   <h2 className="text-lg font-bold text-white">{t("student.myCourses")}</h2>
                 </div>
-                <span className="text-[10px] text-muted-foreground bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50">{activeCourses.length} {t("student.courses")}</span>
-                <button onClick={() => setLocation("/courses")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ms-auto">
-                  {t("student.viewAll")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-muted-foreground bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50">{activeCourses.length} {t("student.courses")}</span>
+                  <button onClick={() => setLocation("/courses")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ms-auto">
+                    {t("student.viewAll")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
+                  </button>
+                </div>
               </motion.div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -434,17 +436,19 @@ export default function StudentDashboard() {
 
             {/* Upcoming Assignments */}
             <motion.div initial="initial" animate="animate" variants={staggerContainer} className="space-y-4">
-              <motion.div variants={fadeInUp} className="flex items-center justify-between">
+              <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center">
                     <FileText className="w-4 h-4 text-white" />
                   </div>
                   <h2 className="text-lg font-bold text-white">{t("student.upcomingAssignments")}</h2>
                 </div>
-                <span className="text-[10px] text-muted-foreground bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50">{(overview?.upcomingAssignments ?? []).length} {t("student.pending")}</span>
-                <button onClick={() => setLocation("/assignments")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ms-auto">
-                  {t("student.viewAll")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-muted-foreground bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50">{(overview?.upcomingAssignments ?? []).length} {t("student.pending")}</span>
+                  <button onClick={() => setLocation("/assignments")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ms-auto">
+                    {t("student.viewAll")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
+                  </button>
+                </div>
               </motion.div>
 
               <div className="space-y-2">
@@ -579,17 +583,19 @@ export default function StudentDashboard() {
 
             {/* Today's Schedule */}
             <motion.div initial="initial" animate="animate" variants={staggerContainer} className="space-y-4">
-              <motion.div variants={fadeInUp} className="flex items-center justify-between">
+              <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
                     <Clock className="w-4 h-4 text-white" />
                   </div>
                   <h2 className="text-lg font-bold text-white">{t("student.todaySchedule")}</h2>
                 </div>
-                <button onClick={() => setLocation("/schedule")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ms-auto">
-                  {t("student.viewFull")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
-                </button>
-                {nextUpcoming && <CountdownTimer minutes={nextUpcoming.countdownMinutes} t={t} />}
+                <div className="flex items-center gap-2">
+                  {nextUpcoming && <CountdownTimer minutes={nextUpcoming.countdownMinutes} t={t} />}
+                  <button onClick={() => setLocation("/schedule")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ms-auto">
+                    {t("student.viewFull")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
+                  </button>
+                </div>
               </motion.div>
 
               {/* Featured lecture card */}
@@ -713,7 +719,7 @@ export default function StudentDashboard() {
             {/* Study Streak */}
             <motion.div initial="initial" animate="animate" variants={staggerContainer}>
               <motion.div variants={fadeInUp} className="glass-card-strong rounded-2xl p-4 sm:p-5 border border-orange-500/10 glow-amber">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
                   <div className="flex items-center gap-2">
                     <Flame className="w-5 h-5 text-orange-400" />
                     <h3 className="text-sm font-bold text-white">{t("student.studyStreak")}</h3>
@@ -750,19 +756,21 @@ export default function StudentDashboard() {
 
             {/* Achievement Badges */}
             <motion.div initial="initial" animate="animate" variants={staggerContainer} className="space-y-4">
-              <motion.div variants={fadeInUp} className="flex items-center justify-between">
+              <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-500 to-amber-500 flex items-center justify-center">
                     <Award className="w-4 h-4 text-white" />
                   </div>
                   <h2 className="text-lg font-bold text-white">{t("student.achievements")}</h2>
                 </div>
-                <span className="text-[10px] text-muted-foreground bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50">
-                  {(overview?.achievements ?? EMPTY_ACHIEVEMENTS).filter(a => a.unlocked).length}/{(overview?.achievements ?? EMPTY_ACHIEVEMENTS).length}
-                </span>
-                <button onClick={() => setLocation("/achievements")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ms-auto">
-                  {t("student.viewAll")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-muted-foreground bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50">
+                    {(overview?.achievements ?? EMPTY_ACHIEVEMENTS).filter(a => a.unlocked).length}/{(overview?.achievements ?? EMPTY_ACHIEVEMENTS).length}
+                  </span>
+                  <button onClick={() => setLocation("/achievements")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ms-auto">
+                    {t("student.viewAll")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
+                  </button>
+                </div>
               </motion.div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {overviewL ? (
@@ -813,14 +821,14 @@ export default function StudentDashboard() {
             {/* Announcements */}
             {announcements.length > 0 && (
               <motion.div initial="initial" animate="animate" variants={staggerContainer} className="space-y-4">
-                <motion.div variants={fadeInUp} className="flex items-center justify-between">
+                <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-500 to-slate-600 flex items-center justify-center">
                       <Bell className="w-4 h-4 text-white" />
                     </div>
                     <h2 className="text-lg font-bold text-white">{t("student.announcements")}</h2>
                   </div>
-                  <button onClick={() => setLocation("/announcements")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5">
+                  <button onClick={() => setLocation("/announcements")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 self-start sm:self-auto">
                     {t("student.viewAll")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
                   </button>
                 </motion.div>

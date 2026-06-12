@@ -35,19 +35,19 @@ export default function Assignments() {
               ? Math.ceil((new Date(a.dueDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
               : 0;
             return (
-              <div key={a.id} className="flex items-center justify-between p-4 rounded-xl bg-slate-800/30 border border-white/5">
-                <div>
-                  <p className="text-white font-medium">{a.title}</p>
+              <div key={a.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 rounded-xl bg-slate-800/30 border border-white/5 gap-3 sm:gap-0">
+                <div className="min-w-0">
+                  <p className="text-white font-medium truncate">{a.title}</p>
                   <p className="text-sm text-slate-400">{a.courseCode} • {a.courseName}</p>
                 </div>
-                <div className="text-end">
+                <div className="text-start sm:text-end">
                   {a.status === "pending" && daysLeft >= 0 && (
-                    <p className="text-xs text-amber-400 flex items-center justify-end gap-1">
+                    <p className="text-xs text-amber-400 flex items-center justify-start sm:justify-end gap-1">
                       <Clock className="w-3 h-3" /> {daysLeft} {t("student.daysLeft")}
                     </p>
                   )}
                   {a.status === "overdue" && (
-                    <p className="text-xs text-red-400 flex items-center justify-end gap-1">
+                    <p className="text-xs text-red-400 flex items-center justify-start sm:justify-end gap-1">
                       <AlertCircle className="w-3 h-3" /> {t("student.overdue")}
                     </p>
                   )}
@@ -74,12 +74,12 @@ export default function Assignments() {
   return (
     <DashboardLayout>
       <div className="space-y-6 pb-10">
-        <motion.div {...fadeInUp} className="flex items-center justify-between">
+        <motion.div {...fadeInUp} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white">{t("student.assignments")}</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">{t("student.assignments")}</h1>
             <p className="text-slate-400 mt-1">{assignments.length} {t("student.totalAssignments")}</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap justify-start sm:justify-end">
             <div className="text-center px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
               <p className="text-2xl font-bold text-amber-400">{pending.length}</p>
               <p className="text-xs text-slate-400">{t("student.pending")}</p>

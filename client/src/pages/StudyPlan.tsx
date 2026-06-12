@@ -86,7 +86,7 @@ export default function StudyPlan() {
               const semCourses = courses.filter((c) => c.semester === sem);
               return (
                 <motion.div key={sem} {...fadeInUp} className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-2xl">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
                     <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                       <Calendar className="w-5 h-5 text-cyan-400" /> {t("student.semester")} {sem}
                     </h3>
@@ -96,25 +96,25 @@ export default function StudyPlan() {
                   </div>
                   <div className="space-y-2">
                     {semCourses.map((c) => (
-                      <div key={c.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-800/30 border border-white/5">
+                      <div key={c.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-xl bg-slate-800/30 border border-white/5 gap-2 sm:gap-0">
                         <div className="flex items-center gap-3">
                           {c.status === "completed" ? (
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                           ) : c.status === "in_progress" ? (
-                            <Circle className="w-4 h-4 text-blue-400" />
+                            <Circle className="w-4 h-4 text-blue-400 shrink-0" />
                           ) : (
-                            <Circle className="w-4 h-4 text-slate-500" />
+                            <Circle className="w-4 h-4 text-slate-500 shrink-0" />
                           )}
-                          <div>
-                            <p className="text-white font-medium">{c.name}</p>
+                          <div className="min-w-0">
+                            <p className="text-white font-medium truncate">{c.name}</p>
                             <p className="text-xs text-slate-400">{c.code} • {c.credits} {t("student.credits")}</p>
                           </div>
                         </div>
-                        <div className="text-end">
+                        <div className="text-start sm:text-end ps-7 sm:ps-0">
                           {c.grade && (
                             <span className="text-sm font-medium text-emerald-400">{c.grade}</span>
                           )}
-                          <span className={`ms-2 text-xs font-medium px-2 py-0.5 rounded-full ${
+                          <span className={`ms-0 sm:ms-2 text-xs font-medium px-2 py-0.5 rounded-full ${
                             c.status === "completed" ? "bg-emerald-500/15 text-emerald-400" :
                             c.status === "in_progress" ? "bg-blue-500/15 text-blue-400" :
                             "bg-slate-500/15 text-slate-400"

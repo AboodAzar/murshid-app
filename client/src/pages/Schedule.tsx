@@ -76,24 +76,24 @@ export default function Schedule() {
                   </h3>
                   <div className="space-y-3">
                     {items.map((s) => (
-                      <div key={s.id} className={`flex items-center justify-between p-4 rounded-xl bg-slate-800/30 border-s-4 ${dayColors[day]} border-y border-e border-white/5`}>
+                      <div key={s.id} className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 rounded-xl bg-slate-800/30 border-s-4 ${dayColors[day]} border-y border-e border-white/5 gap-3 sm:gap-0`}>
                         <div className="flex items-center gap-4">
                           <div className="text-center min-w-[70px]">
                             <p className="text-white font-bold text-lg">{s.startTime}</p>
                             <p className="text-xs text-slate-400">{s.endTime}</p>
                           </div>
-                          <div className="h-10 w-px bg-white/10" />
-                          <div>
-                            <p className="text-white font-medium">{s.courseName}</p>
+                          <div className="hidden sm:block h-10 w-px bg-white/10" />
+                          <div className="min-w-0">
+                            <p className="text-white font-medium truncate">{s.courseName}</p>
                             <p className="text-sm text-slate-400">{s.courseCode}</p>
                           </div>
                         </div>
-                        <div className="text-end space-y-1">
-                          <p className="text-sm text-slate-300 flex items-center justify-end gap-1.5">
-                            <MapPin className="w-3.5 h-3.5 text-slate-500" /> {s.buildingName} • {t("student.room")} {s.roomNumber}
+                        <div className="text-start sm:text-end space-y-1 ps-[86px] sm:ps-0">
+                          <p className="text-sm text-slate-300 flex items-center justify-start sm:justify-end gap-1.5">
+                            <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0" /> <span className="truncate">{s.buildingName} • {t("student.room")} {s.roomNumber}</span>
                           </p>
-                          <p className="text-xs text-slate-400 flex items-center justify-end gap-1.5">
-                            <Users className="w-3.5 h-3.5 text-slate-500" /> {s.lecturerName}
+                          <p className="text-xs text-slate-400 flex items-center justify-start sm:justify-end gap-1.5">
+                            <Users className="w-3.5 h-3.5 text-slate-500 shrink-0" /> <span className="truncate">{s.lecturerName}</span>
                           </p>
                         </div>
                       </div>
