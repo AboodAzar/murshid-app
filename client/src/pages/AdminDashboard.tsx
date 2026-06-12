@@ -656,10 +656,10 @@ export default function AdminDashboard() {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="flex flex-col gap-3 sm:grid sm:grid-cols-[auto_1fr_auto_auto_auto_auto] sm:items-center sm:gap-4 px-4 py-3 sm:px-6 sm:py-4 hover:bg-accent/30 transition-colors"
+                                className="grid grid-cols-[auto_1fr_auto_auto_auto_auto] items-center gap-1.5 sm:gap-4 px-2.5 py-2 sm:px-6 sm:py-4 hover:bg-accent/30 transition-colors"
                               >
                                 {/* Left: Avatar + User info */}
-                                <div className="flex items-center gap-3 sm:contents">
+                                <div className="flex items-center gap-3 contents">
                                   {/* Avatar */}
                                   <div
                                     className={`w-10 h-10 rounded-xl bg-gradient-to-br ${getAvatarGradient(u.id)} flex items-center justify-center text-white font-semibold text-sm shrink-0 shadow-sm`}
@@ -689,7 +689,7 @@ export default function AdminDashboard() {
                                 </div>
 
                                 {/* Right: Role + Status + Actions */}
-                                <div className="flex items-center gap-2 flex-wrap justify-end sm:contents">
+                                <div className="flex items-center gap-2 flex-wrap justify-end contents">
                                   {/* Role badge */}
                                   <div className="flex sm:justify-center">
                                     <Select
@@ -703,7 +703,7 @@ export default function AdminDashboard() {
                                       }}
                                     >
                                       <SelectTrigger
-                                        className={`h-7 text-xs border px-2 gap-1.5 w-28 ${meta.color} bg-transparent hover:bg-white/5`}
+                                        className={`h-7 text-xs border px-2 gap-1.5 w-24 sm:w-28 ${meta.color} bg-transparent hover:bg-white/5`}
                                       >
                                         {meta.icon}
                                         <SelectValue />
@@ -725,7 +725,7 @@ export default function AdminDashboard() {
                                           newStatus: !u.isActive,
                                         })
                                       }
-                                      className={`flex items-center gap-1.5 h-7 px-3 rounded-full text-xs font-medium border transition-all hover:scale-105 ${
+                                      className={`flex items-center gap-1.5 h-7 px-2 sm:px-3 rounded-full text-xs font-medium border transition-all hover:scale-105 ${
                                         u.isActive
                                           ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20"
                                           : "bg-slate-500/10 text-muted-foreground border-slate-500/30 hover:bg-slate-500/20"
