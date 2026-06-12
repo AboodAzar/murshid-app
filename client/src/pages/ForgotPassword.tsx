@@ -51,7 +51,7 @@ export default function ForgotPassword() {
           onClick={() => setLocation("/login")}
           className="flex items-center gap-2 text-slate-400 hover:text-slate-200 mb-8 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
           {t("auth.backToLogin")}
         </button>
 

@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Streamdown } from "streamdown";
 import DashboardLayout from "@/components/DashboardLayout";
+import Logo from "@/components/Logo";
 import {
   Sparkles, BrainCircuit, Send, Plus, Trash2, MessageCircle, Bot, User,
   Zap, Target, TrendingUp, TrendingDown, AlertTriangle, CheckCircle2,
@@ -42,7 +43,7 @@ function ScoreRing({ score, size = 100 }: { score: number; size?: number }) {
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span className="text-lg font-bold" style={{ color }}>{score}</span>
-        <span className="text-[9px] text-slate-500 uppercase tracking-wider">Score</span>
+        <span className="text-[9px] text-muted-foreground uppercase tracking-wider">Score</span>
       </div>
     </div>
   );
@@ -64,7 +65,7 @@ function StatusDot({ status }: { status: string }) {
 function ActivityIcon(props: any) { return <BarChart3 {...props} />; }
 
 const QUICK_ACTIONS = [
-  { id: "plan", label: "Study Plan", icon: ClipboardList, color: "bg-blue-500/15 text-blue-400", desc: "Weekly AI schedule" },
+  { id: "plan", label: "Study Plan", icon: ClipboardList, color: "bg-blue-500/15 text-primary", desc: "Weekly AI schedule" },
   { id: "gpa", label: "Analyze GPA", icon: BarChart3, color: "bg-violet-500/15 text-violet-400", desc: "Performance deep-dive" },
   { id: "graduation", label: "Graduation", icon: GraduationCap, color: "bg-emerald-500/15 text-emerald-400", desc: "Graduation forecast" },
   { id: "courses", label: "Courses", icon: BookOpen, color: "bg-amber-500/15 text-amber-400", desc: "Next semester picks" },
@@ -82,7 +83,7 @@ const SUGGESTED_PROMPTS = [
   "Explain my academic health score",
 ];
 
-interface Message { id?: number; role: "user" | "assistant"; content: string; createdAt?: Date; feedback?: "up" | "down" | "none"; }
+interface Message { id?: number; role: "user" | "assistant"; content: string; createdAt?: Date; feedback?: "up" | "down" | "none" | null; }
 
 export default function AIChatPage() {
   const { t } = useI18n();
@@ -133,7 +134,8 @@ export default function AIChatPage() {
 
   useEffect(() => {
     if (messagesData) {
-      setMessages(prev => { const hasOpt = prev.some(m => !m.id); if (hasOpt && prev.length >= messagesData.length) return prev; return messagesData; });
+      const data = messagesData;
+      setMessages(prev => { const hasOpt = prev.some(m => !m.id); if (hasOpt && prev.length >= data.length) return prev; return data; });
       scrollToBottom();
     }
   }, [messagesData]);
@@ -187,22 +189,25 @@ export default function AIChatPage() {
       <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
         {/* ─── Hero ─── */}
         <motion.div {...fadeInUp} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-900/40 via-slate-900/60 to-slate-900/80 border border-blue-500/20 backdrop-blur-2xl p-6 md:p-8">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute top-0 end-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-xs font-medium text-emerald-400 uppercase tracking-wider">AI Online</span>
+              <div className="flex items-center gap-3">
+                <Logo size={40} className="rounded-xl shadow-[0_0_30px_rgba(59,130,246,.35)]" />
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-xs font-medium text-emerald-400 uppercase tracking-wider">AI Online</span>
+                </div>
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-white">Welcome back, {studentName}.</h1>
-              <p className="text-slate-400 max-w-md">I'm <span className="text-blue-400 font-semibold">Murshid AI</span>, your academic advisor and study companion.</p>
+              <p className="text-muted-foreground max-w-md">I'm <span className="text-primary font-semibold">Murshid AI</span>, your academic advisor and study companion.</p>
             </div>
             {allLoaded ? (
               <div className="flex flex-wrap items-center gap-3">
-                <div className="bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 backdrop-blur-xl"><p className="text-xs text-slate-500">GPA</p><p className={`text-lg font-bold ${gpa >= 3 ? "text-emerald-400" : gpa >= 2.5 ? "text-amber-400" : "text-red-400"}`}>{gpa.toFixed(2)}</p></div>
-                <div className="bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 backdrop-blur-xl"><p className="text-xs text-slate-500">Health</p><p className={`text-lg font-bold ${healthScore >= 70 ? "text-emerald-400" : healthScore >= 50 ? "text-amber-400" : "text-red-400"}`}>{healthScore}</p></div>
-                <div className="bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 backdrop-blur-xl"><p className="text-xs text-slate-500">Semester</p><p className="text-lg font-bold text-white">{currentSem}</p></div>
-                <div className="bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 backdrop-blur-xl"><p className="text-xs text-slate-500">Progress</p><p className="text-lg font-bold text-blue-400">{Math.round(gradProgress * 100)}%</p></div>
+                <div className="bg-card border border-border rounded-xl px-4 py-3 backdrop-blur-xl"><p className="text-xs text-muted-foreground">GPA</p><p className={`text-lg font-bold ${gpa >= 3 ? "text-emerald-400" : gpa >= 2.5 ? "text-amber-400" : "text-red-400"}`}>{gpa.toFixed(2)}</p></div>
+                <div className="bg-card border border-border rounded-xl px-4 py-3 backdrop-blur-xl"><p className="text-xs text-muted-foreground">Health</p><p className={`text-lg font-bold ${healthScore >= 70 ? "text-emerald-400" : healthScore >= 50 ? "text-amber-400" : "text-red-400"}`}>{healthScore}</p></div>
+                <div className="bg-card border border-border rounded-xl px-4 py-3 backdrop-blur-xl"><p className="text-xs text-muted-foreground">Semester</p><p className="text-lg font-bold text-white">{currentSem}</p></div>
+                <div className="bg-card border border-border rounded-xl px-4 py-3 backdrop-blur-xl"><p className="text-xs text-muted-foreground">Progress</p><p className="text-lg font-bold text-primary">{Math.round(gradProgress * 100)}%</p></div>
               </div>
             ) : (
               <div className="flex gap-3"><Skeleton className="h-16 w-20" /><Skeleton className="h-16 w-20" /><Skeleton className="h-16 w-20" /><Skeleton className="h-16 w-20" /></div>
@@ -218,11 +223,11 @@ export default function AIChatPage() {
               <motion.div key={action.id} variants={scaleIn}>
                 <button
                   onClick={() => { if (action.id === "chat") setActiveTab("chat"); else if (["plan","schedule"].includes(action.id)) setActiveTab("planner"); else if (action.id === "career") setActiveTab("career"); else setActiveTab("insights"); }}
-                  className="w-full h-full p-4 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-2xl hover:bg-white/[0.07] hover:border-white/15 transition-all text-left group"
+                  className="w-full h-full p-4 rounded-xl bg-card border border-border backdrop-blur-2xl hover:bg-accent hover:border-border/80 transition-all text-start group"
                 >
                   <div className={`w-9 h-9 rounded-lg ${action.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}><Icon className="w-4 h-4" /></div>
                   <p className="text-xs font-semibold text-white leading-tight">{action.label}</p>
-                  <p className="text-[10px] text-slate-500 mt-1">{action.desc}</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">{action.desc}</p>
                 </button>
               </motion.div>
             );
@@ -231,12 +236,12 @@ export default function AIChatPage() {
 
         {/* ─── Main Tabs ─── */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white/[0.04] border border-white/10 backdrop-blur-2xl p-1 flex flex-wrap h-auto gap-1">
-            <TabsTrigger value="dashboard" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-slate-400"><BrainCircuit className="w-3.5 h-3.5 mr-1.5" />Dashboard</TabsTrigger>
-            <TabsTrigger value="insights" className="data-[state=active]:bg-violet-600 data-[state=active]:text-white text-slate-400"><Zap className="w-3.5 h-3.5 mr-1.5" />Insights</TabsTrigger>
-            <TabsTrigger value="planner" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-slate-400"><ClipboardList className="w-3.5 h-3.5 mr-1.5" />Planner</TabsTrigger>
-            <TabsTrigger value="career" className="data-[state=active]:bg-rose-600 data-[state=active]:text-white text-slate-400"><Briefcase className="w-3.5 h-3.5 mr-1.5" />Career</TabsTrigger>
-            <TabsTrigger value="chat" className="data-[state=active]:bg-fuchsia-600 data-[state=active]:text-white text-slate-400"><Sparkles className="w-3.5 h-3.5 mr-1.5" />Chat</TabsTrigger>
+          <TabsList className="bg-card border border-border backdrop-blur-2xl p-1 flex flex-wrap h-auto gap-1">
+            <TabsTrigger value="dashboard" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-muted-foreground"><BrainCircuit className="w-3.5 h-3.5 me-1.5" />Dashboard</TabsTrigger>
+            <TabsTrigger value="insights" className="data-[state=active]:bg-violet-600 data-[state=active]:text-white text-muted-foreground"><Zap className="w-3.5 h-3.5 me-1.5" />Insights</TabsTrigger>
+            <TabsTrigger value="planner" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-muted-foreground"><ClipboardList className="w-3.5 h-3.5 me-1.5" />Planner</TabsTrigger>
+            <TabsTrigger value="career" className="data-[state=active]:bg-rose-600 data-[state=active]:text-white text-muted-foreground"><Briefcase className="w-3.5 h-3.5 me-1.5" />Career</TabsTrigger>
+            <TabsTrigger value="chat" className="data-[state=active]:bg-fuchsia-600 data-[state=active]:text-white text-muted-foreground"><Sparkles className="w-3.5 h-3.5 me-1.5" />Chat</TabsTrigger>
           </TabsList>
 
           {/* ─── Dashboard Tab ─── */}
@@ -244,7 +249,7 @@ export default function AIChatPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Academic Health */}
               <motion.div {...fadeInUp}>
-                <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+                <Card className="bg-card border-border backdrop-blur-2xl">
                   <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><ActivityIcon className="w-4 h-4 text-violet-400" />Academic Health</CardTitle></CardHeader>
                   <CardContent className="p-5 space-y-5">
                     {health ? (
@@ -252,14 +257,14 @@ export default function AIChatPage() {
                         <div className="flex items-center gap-5">
                           <ScoreRing score={health.overallScore} size={100} />
                           <div className="flex-1 space-y-3">
-                            <div><div className="flex items-center justify-between text-xs mb-1"><span className="text-slate-400">Overall</span><span className="text-white font-semibold">{health.overallScore}/100</span></div><MiniBar value={health.overallScore} color={health.overallScore >= 70 ? "#10b981" : health.overallScore >= 50 ? "#f59e0b" : "#ef4444"} /></div>
-                            <div className="flex items-center gap-2 text-xs"><StatusDot status={health.trend === "improving" ? "good" : health.trend === "declining" ? "high" : "fair"} /><span className="text-slate-400">Trend: <span className="text-white">{health.trend}</span></span></div>
+                            <div><div className="flex items-center justify-between text-xs mb-1"><span className="text-muted-foreground">Overall</span><span className="text-white font-semibold">{health.overallScore}/100</span></div><MiniBar value={health.overallScore} color={health.overallScore >= 70 ? "#10b981" : health.overallScore >= 50 ? "#f59e0b" : "#ef4444"} /></div>
+                            <div className="flex items-center gap-2 text-xs"><StatusDot status={health.trend === "improving" ? "good" : health.trend === "declining" ? "high" : "fair"} /><span className="text-muted-foreground">Trend: <span className="text-white">{health.trend}</span></span></div>
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           {(health.categories ?? []).map((c: any, i: number) => (
-                            <div key={i} className="p-3 rounded-lg bg-white/[0.03] border border-white/5">
-                              <p className="text-[10px] text-slate-500 uppercase">{c.name}</p>
+                            <div key={i} className="p-3 rounded-lg bg-card border border-border">
+                              <p className="text-[10px] text-muted-foreground uppercase">{c.name}</p>
                               <div className="flex items-center gap-2 mt-1"><span className="text-sm font-bold text-white">{c.score}</span><MiniBar value={c.score} color={c.score >= 70 ? "#10b981" : c.score >= 50 ? "#f59e0b" : "#ef4444"} /></div>
                             </div>
                           ))}
@@ -272,18 +277,18 @@ export default function AIChatPage() {
 
               {/* Graduation Predictor */}
               <motion.div {...fadeInUp}>
-                <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+                <Card className="bg-card border-border backdrop-blur-2xl">
                   <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><GraduationCap className="w-4 h-4 text-emerald-400" />Graduation Predictor</CardTitle></CardHeader>
                   <CardContent className="p-5 space-y-5">
                     {allLoaded ? (
                       <>
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center"><p className="text-[10px] text-slate-500 uppercase">Expected</p><p className="text-base font-bold text-white mt-1">{risk?.estimatedCompletionDate ? new Date(risk.estimatedCompletionDate).toLocaleDateString("en-US", { year: "numeric", month: "short" }) : "—"}</p></div>
-                          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center"><p className="text-[10px] text-slate-500 uppercase">Remaining</p><p className="text-base font-bold text-white mt-1">{roadmap ? (roadmap.totalCredits - roadmap.completedCredits) : (dashboard?.stats?.totalCredits ? dashboard.stats.totalCredits - (dashboard.stats.earnedCredits ?? 0) : "—")}</p></div>
-                          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center"><p className="text-[10px] text-slate-500 uppercase">Semesters</p><p className="text-base font-bold text-white mt-1">{semestersLeft}</p></div>
-                          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center"><p className="text-[10px] text-slate-500 uppercase">Risk</p><Badge className={`mt-1 ${RISK_BG[risk?.overallRisk ?? "low"]}`}>{risk?.overallRisk ?? "low"}</Badge></div>
+                          <div className="p-3 rounded-xl bg-card border border-border text-center"><p className="text-[10px] text-muted-foreground uppercase">Expected</p><p className="text-base font-bold text-white mt-1">{risk?.estimatedCompletionDate ? new Date(risk.estimatedCompletionDate).toLocaleDateString("en-US", { year: "numeric", month: "short" }) : "—"}</p></div>
+                          <div className="p-3 rounded-xl bg-card border border-border text-center"><p className="text-[10px] text-muted-foreground uppercase">Remaining</p><p className="text-base font-bold text-white mt-1">{roadmap ? (roadmap.totalCredits - roadmap.completedCredits) : (dashboard?.stats?.totalCredits ? dashboard.stats.totalCredits - (dashboard.stats.earnedCredits ?? 0) : "—")}</p></div>
+                          <div className="p-3 rounded-xl bg-card border border-border text-center"><p className="text-[10px] text-muted-foreground uppercase">Semesters</p><p className="text-base font-bold text-white mt-1">{semestersLeft}</p></div>
+                          <div className="p-3 rounded-xl bg-card border border-border text-center"><p className="text-[10px] text-muted-foreground uppercase">Risk</p><Badge className={`mt-1 ${RISK_BG[risk?.overallRisk ?? "low"]}`}>{risk?.overallRisk ?? "low"}</Badge></div>
                         </div>
-                        <div><p className="text-xs text-slate-500 mb-2">Progress</p><MiniBar value={gradProgress * 100} color="#10b981" /><p className="text-xs text-slate-500 mt-1 text-right">{Math.round(gradProgress * 100)}% complete</p></div>
+                        <div><p className="text-xs text-muted-foreground mb-2">Progress</p><MiniBar value={gradProgress * 100} color="#10b981" /><p className="text-xs text-muted-foreground mt-1 text-end">{Math.round(gradProgress * 100)}% complete</p></div>
                       </>
                     ) : <div className="space-y-4">{[1,2,3].map(i => <Skeleton key={i} className="h-16" />)}</div>}
                   </CardContent>
@@ -292,26 +297,26 @@ export default function AIChatPage() {
 
               {/* AI Twin / Alerts */}
               <motion.div {...fadeInUp} className="space-y-4">
-                <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
-                  <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Bot className="w-4 h-4 text-blue-400" />AI Academic Twin</CardTitle></CardHeader>
+                <Card className="bg-card border-border backdrop-blur-2xl">
+                  <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Bot className="w-4 h-4 text-primary" />AI Academic Twin</CardTitle></CardHeader>
                   <CardContent className="p-5 space-y-3">
                     {allLoaded ? (
                       <>
-                        <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.03] border border-white/5"><span className="text-xs text-slate-400">Predicted GPA</span><span className="text-sm font-bold text-blue-400">{forecast?.overallProjection?.currentGPA?.toFixed(2) ?? "—"}</span></div>
-                        <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.03] border border-white/5"><span className="text-xs text-slate-400">Confidence</span><span className="text-sm font-bold text-emerald-400">{forecast?.overallProjection?.confidenceLevel ?? "—"}</span></div>
-                        <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.03] border border-white/5"><span className="text-xs text-slate-400">Active Risks</span><span className="text-sm font-bold text-red-400">{risk?.factors?.length ?? 0}</span></div>
-                        <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.03] border border-white/5"><span className="text-xs text-slate-400">Streak</span><span className="text-sm font-bold text-amber-400">{overview?.streak?.current ?? 0} days</span></div>
+                        <div className="flex items-center justify-between p-3 rounded-lg bg-card border border-border"><span className="text-xs text-muted-foreground">Predicted GPA</span><span className="text-sm font-bold text-primary">{forecast?.overallProjection?.currentGPA?.toFixed(2) ?? "—"}</span></div>
+                        <div className="flex items-center justify-between p-3 rounded-lg bg-card border border-border"><span className="text-xs text-muted-foreground">Confidence</span><span className="text-sm font-bold text-emerald-400">{forecast?.overallProjection?.confidenceLevel ?? "—"}</span></div>
+                        <div className="flex items-center justify-between p-3 rounded-lg bg-card border border-border"><span className="text-xs text-muted-foreground">Active Risks</span><span className="text-sm font-bold text-red-400">{risk?.factors?.length ?? 0}</span></div>
+                        <div className="flex items-center justify-between p-3 rounded-lg bg-card border border-border"><span className="text-xs text-muted-foreground">Streak</span><span className="text-sm font-bold text-amber-400">{overview?.streak?.current ?? 0} days</span></div>
                       </>
                     ) : <div className="space-y-3">{[1,2,3,4].map(i => <Skeleton key={i} className="h-10" />)}</div>}
                   </CardContent>
                 </Card>
-                <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+                <Card className="bg-card border-border backdrop-blur-2xl">
                   <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Bell className="w-4 h-4 text-red-400" />Alerts</CardTitle></CardHeader>
                   <CardContent className="p-5 space-y-2">
                     {allLoaded ? (
                       dashboard?.advisorAlerts && dashboard.advisorAlerts.length > 0 ? dashboard.advisorAlerts.slice(0, 3).map((alert: any, i: number) => (
-                        <div key={i} className="flex items-start gap-2 p-2 rounded-lg bg-red-500/5 border border-red-500/10"><ShieldAlert className="w-3.5 h-3.5 text-red-400 shrink-0 mt-0.5" /><div><p className="text-xs text-white">{alert.title}</p><p className="text-[10px] text-slate-500">{alert.message}</p></div></div>
-                      )) : <div className="flex items-center gap-2 justify-center py-3"><CheckCircle2 className="w-4 h-4 text-emerald-400" /><p className="text-xs text-slate-400">No active alerts</p></div>
+                        <div key={i} className="flex items-start gap-2 p-2 rounded-lg bg-red-500/5 border border-red-500/10"><ShieldAlert className="w-3.5 h-3.5 text-red-400 shrink-0 mt-0.5" /><div><p className="text-xs text-white">{alert.title}</p><p className="text-[10px] text-muted-foreground">{alert.message}</p></div></div>
+                      )) : <div className="flex items-center gap-2 justify-center py-3"><CheckCircle2 className="w-4 h-4 text-emerald-400" /><p className="text-xs text-muted-foreground">No active alerts</p></div>
                     ) : <div className="space-y-2">{[1,2].map(i => <Skeleton key={i} className="h-10" />)}</div>}
                   </CardContent>
                 </Card>
@@ -320,18 +325,18 @@ export default function AIChatPage() {
 
             {/* Recommended Actions */}
             <motion.div {...fadeInUp}>
-              <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+              <Card className="bg-card border-border backdrop-blur-2xl">
                 <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Lightbulb className="w-4 h-4 text-amber-400" />Personalized Recommendations</CardTitle></CardHeader>
                 <CardContent className="p-5">
                   {allLoaded ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                       {recommendations?.recommendations && recommendations.recommendations.length > 0 ? recommendations.recommendations.slice(0, 6).map((rec: any, i: number) => (
-                        <div key={i} className="p-4 rounded-xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-colors">
-                          <div className="flex items-start justify-between gap-2"><p className="text-sm font-medium text-white">{rec.name}</p><Badge variant="outline" className="border-white/10 text-slate-400 text-[10px] shrink-0">{rec.score}</Badge></div>
-                          <p className="text-xs text-slate-500 mt-1">{rec.reason}</p>
+                        <div key={i} className="p-4 rounded-xl bg-card border border-border hover:bg-white/[0.05] transition-colors">
+                          <div className="flex items-start justify-between gap-2"><p className="text-sm font-medium text-white">{rec.name}</p><Badge variant="outline" className="border-border text-muted-foreground text-[10px] shrink-0">{rec.score}</Badge></div>
+                          <p className="text-xs text-muted-foreground mt-1">{rec.reason}</p>
                         </div>
                       )) : (
-                        <div className="col-span-full text-center py-6 text-slate-500"><Lightbulb className="w-8 h-8 mx-auto mb-2 opacity-30" /><p className="text-sm">Complete more courses to get AI recommendations</p></div>
+                        <div className="col-span-full text-center py-6 text-muted-foreground"><Lightbulb className="w-8 h-8 mx-auto mb-2 opacity-30" /><p className="text-sm">Complete more courses to get AI recommendations</p></div>
                       )}
                     </div>
                   ) : <div className="grid grid-cols-1 md:grid-cols-3 gap-3">{[1,2,3].map(i => <Skeleton key={i} className="h-20" />)}</div>}
@@ -342,16 +347,16 @@ export default function AIChatPage() {
             {/* Suggested Prompts */}
             <motion.div {...fadeInUp}>
               <Card className="bg-gradient-to-r from-blue-900/20 to-slate-900/20 border-blue-500/20 backdrop-blur-2xl">
-                <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><MessageCircle className="w-4 h-4 text-blue-400" />Ask Murshid AI</CardTitle></CardHeader>
+                <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><MessageCircle className="w-4 h-4 text-primary" />Ask Murshid AI</CardTitle></CardHeader>
                 <CardContent className="p-5">
                   <div className="flex flex-wrap gap-2">
                     {SUGGESTED_PROMPTS.map((prompt, i) => (
-                      <button key={i} onClick={() => openChatWithPrompt(prompt)} className="px-4 py-2 rounded-lg bg-white/[0.05] border border-white/10 text-xs text-slate-300 hover:bg-white/[0.08] hover:text-white hover:border-white/20 transition-all">
+                      <button key={i} onClick={() => openChatWithPrompt(prompt)} className="px-4 py-2 rounded-lg bg-white/[0.05] border border-border text-xs text-secondary-foreground hover:bg-white/[0.08] hover:text-white hover:border-white/20 transition-all">
                         {prompt}
                       </button>
                     ))}
                   </div>
-                  <Button className="mt-4 bg-blue-600 hover:bg-blue-500 text-white" onClick={() => setActiveTab("chat")}><Sparkles className="w-4 h-4 mr-2" />Start a Conversation</Button>
+                  <Button className="mt-4 bg-blue-600 hover:bg-blue-500 text-white" onClick={() => setActiveTab("chat")}><Sparkles className="w-4 h-4 me-2" />Start a Conversation</Button>
                 </CardContent>
               </Card>
             </motion.div>
@@ -361,33 +366,33 @@ export default function AIChatPage() {
           <TabsContent value="insights" className="mt-6 space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <motion.div {...fadeInUp}>
-                <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+                <Card className="bg-card border-border backdrop-blur-2xl">
                   <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Zap className="w-4 h-4 text-amber-400" />AI Academic Insights</CardTitle></CardHeader>
                   <CardContent className="p-5 space-y-3">
                     {allLoaded ? (
                       <>
                         {forecast && (
-                          <div className="flex items-start gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/5">
-                            <div className="w-8 h-8 rounded-lg bg-blue-500/15 flex items-center justify-center shrink-0"><TrendingUp className="w-4 h-4 text-blue-400" /></div>
-                            <div><p className="text-sm text-white">Predicted GPA: <span className="font-bold text-blue-400">{forecast?.overallProjection?.currentGPA?.toFixed(2) ?? "—"}</span></p><p className="text-xs text-slate-500">Based on current trajectory</p></div>
+                          <div className="flex items-start gap-3 p-3 rounded-lg bg-card border border-border">
+                            <div className="w-8 h-8 rounded-lg bg-blue-500/15 flex items-center justify-center shrink-0"><TrendingUp className="w-4 h-4 text-primary" /></div>
+                            <div><p className="text-sm text-white">Predicted GPA: <span className="font-bold text-primary">{forecast?.overallProjection?.currentGPA?.toFixed(2) ?? "—"}</span></p><p className="text-xs text-muted-foreground">Based on current trajectory</p></div>
                           </div>
                         )}
                         {risk && (
-                          <div className="flex items-start gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/5">
+                          <div className="flex items-start gap-3 p-3 rounded-lg bg-card border border-border">
                             <div className="w-8 h-8 rounded-lg bg-violet-500/15 flex items-center justify-center shrink-0"><Target className="w-4 h-4 text-violet-400" /></div>
-                            <div><p className="text-sm text-white">Graduation Risk: <span className="font-bold" style={{ color: RISK_COLORS[risk.overallRisk] ?? "#94a3b8" }}>{risk.overallRisk}</span></p><p className="text-xs text-slate-500">Score: {risk.score}</p></div>
+                            <div><p className="text-sm text-white">Graduation Risk: <span className="font-bold" style={{ color: RISK_COLORS[risk.overallRisk] ?? "#94a3b8" }}>{risk.overallRisk}</span></p><p className="text-xs text-muted-foreground">Score: {risk.score}</p></div>
                           </div>
                         )}
                         {warnings?.warnings && warnings.warnings.length > 0 && (
                           <div className="flex items-start gap-3 p-3 rounded-lg bg-red-500/5 border border-red-500/10">
                             <div className="w-8 h-8 rounded-lg bg-red-500/15 flex items-center justify-center shrink-0"><AlertTriangle className="w-4 h-4 text-red-400" /></div>
-                            <div><p className="text-sm text-white">At-Risk Courses</p><p className="text-xs text-slate-500">{warnings.warnings.length} course(s) need attention</p></div>
+                            <div><p className="text-sm text-white">At-Risk Courses</p><p className="text-xs text-muted-foreground">{warnings.warnings.length} course(s) need attention</p></div>
                           </div>
                         )}
                         {overview?.upcomingAssignments && overview.upcomingAssignments.length > 0 && (
-                          <div className="flex items-start gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/5">
+                          <div className="flex items-start gap-3 p-3 rounded-lg bg-card border border-border">
                             <div className="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center shrink-0"><Clock className="w-4 h-4 text-amber-400" /></div>
-                            <div><p className="text-sm text-white">Upcoming Deadlines</p><p className="text-xs text-slate-500">{overview.upcomingAssignments.length} assignment(s) due soon</p></div>
+                            <div><p className="text-sm text-white">Upcoming Deadlines</p><p className="text-xs text-muted-foreground">{overview.upcomingAssignments.length} assignment(s) due soon</p></div>
                           </div>
                         )}
                       </>
@@ -396,18 +401,18 @@ export default function AIChatPage() {
                 </Card>
               </motion.div>
               <motion.div {...fadeInUp}>
-                <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+                <Card className="bg-card border-border backdrop-blur-2xl">
                   <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><BarChart3 className="w-4 h-4 text-cyan-400" />AI Analytics</CardTitle></CardHeader>
                   <CardContent className="p-5 space-y-4">
                     {allLoaded ? (
                       <>
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center"><p className="text-[10px] text-slate-500 uppercase">Questions</p><p className="text-xl font-bold text-white mt-1">{conversations.length * 3 + 12}</p></div>
-                          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center"><p className="text-[10px] text-slate-500 uppercase">Engagement</p><p className="text-xl font-bold text-white mt-1">{healthScore > 0 ? Math.min(100, Math.round(healthScore * 0.8 + 20)) : "—"}</p></div>
-                          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center"><p className="text-[10px] text-slate-500 uppercase">Courses</p><p className="text-xl font-bold text-white mt-1">{dashboard?.courses?.length ?? 0}</p></div>
-                          <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-center"><p className="text-[10px] text-slate-500 uppercase">Streak</p><p className="text-xl font-bold text-white mt-1">{overview?.streak?.current ?? 0}d</p></div>
+                          <div className="p-3 rounded-xl bg-card border border-border text-center"><p className="text-[10px] text-muted-foreground uppercase">Questions</p><p className="text-xl font-bold text-white mt-1">{conversations.length * 3 + 12}</p></div>
+                          <div className="p-3 rounded-xl bg-card border border-border text-center"><p className="text-[10px] text-muted-foreground uppercase">Engagement</p><p className="text-xl font-bold text-white mt-1">{healthScore > 0 ? Math.min(100, Math.round(healthScore * 0.8 + 20)) : "—"}</p></div>
+                          <div className="p-3 rounded-xl bg-card border border-border text-center"><p className="text-[10px] text-muted-foreground uppercase">Courses</p><p className="text-xl font-bold text-white mt-1">{dashboard?.courses?.length ?? 0}</p></div>
+                          <div className="p-3 rounded-xl bg-card border border-border text-center"><p className="text-[10px] text-muted-foreground uppercase">Streak</p><p className="text-xl font-bold text-white mt-1">{overview?.streak?.current ?? 0}d</p></div>
                         </div>
-                        <div><p className="text-xs text-slate-500 mb-2">Academic Improvement</p><MiniBar value={gpa >= 3 ? 85 : gpa >= 2.5 ? 60 : 35} color="#10b981" /></div>
+                        <div><p className="text-xs text-muted-foreground mb-2">Academic Improvement</p><MiniBar value={gpa >= 3 ? 85 : gpa >= 2.5 ? 60 : 35} color="#10b981" /></div>
                       </>
                     ) : <div className="space-y-4">{[1,2,3].map(i => <Skeleton key={i} className="h-16" />)}</div>}
                   </CardContent>
@@ -415,15 +420,15 @@ export default function AIChatPage() {
               </motion.div>
             </div>
             <motion.div {...fadeInUp}>
-              <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+              <Card className="bg-card border-border backdrop-blur-2xl">
                 <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><ClipboardList className="w-4 h-4 text-cyan-400" />Study Planner Snapshot</CardTitle></CardHeader>
                 <CardContent className="p-5">
                   {allLoaded ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                      <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 text-center"><Calendar className="w-5 h-5 text-cyan-400 mx-auto mb-2" /><p className="text-xs text-slate-500">Weekly Schedule</p><p className="text-sm font-bold text-white mt-1">{dashboard?.courses?.length ?? 0} courses</p></div>
-                      <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 text-center"><PenLine className="w-5 h-5 text-amber-400 mx-auto mb-2" /><p className="text-xs text-slate-500">Assignments</p><p className="text-sm font-bold text-white mt-1">{overview?.upcomingAssignments?.length ?? 0} pending</p></div>
-                      <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 text-center"><Clock className="w-5 h-5 text-blue-400 mx-auto mb-2" /><p className="text-xs text-slate-500">Study Hours</p><p className="text-sm font-bold text-white mt-1">{Math.round((dashboard?.courses?.length ?? 0) * 4.5)}h/week</p></div>
-                      <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 text-center"><Target className="w-5 h-5 text-emerald-400 mx-auto mb-2" /><p className="text-xs text-slate-500">Focus Areas</p><p className="text-sm font-bold text-white mt-1">{warnings?.warnings?.filter((w: any) => w.type === 'at_risk').length ?? 0} at risk</p></div>
+                      <div className="p-4 rounded-xl bg-card border border-border text-center"><Calendar className="w-5 h-5 text-cyan-400 mx-auto mb-2" /><p className="text-xs text-muted-foreground">Weekly Schedule</p><p className="text-sm font-bold text-white mt-1">{dashboard?.courses?.length ?? 0} courses</p></div>
+                      <div className="p-4 rounded-xl bg-card border border-border text-center"><PenLine className="w-5 h-5 text-amber-400 mx-auto mb-2" /><p className="text-xs text-muted-foreground">Assignments</p><p className="text-sm font-bold text-white mt-1">{overview?.upcomingAssignments?.length ?? 0} pending</p></div>
+                      <div className="p-4 rounded-xl bg-card border border-border text-center"><Clock className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-xs text-muted-foreground">Study Hours</p><p className="text-sm font-bold text-white mt-1">{Math.round((dashboard?.courses?.length ?? 0) * 4.5)}h/week</p></div>
+                      <div className="p-4 rounded-xl bg-card border border-border text-center"><Target className="w-5 h-5 text-emerald-400 mx-auto mb-2" /><p className="text-xs text-muted-foreground">Focus Areas</p><p className="text-sm font-bold text-white mt-1">{warnings?.warnings?.filter((w: any) => w.type === 'at_risk').length ?? 0} at risk</p></div>
                     </div>
                   ) : <div className="grid grid-cols-4 gap-3">{[1,2,3,4].map(i => <Skeleton key={i} className="h-20" />)}</div>}
                 </CardContent>
@@ -435,31 +440,31 @@ export default function AIChatPage() {
           <TabsContent value="planner" className="mt-6 space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <motion.div {...fadeInUp}>
-                <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+                <Card className="bg-card border-border backdrop-blur-2xl">
                   <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><BookOpen className="w-4 h-4 text-amber-400" />Smart Course Recommendations</CardTitle></CardHeader>
                   <CardContent className="p-5 space-y-3">
                     {recLoading ? <div className="space-y-3">{[1,2,3].map(i => <Skeleton key={i} className="h-20" />)}</div> :
                       recommendations && recommendations.recommendations?.length > 0 ? recommendations.recommendations.slice(0, 5).map((rec: any, i: number) => (
-                        <div key={i} className="p-4 rounded-xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-colors">
-                          <div className="flex items-start justify-between gap-3"><div><p className="text-sm font-semibold text-white">{rec.name}</p><p className="text-xs text-slate-500 mt-1">{rec.reason}</p></div><Badge variant="outline" className="border-white/10 text-slate-400 text-[10px] shrink-0">{rec.score}</Badge></div>
+                        <div key={i} className="p-4 rounded-xl bg-card border border-border hover:bg-white/[0.05] transition-colors">
+                          <div className="flex items-start justify-between gap-3"><div><p className="text-sm font-semibold text-white">{rec.name}</p><p className="text-xs text-muted-foreground mt-1">{rec.reason}</p></div><Badge variant="outline" className="border-border text-muted-foreground text-[10px] shrink-0">{rec.score}</Badge></div>
                         </div>
                       )) : planner?.plan?.courses && planner.plan.courses.length > 0 ? planner.plan.courses.slice(0, 5).map((rec: any, i: number) => (
-                        <div key={i} className="p-4 rounded-xl bg-white/[0.03] border border-white/5"><p className="text-sm font-semibold text-white">{rec.name ?? "Course"}</p><p className="text-xs text-slate-500 mt-1">{rec.reason ?? "Recommended for your plan"}</p></div>
-                      )) : <div className="text-center py-8 text-slate-500"><BookOpen className="w-8 h-8 mx-auto mb-2 opacity-30" /><p className="text-sm">No recommendations yet</p></div>}
+                        <div key={i} className="p-4 rounded-xl bg-card border border-border"><p className="text-sm font-semibold text-white">{rec.name ?? "Course"}</p><p className="text-xs text-muted-foreground mt-1">{rec.reason ?? "Recommended for your plan"}</p></div>
+                      )) : <div className="text-center py-8 text-muted-foreground"><BookOpen className="w-8 h-8 mx-auto mb-2 opacity-30" /><p className="text-sm">No recommendations yet</p></div>}
                   </CardContent>
                 </Card>
               </motion.div>
               <motion.div {...fadeInUp}>
-                <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl">
+                <Card className="bg-card border-border backdrop-blur-2xl">
                   <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><ClipboardList className="w-4 h-4 text-cyan-400" />Degree Roadmap</CardTitle></CardHeader>
                   <CardContent className="p-5 space-y-3">
                     {rmLoading ? <div className="space-y-3">{[1,2,3,4].map(i => <Skeleton key={i} className="h-12" />)}</div> :
                       roadmap?.roadmap && roadmap.roadmap.length > 0 ? roadmap.roadmap.slice(0, 6).map((item: any, i: number) => (
-                        <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white/[0.03] border border-white/5">
-                          <div className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-blue-500/15 flex items-center justify-center text-xs font-bold text-blue-400">{item.semester}</div><span className="text-sm text-white">{item.credits} credits</span></div>
-                          <span className="text-xs text-slate-500">{item.status}</span>
+                        <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-card border border-border">
+                          <div className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-blue-500/15 flex items-center justify-center text-xs font-bold text-primary">{item.semester}</div><span className="text-sm text-white">{item.credits} credits</span></div>
+                          <span className="text-xs text-muted-foreground">{item.status}</span>
                         </div>
-                      )) : <div className="text-center py-8 text-slate-500"><Compass className="w-8 h-8 mx-auto mb-2 opacity-30" /><p className="text-sm">Roadmap data not available</p></div>}
+                      )) : <div className="text-center py-8 text-muted-foreground"><Compass className="w-8 h-8 mx-auto mb-2 opacity-30" /><p className="text-sm">Roadmap data not available</p></div>}
                   </CardContent>
                 </Card>
               </motion.div>
@@ -472,18 +477,18 @@ export default function AIChatPage() {
               {cLoading ? [1,2,3].map(i => <Skeleton key={i} className="h-64" />) :
                 career?.matches && career.matches.length > 0 ? career.matches.slice(0, 6).map((c: any, i: number) => (
                   <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-                    <Card className="bg-white/[0.04] border-white/10 backdrop-blur-2xl h-full hover:bg-white/[0.06] transition-colors">
+                    <Card className="bg-card border-border backdrop-blur-2xl h-full hover:bg-white/[0.06] transition-colors">
                       <CardContent className="p-5 space-y-3">
-                        <div className="flex items-start justify-between"><div className={`w-10 h-10 rounded-lg ${i % 2 === 0 ? "bg-rose-500/15 text-rose-400" : "bg-blue-500/15 text-blue-400"} flex items-center justify-center`}><Briefcase className="w-5 h-5" /></div><Badge variant="outline" className="border-white/10 text-slate-400 text-[10px]">{c.matchPercentage ?? 0}% match</Badge></div>
+                        <div className="flex items-start justify-between"><div className={`w-10 h-10 rounded-lg ${i % 2 === 0 ? "bg-rose-500/15 text-rose-400" : "bg-blue-500/15 text-primary"} flex items-center justify-center`}><Briefcase className="w-5 h-5" /></div><Badge variant="outline" className="border-border text-muted-foreground text-[10px]">{c.matchPercentage ?? 0}% match</Badge></div>
                         <h4 className="text-sm font-bold text-white">{c.title}</h4>
-                        <p className="text-xs text-slate-500">{c.description}</p>
-                        <div className="space-y-1"><p className="text-[10px] text-slate-500 uppercase">Skills</p><div className="flex flex-wrap gap-1">{(c.requiredSkills ?? []).slice(0, 4).map((s: string, j: number) => <Badge key={j} variant="outline" className="border-white/10 text-slate-400 text-[10px]">{s}</Badge>)}</div></div>
-                        <div className="pt-2 border-t border-white/5 flex items-center justify-between text-xs text-slate-500"><span>Salary: {c.avgStartingSalary}</span><span className="text-emerald-400">{c.growthOutlook}</span></div>
+                        <p className="text-xs text-muted-foreground">{c.description}</p>
+                        <div className="space-y-1"><p className="text-[10px] text-muted-foreground uppercase">Skills</p><div className="flex flex-wrap gap-1">{(c.requiredSkills ?? []).slice(0, 4).map((s: string, j: number) => <Badge key={j} variant="outline" className="border-border text-muted-foreground text-[10px]">{s}</Badge>)}</div></div>
+                        <div className="pt-2 border-t border-border flex items-center justify-between text-xs text-muted-foreground"><span>Salary: {c.avgStartingSalary}</span><span className="text-emerald-400">{c.growthOutlook}</span></div>
                       </CardContent>
                     </Card>
                   </motion.div>
                 )) : (
-                  <div className="col-span-full text-center py-10 text-slate-500">
+                  <div className="col-span-full text-center py-10 text-muted-foreground">
                     <Briefcase className="w-10 h-10 mx-auto mb-3 opacity-30" />
                     <p className="text-sm">Complete your profile and courses to see career matches.</p>
                   </div>
@@ -495,32 +500,32 @@ export default function AIChatPage() {
           <TabsContent value="chat" className="mt-6">
             <div className="flex h-[calc(100vh-220px)] gap-4">
               {/* Sidebar */}
-              <div className="w-64 bg-white/[0.04] border border-white/10 rounded-xl p-4 flex flex-col backdrop-blur-2xl">
-                <Button onClick={handleCreateConversation} className="w-full mb-4 bg-blue-600 hover:bg-blue-500" disabled={createConv.isPending}><Plus className="w-4 h-4 mr-2" />New Chat</Button>
+              <div className="w-64 bg-card border border-border rounded-xl p-4 flex flex-col backdrop-blur-2xl">
+                <Button onClick={handleCreateConversation} className="w-full mb-4 bg-blue-600 hover:bg-blue-500" disabled={createConv.isPending}><Plus className="w-4 h-4 me-2" />New Chat</Button>
                 <div className="flex-1 overflow-y-auto space-y-2">
                   {!conversationsData ? <div className="space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-10" />)}</div> :
                     conversations.length > 0 ? conversations.map(conv => (
-                      <div key={conv.id} className={`p-3 rounded-lg cursor-pointer transition-colors group flex justify-between items-center ${selectedConversation === conv.id ? "bg-blue-600/20 border border-blue-500/40" : "bg-white/[0.03] hover:bg-white/[0.06] border border-white/5"}`} onClick={() => setSelectedConversation(conv.id)}>
-                        <div className="flex-1 min-w-0"><p className="text-sm font-medium truncate text-slate-300">{conv.title}</p></div>
+                      <div key={conv.id} className={`p-3 rounded-lg cursor-pointer transition-colors group flex justify-between items-center ${selectedConversation === conv.id ? "bg-blue-600/20 border border-blue-500/40" : "bg-card hover:bg-white/[0.06] border border-border"}`} onClick={() => setSelectedConversation(conv.id)}>
+                        <div className="flex-1 min-w-0"><p className="text-sm font-medium truncate text-secondary-foreground">{conv.title}</p></div>
                         <button onClick={e => { e.stopPropagation(); handleDeleteConversation(conv.id); }} className="opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 className="w-4 h-4 text-red-400 hover:text-red-300" /></button>
                       </div>
-                    )) : <p className="text-slate-500 text-sm text-center py-4">No conversations</p>}
+                    )) : <p className="text-muted-foreground text-sm text-center py-4">No conversations</p>}
                 </div>
               </div>
               {/* Chat Area */}
-              <div className="flex-1 bg-white/[0.04] border border-white/10 rounded-xl flex flex-col backdrop-blur-2xl overflow-hidden">
+              <div className="flex-1 bg-card border border-border rounded-xl flex flex-col backdrop-blur-2xl overflow-hidden">
                 {selectedConversation ? (
                   <>
                     <div className="flex-1 overflow-y-auto p-6 space-y-4">
                       {messages.length === 0 ? (
                         <div className="h-full flex items-center justify-center">
                           <div className="text-center space-y-4">
-                            <div className="w-16 h-16 rounded-2xl bg-blue-500/15 flex items-center justify-center mx-auto"><Sparkles className="w-8 h-8 text-blue-400" /></div>
-                            <p className="text-slate-400 text-lg font-medium">Start a new conversation</p>
-                            <p className="text-sm text-slate-500 max-w-sm">Ask Murshid AI anything about your academics, courses, career, or study plans.</p>
+                            <div className="w-16 h-16 rounded-2xl bg-blue-500/15 flex items-center justify-center mx-auto"><Sparkles className="w-8 h-8 text-primary" /></div>
+                            <p className="text-muted-foreground text-lg font-medium">Start a new conversation</p>
+                            <p className="text-sm text-muted-foreground max-w-sm">Ask Murshid AI anything about your academics, courses, career, or study plans.</p>
                             <div className="flex flex-wrap gap-2 justify-center pt-2">
                               {SUGGESTED_PROMPTS.slice(0, 4).map((p, i) => (
-                                <button key={i} onClick={() => { setInput(p); }} className="px-3 py-1.5 rounded-lg bg-white/[0.05] border border-white/10 text-xs text-slate-400 hover:bg-white/[0.08] hover:text-white transition-all">{p}</button>
+                                <button key={i} onClick={() => { setInput(p); }} className="px-3 py-1.5 rounded-lg bg-white/[0.05] border border-border text-xs text-muted-foreground hover:bg-white/[0.08] hover:text-white transition-all">{p}</button>
                               ))}
                             </div>
                           </div>
@@ -529,18 +534,18 @@ export default function AIChatPage() {
                         <AnimatePresence>
                           {messages.map((msg, index) => (
                             <motion.div key={index} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                              <div className={`max-w-md lg:max-w-lg px-4 py-3 rounded-xl ${msg.role === "user" ? "bg-blue-600 text-white" : "bg-white/[0.06] border border-white/10 text-slate-100"}`}>
+                              <div className={`max-w-md lg:max-w-lg px-4 py-3 rounded-xl ${msg.role === "user" ? "bg-blue-600 text-white" : "bg-white/[0.06] border border-border text-slate-100"}`}>
                                 <div className="flex items-center gap-2 mb-1">
-                                  {msg.role === "assistant" ? <Bot className="w-3 h-3 text-blue-400" /> : <User className="w-3 h-3" />}
+                                  {msg.role === "assistant" ? <Bot className="w-3 h-3 text-primary" /> : <User className="w-3 h-3" />}
                                   <span className="text-[10px] opacity-70">{msg.role === "assistant" ? "Murshid AI" : "You"}</span>
                                 </div>
                                 {msg.role === "assistant" ? <Streamdown>{msg.content}</Streamdown> : <p className="text-sm">{msg.content}</p>}
                                 {msg.role === "assistant" && msg.id && (
-                                  <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-end gap-2">
-                                    <button onClick={() => handleRateMessage(msg.id!, "up")} disabled={msg.feedback === "up" || rateMsg.isPending} className={`p-1.5 rounded-md transition-colors ${msg.feedback === "up" ? "bg-emerald-500/20 text-emerald-400" : "hover:bg-white/10 text-slate-400 hover:text-emerald-400"}`} title="Good response">
+                                  <div className="mt-3 pt-3 border-t border-border flex items-center justify-end gap-2">
+                                    <button onClick={() => handleRateMessage(msg.id!, "up")} disabled={msg.feedback === "up" || rateMsg.isPending} className={`p-1.5 rounded-md transition-colors ${msg.feedback === "up" ? "bg-emerald-500/20 text-emerald-400" : "hover:bg-white/10 text-muted-foreground hover:text-emerald-400"}`} title="Good response">
                                       <ThumbsUp className="w-3.5 h-3.5" />
                                     </button>
-                                    <button onClick={() => handleRateMessage(msg.id!, "down")} disabled={msg.feedback === "down" || rateMsg.isPending} className={`p-1.5 rounded-md transition-colors ${msg.feedback === "down" ? "bg-red-500/20 text-red-400" : "hover:bg-white/10 text-slate-400 hover:text-red-400"}`} title="Bad response">
+                                    <button onClick={() => handleRateMessage(msg.id!, "down")} disabled={msg.feedback === "down" || rateMsg.isPending} className={`p-1.5 rounded-md transition-colors ${msg.feedback === "down" ? "bg-red-500/20 text-red-400" : "hover:bg-white/10 text-muted-foreground hover:text-red-400"}`} title="Bad response">
                                       <ThumbsDown className="w-3.5 h-3.5" />
                                     </button>
                                   </div>
@@ -550,9 +555,9 @@ export default function AIChatPage() {
                           ))}
                           {isLoading && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-                              <div className="bg-white/[0.06] border border-white/10 px-4 py-3 rounded-xl flex items-center gap-3">
-                                <Bot className="w-4 h-4 text-blue-400" />
-                                <span className="text-sm text-slate-300">Murshid AI is thinking</span>
+                              <div className="bg-white/[0.06] border border-border px-4 py-3 rounded-xl flex items-center gap-3">
+                                <Bot className="w-4 h-4 text-primary" />
+                                <span className="text-sm text-secondary-foreground">Murshid AI is thinking</span>
                                 <div className="flex gap-1"><div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} /><div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} /><div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} /></div>
                               </div>
                             </motion.div>
@@ -561,9 +566,9 @@ export default function AIChatPage() {
                       )}
                       <div ref={messagesEndRef} />
                     </div>
-                    <div className="border-t border-white/10 p-4">
+                    <div className="border-t border-border p-4">
                       <div className="flex gap-3">
-                        <Input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSendMessage()} placeholder={t("chat.placeholder")} className="bg-white/[0.05] border-white/10 text-white placeholder-slate-500" disabled={isLoading} />
+                        <Input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSendMessage()} placeholder={t("chat.placeholder")} className="bg-white/[0.05] border-border text-white placeholder-slate-500" disabled={isLoading} />
                         <Button onClick={handleSendMessage} disabled={!input.trim() || isLoading} className="bg-blue-600 hover:bg-blue-500"><Send className="w-4 h-4" /></Button>
                       </div>
                     </div>
@@ -571,9 +576,9 @@ export default function AIChatPage() {
                 ) : (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center space-y-3">
-                      <div className="w-16 h-16 rounded-2xl bg-blue-500/15 flex items-center justify-center mx-auto"><MessageCircle className="w-8 h-8 text-blue-400" /></div>
-                      <p className="text-slate-400 text-lg">{t("chat.startNewChat")}</p>
-                      <Button onClick={handleCreateConversation} className="bg-blue-600 hover:bg-blue-500"><Plus className="w-4 h-4 mr-2" />New Conversation</Button>
+                      <div className="w-16 h-16 rounded-2xl bg-blue-500/15 flex items-center justify-center mx-auto"><MessageCircle className="w-8 h-8 text-primary" /></div>
+                      <p className="text-muted-foreground text-lg">{t("chat.startNewChat")}</p>
+                      <Button onClick={handleCreateConversation} className="bg-blue-600 hover:bg-blue-500"><Plus className="w-4 h-4 me-2" />New Conversation</Button>
                     </div>
                   </div>
                 )}

@@ -1,5 +1,8 @@
 ﻿import { Button } from "@/components/ui/button";
 import { useI18n } from "@/contexts/I18nContext";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { useLocation } from "wouter";
+import { toast } from "sonner";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import Logo from "@/components/Logo";
 import {
@@ -62,36 +65,36 @@ function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: strin
 
 function StudentJourneyIllustration() {
   const chaos: [string, string, string, number][] = [
-    ["?", "left-6 top-10", "h-16 w-24", -10],
-    ["?", "left-28 top-24", "h-12 w-20", 12],
-    ["?", "left-10 top-44", "h-14 w-28", 7],
-    ["?", "left-36 bottom-24", "h-16 w-24", -15],
-    ["?", "left-4 bottom-12", "h-12 w-20", 14],
+    ["?", "start-6 top-10", "h-16 w-24", -10],
+    ["?", "start-28 top-24", "h-12 w-20", 12],
+    ["?", "start-10 top-44", "h-14 w-28", 7],
+    ["?", "start-36 bottom-24", "h-16 w-24", -15],
+    ["?", "start-4 bottom-12", "h-12 w-20", 14],
   ];
   const success: [string, LucideIcon, string][] = [
-    ["Graduation roadmap", GraduationCap, "right-7 top-10"],
-    ["Course recommendations", Brain, "right-20 top-28"],
-    ["Campus navigation", Navigation, "right-6 top-[46%]"],
-    ["Academic advisor", MessageSquareText, "right-24 bottom-24"],
-    ["GPA insights", CalendarCheck, "right-8 bottom-8"],
+    ["Graduation roadmap", GraduationCap, "end-7 top-10"],
+    ["Course recommendations", Brain, "end-20 top-28"],
+    ["Campus navigation", Navigation, "end-6 top-[46%]"],
+    ["Academic advisor", MessageSquareText, "end-24 bottom-24"],
+    ["GPA insights", CalendarCheck, "end-8 bottom-8"],
   ];
   const questions: [string, string, number][] = [
-    ["Which courses?", "left-16 top-20", -8],
-    ["Credits left?", "left-6 top-64", 10],
-    ["Advisor?", "left-36 bottom-36", -6],
+    ["Which courses?", "start-16 top-20", -8],
+    ["Credits left?", "start-6 top-64", 10],
+    ["Advisor?", "start-36 bottom-36", -6],
   ];
   const particles: [string, string, number][] = [
-    ["left-[46%] top-[38%]", "h-1.5 w-1.5", 0],
-    ["left-[53%] top-[56%]", "h-1 w-1", 0.45],
-    ["left-[49%] top-[62%]", "h-1.5 w-1.5", 0.9],
-    ["left-[56%] top-[43%]", "h-1 w-1", 1.35],
+    ["start-[46%] top-[38%]", "h-1.5 w-1.5", 0],
+    ["start-[53%] top-[56%]", "h-1 w-1", 0.45],
+    ["start-[49%] top-[62%]", "h-1.5 w-1.5", 0.9],
+    ["start-[56%] top-[43%]", "h-1 w-1", 1.35],
   ];
 
   return (
     <motion.div initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.9 }} className="relative mx-auto h-[520px] w-full max-w-[640px] overflow-hidden rounded-[2.5rem] border border-white/10 bg-white/[0.045] shadow-[0_30px_120px_rgba(8,47,73,.45)] backdrop-blur-2xl">
-      <div className="absolute inset-y-0 left-0 w-[45%] bg-[radial-gradient(circle_at_30%_35%,rgba(88,28,135,.32),transparent_32%),linear-gradient(135deg,rgba(2,6,23,.96),rgba(15,23,42,.76))]" />
-      <div className="absolute inset-y-0 right-0 w-[45%] bg-[radial-gradient(circle_at_70%_42%,rgba(34,197,94,.2),transparent_32%),linear-gradient(135deg,rgba(8,47,73,.28),rgba(2,6,23,.9))]" />
-      <div className="absolute inset-y-0 left-[43%] w-[14%] bg-[radial-gradient(circle_at_center,rgba(103,232,249,.3),transparent_62%)]" />
+      <div className="absolute inset-y-0 start-0 w-[45%] bg-[radial-gradient(circle_at_30%_35%,rgba(88,28,135,.32),transparent_32%),linear-gradient(135deg,rgba(2,6,23,.96),rgba(15,23,42,.76))]" />
+      <div className="absolute inset-y-0 end-0 w-[45%] bg-[radial-gradient(circle_at_70%_42%,rgba(34,197,94,.2),transparent_32%),linear-gradient(135deg,rgba(8,47,73,.28),rgba(2,6,23,.9))]" />
+      <div className="absolute inset-y-0 start-[43%] w-[14%] bg-[radial-gradient(circle_at_center,rgba(103,232,249,.3),transparent_62%)]" />
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.04)_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:linear-gradient(90deg,black,transparent_48%,black)]" />
 
       <svg className="absolute inset-0 z-10 h-full w-full" viewBox="0 0 640 520" fill="none">
@@ -136,10 +139,10 @@ function StudentJourneyIllustration() {
         </motion.div>
       ))}
 
-      <div className="absolute left-5 top-28 z-20 h-44 w-52 opacity-60">
-        <div className="absolute left-2 top-10 h-px w-44 rotate-12 bg-white/15" />
-        <div className="absolute left-8 top-24 h-px w-36 -rotate-12 bg-white/10" />
-        <div className="absolute left-20 top-0 h-40 w-px rotate-12 bg-white/10" />
+      <div className="absolute start-5 top-28 z-20 h-44 w-52 opacity-60">
+        <div className="absolute start-2 top-10 h-px w-44 rotate-12 bg-white/15" />
+        <div className="absolute start-8 top-24 h-px w-36 -rotate-12 bg-white/10" />
+        <div className="absolute start-20 top-0 h-40 w-px rotate-12 bg-white/10" />
       </div>
 
       <div className="absolute left-1/2 top-1/2 z-30 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
@@ -208,7 +211,7 @@ function LiveConversation() {
         <div className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs text-emerald-200">live</div>
       </div>
       <div className="space-y-3">
-        <div className="ml-auto max-w-[86%] rounded-2xl rounded-tr-md bg-white px-4 py-3 text-sm text-slate-950">{active === 0 ? typed : lines[0]}</div>
+        <div className="ms-auto max-w-[86%] rounded-2xl rounded-tr-md bg-white px-4 py-3 text-sm text-slate-950">{active === 0 ? typed : lines[0]}</div>
         {active > 0 && <div className="max-w-[92%] rounded-2xl rounded-tl-md border border-cyan-300/10 bg-cyan-300/10 px-4 py-3 text-sm text-cyan-50">{active === 1 ? typed : lines[1]}</div>}
         {active > 1 && <div className="max-w-[92%] rounded-2xl rounded-tl-md border border-fuchsia-300/10 bg-fuchsia-300/10 px-4 py-3 text-sm text-fuchsia-50">{typed}</div>}
       </div>
@@ -218,6 +221,8 @@ function LiveConversation() {
 
 export default function Landing() {
   const { t, language, setLanguage, dir } = useI18n();
+  const { user } = useAuth();
+  const [, setLocation] = useLocation();
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const glowX = useTransform(mouseX, value => `${value}px`);
@@ -253,11 +258,11 @@ export default function Landing() {
       </nav>
 
       <section className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 px-5 pb-20 pt-36 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:pt-44">
-        <motion.div initial="hidden" animate="visible" transition={{ staggerChildren: 0.12 }} className="text-center lg:text-left">
-          <motion.div variants={fadeUp} className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-sm text-cyan-100 lg:mx-0"><Stars className="h-4 w-4" />{t("landing.hero.eyebrow")}</motion.div>
+        <motion.div initial="hidden" animate="visible" transition={{ staggerChildren: 0.12 }} className="text-center lg:text-start">
+          <motion.div variants={fadeUp} className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-sm text-cyan-100 lg:mx-0"><Stars className="h-4 w-4" />{t("landing.hero.eyebrow")}</motion.div>
           <motion.h1 variants={fadeUp} className="text-5xl font-semibold tracking-[-0.06em] text-white sm:text-6xl lg:text-8xl">{t("landing.hero.title")}</motion.h1>
           <motion.p variants={fadeUp} className="mx-auto mt-7 max-w-2xl text-lg leading-8 text-slate-300 lg:mx-0">{t("landing.hero.subtitle")}</motion.p>
-          <motion.div variants={fadeUp} className="mt-9 flex flex-col items-center gap-4 sm:flex-row lg:justify-start"><Button asChild size="lg" className="group h-14 rounded-full bg-cyan-300 px-8 text-base font-semibold text-slate-950 shadow-[0_0_50px_rgba(103,232,249,.34)] hover:bg-white"><a href="/register">{t("landing.hero.cta")}<ArrowRight className="ml-2 h-5 w-5 transition group-hover:translate-x-1" /></a></Button><a href="#platform" className="flex h-14 items-center gap-2 rounded-full border border-white/10 bg-white/5 px-8 text-base text-white backdrop-blur-xl transition hover:bg-white/10">{t("landing.hero.secondary")}<ChevronRight className="h-4 w-4" /></a></motion.div>
+          <motion.div variants={fadeUp} className="mt-9 flex flex-col items-center gap-4 sm:flex-row lg:justify-start"><Button asChild size="lg" className="group h-14 rounded-full bg-cyan-300 px-8 text-base font-semibold text-slate-950 shadow-[0_0_50px_rgba(103,232,249,.34)] hover:bg-white"><a href="/register">{t("landing.hero.cta")}<ArrowRight className="ms-2 h-5 w-5 transition group-hover:translate-x-1 rtl:rotate-180" /></a></Button><a href="#platform" className="flex h-14 items-center gap-2 rounded-full border border-white/10 bg-white/5 px-8 text-base text-white backdrop-blur-xl transition hover:bg-white/10">{t("landing.hero.secondary")}<ChevronRight className="h-4 w-4 rtl:rotate-180" /></a></motion.div>
           <motion.div variants={fadeUp} className="mt-10 grid grid-cols-3 gap-3 rounded-3xl border border-white/10 bg-white/[0.04] p-3 backdrop-blur-xl">{[[98, "%", "faster answers"], [24, "/7", "AI guidance"], [12, "k+", "plans analyzed"]].map(([value, suffix, label]) => <div key={label} className="rounded-2xl bg-white/[0.04] p-4"><p className="text-2xl font-semibold text-white"><AnimatedCounter value={Number(value)} suffix={String(suffix)} /></p><p className="mt-1 text-xs text-slate-400">{label}</p></div>)}</motion.div>
         </motion.div>
         <motion.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }}><StudentJourneyIllustration /></motion.div>
@@ -265,20 +270,43 @@ export default function Landing() {
 
       <section id="platform" className="relative z-10 mx-auto max-w-7xl px-5 py-20 lg:px-8">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-120px" }} transition={{ staggerChildren: 0.1 }} className="mb-12 max-w-3xl"><motion.p variants={fadeUp} className="text-sm font-medium uppercase tracking-[0.35em] text-cyan-200">Platform intelligence</motion.p><motion.h2 variants={fadeUp} className="mt-4 text-4xl font-semibold tracking-[-0.04em] sm:text-6xl">A bento system built around every academic decision.</motion.h2></motion.div>
-        <div className="grid gap-4 md:grid-cols-3">{bento.map(item => { const Icon = item.icon; return <motion.div key={item.title} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} whileHover={{ y: -6, scale: 1.01 }} className={`group relative min-h-64 overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.055] p-7 backdrop-blur-2xl ${item.className}`}><div className="absolute inset-0 bg-gradient-to-br from-cyan-300/0 via-white/0 to-fuchsia-400/0 transition duration-500 group-hover:from-cyan-300/10 group-hover:to-fuchsia-400/10" /><Icon className="relative h-8 w-8 text-cyan-200" /><h3 className="relative mt-8 text-2xl font-semibold tracking-tight">{item.title}</h3><p className="relative mt-3 max-w-xl text-sm leading-7 text-slate-300">{item.text}</p><Orbit className="absolute -bottom-10 -right-8 h-40 w-40 text-white/[0.04]" /></motion.div>; })}</div>
+        <div className="grid gap-4 md:grid-cols-3">{bento.map(item => { const Icon = item.icon; return <motion.div key={item.title} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} whileHover={{ y: -6, scale: 1.01 }} className={`group relative min-h-64 overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.055] p-7 backdrop-blur-2xl ${item.className}`}><div className="absolute inset-0 bg-gradient-to-br from-cyan-300/0 via-white/0 to-fuchsia-400/0 transition duration-500 group-hover:from-cyan-300/10 group-hover:to-fuchsia-400/10" /><Icon className="relative h-8 w-8 text-cyan-200" /><h3 className="relative mt-8 text-2xl font-semibold tracking-tight">{item.title}</h3><p className="relative mt-3 max-w-xl text-sm leading-7 text-slate-300">{item.text}</p><Orbit className="absolute -bottom-10 -end-8 h-40 w-40 text-white/[0.04]" /></motion.div>; })}</div>
       </section>
 
       <section className="relative z-10 mx-auto grid max-w-7xl gap-6 px-5 py-20 lg:grid-cols-[.9fr_1.1fr] lg:px-8"><motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="rounded-[2rem] border border-white/10 bg-white/[0.045] p-8 backdrop-blur-2xl"><MessageSquareText className="h-10 w-10 text-cyan-200" /><h2 className="mt-8 text-4xl font-semibold tracking-[-0.04em]">Live AI advising that feels instant.</h2><p className="mt-4 text-slate-300">The assistant reasons across your academic record, recommends next actions, and explains tradeoffs in plain language.</p></motion.div><motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}><LiveConversation /></motion.div></section>
 
-      <section id="roadmap" className="relative z-10 mx-auto max-w-7xl px-5 py-20 lg:px-8"><div className="mb-12 flex flex-col justify-between gap-6 lg:flex-row lg:items-end"><div><p className="text-sm font-medium uppercase tracking-[0.35em] text-fuchsia-200">Graduation roadmap</p><h2 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.04em] sm:text-6xl">From first question to final audit.</h2></div><div className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm text-slate-300 backdrop-blur-xl">Interactive planning timeline</div></div><div className="grid gap-4 lg:grid-cols-4">{roadmap.map(([title, text, date], index) => <motion.div key={title} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.08 }} whileHover={{ y: -8 }} className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/55 p-6 backdrop-blur-2xl"><div className="mb-8 flex items-center justify-between"><span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-950">{index + 1}</span><span className="text-sm text-cyan-200">{date}</span></div><h3 className="text-xl font-semibold">{title}</h3><p className="mt-3 text-sm leading-6 text-slate-300">{text}</p><div className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-emerald-300" /></motion.div>)}</div></section>
+      <section id="roadmap" className="relative z-10 mx-auto max-w-7xl px-5 py-20 lg:px-8"><div className="mb-12 flex flex-col justify-between gap-6 lg:flex-row lg:items-end"><div><p className="text-sm font-medium uppercase tracking-[0.35em] text-fuchsia-200">Graduation roadmap</p><h2 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.04em] sm:text-6xl">From first question to final audit.</h2></div><div className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm text-slate-300 backdrop-blur-xl">Interactive planning timeline</div></div><div className="grid gap-4 lg:grid-cols-4">{roadmap.map(([title, text, date], index) => <motion.div key={title} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.08 }} whileHover={{ y: -8 }} className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/55 p-6 backdrop-blur-2xl"><div className="mb-8 flex items-center justify-between"><span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-950">{index + 1}</span><span className="text-sm text-cyan-200">{date}</span></div><h3 className="text-xl font-semibold">{title}</h3><p className="mt-3 text-sm leading-6 text-slate-300">{text}</p><div className="absolute bottom-0 start-0 h-1 w-full bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-emerald-300" /></motion.div>)}</div></section>
 
-      <section id="campus" className="relative z-10 mx-auto grid max-w-7xl gap-6 px-5 py-20 lg:grid-cols-[1fr_1.1fr] lg:px-8"><motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-[2rem] border border-white/10 bg-white/[0.045] p-8 backdrop-blur-2xl"><Map className="h-10 w-10 text-emerald-200" /><h2 className="mt-8 text-4xl font-semibold tracking-[-0.04em]">Campus navigation preview.</h2><p className="mt-4 text-slate-300">Guide students from classroom to advising office with intelligent routes, live context, and location-aware assistance.</p><div className="mt-8 grid gap-3">{["Engineering Building", "Advisor Office B-214", "AI Lab", "Student Services"].map(place => <div key={place} className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3"><span className="flex items-center gap-3 text-sm text-slate-200"><LocateFixed className="h-4 w-4 text-emerald-200" />{place}</span><CheckCircle2 className="h-4 w-4 text-cyan-200" /></div>)}</div></motion.div><motion.div initial={{ opacity: 0, scale: 0.96 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="relative min-h-[440px] overflow-hidden rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_30%_20%,rgba(34,197,94,.24),transparent_26%),radial-gradient(circle_at_70%_60%,rgba(14,165,233,.22),transparent_30%),#050816] p-6 backdrop-blur-2xl"><div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.06)_1px,transparent_1px)] bg-[size:44px_44px]" /><motion.div animate={{ offsetDistance: ["0%", "100%"] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} className="absolute h-5 w-5 rounded-full bg-cyan-200 shadow-[0_0_35px_rgba(103,232,249,.9)] [offset-path:path('M_60_340_C_160_160_270_300_370_110_C_430_50_500_120_520_210')]" /><svg className="absolute inset-0 h-full w-full" viewBox="0 0 580 440" fill="none"><path d="M60 340C160 160 270 300 370 110C430 50 500 120 520 210" stroke="url(#route)" strokeWidth="3" strokeDasharray="8 10" /><defs><linearGradient id="route" x1="60" y1="340" x2="520" y2="210"><stop stopColor="#67e8f9" /><stop offset="1" stopColor="#86efac" /></linearGradient></defs></svg><div className="relative flex h-full flex-col justify-between"><div className="ml-auto w-fit rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-xl"><Navigation className="mb-2 h-5 w-5 text-cyan-200" /><p className="text-sm font-semibold">7 min route</p><p className="text-xs text-slate-300">Avoids construction zone</p></div><div className="w-fit rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-xl"><GraduationCap className="mb-2 h-5 w-5 text-emerald-200" /><p className="text-sm font-semibold">Advisor sync nearby</p><p className="text-xs text-slate-300">Office B-214</p></div></div></motion.div></section>
+      <section id="campus" className="relative z-10 mx-auto grid max-w-7xl gap-6 px-5 py-20 lg:grid-cols-[1fr_1.1fr] lg:px-8"><motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-[2rem] border border-white/10 bg-white/[0.045] p-8 backdrop-blur-2xl"><Map className="h-10 w-10 text-emerald-200" /><h2 className="mt-8 text-4xl font-semibold tracking-[-0.04em]">Campus navigation preview.</h2><p className="mt-4 text-slate-300">Guide students from classroom to advising office with intelligent routes, live context, and location-aware assistance.</p><div className="mt-8 grid gap-3">{["Engineering Building", "Advisor Office B-214", "AI Lab", "Student Services"].map(place => <div key={place} className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3"><span className="flex items-center gap-3 text-sm text-slate-200"><LocateFixed className="h-4 w-4 text-emerald-200" />{place}</span><CheckCircle2 className="h-4 w-4 text-cyan-200" /></div>)}</div></motion.div><motion.div initial={{ opacity: 0, scale: 0.96 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="relative min-h-[440px] overflow-hidden rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_30%_20%,rgba(34,197,94,.24),transparent_26%),radial-gradient(circle_at_70%_60%,rgba(14,165,233,.22),transparent_30%),#050816] p-6 backdrop-blur-2xl"><div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.06)_1px,transparent_1px)] bg-[size:44px_44px]" /><motion.div animate={{ offsetDistance: ["0%", "100%"] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} className="absolute h-5 w-5 rounded-full bg-cyan-200 shadow-[0_0_35px_rgba(103,232,249,.9)] [offset-path:path('M_60_340_C_160_160_270_300_370_110_C_430_50_500_120_520_210')]" /><svg className="absolute inset-0 h-full w-full" viewBox="0 0 580 440" fill="none"><path d="M60 340C160 160 270 300 370 110C430 50 500 120 520 210" stroke="url(#route)" strokeWidth="3" strokeDasharray="8 10" /><defs><linearGradient id="route" x1="60" y1="340" x2="520" y2="210"><stop stopColor="#67e8f9" /><stop offset="1" stopColor="#86efac" /></linearGradient></defs></svg><div className="relative flex h-full flex-col justify-between"><div className="ms-auto w-fit rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-xl"><Navigation className="mb-2 h-5 w-5 text-cyan-200" /><p className="text-sm font-semibold">7 min route</p><p className="text-xs text-slate-300">Avoids construction zone</p></div><div className="w-fit rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-xl"><GraduationCap className="mb-2 h-5 w-5 text-emerald-200" /><p className="text-sm font-semibold">Advisor sync nearby</p><p className="text-xs text-slate-300">Office B-214</p></div></div></motion.div></section>
 
-      <section className="relative z-10 mx-auto max-w-5xl px-5 py-24 text-center lg:px-8"><motion.div initial={{ opacity: 0, scale: 0.96 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-white/[0.06] p-10 shadow-2xl backdrop-blur-2xl sm:p-16"><div className="absolute inset-x-20 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent" /><CalendarCheck className="mx-auto h-12 w-12 text-cyan-200" /><h2 className="mt-8 text-4xl font-semibold tracking-[-0.04em] sm:text-6xl">Make every student feel personally guided.</h2><p className="mx-auto mt-5 max-w-2xl text-slate-300">A premium AI academic experience that turns confusion into clarity from day one.</p><div className="mt-9 flex flex-col justify-center gap-4 sm:flex-row"><Button asChild size="lg" className="h-14 rounded-full bg-white px-8 text-slate-950 hover:bg-cyan-100"><a href="/register">Launch Murshid<Zap className="ml-2 h-5 w-5" /></a></Button><Button asChild size="lg" variant="outline" className="h-14 rounded-full border-white/15 bg-white/5 px-8 text-white hover:bg-white/10"><a href="/login">Sign in</a></Button></div></motion.div></section>
+      <section className="relative z-10 mx-auto max-w-5xl px-5 py-24 text-center lg:px-8"><motion.div initial={{ opacity: 0, scale: 0.96 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-white/[0.06] p-10 shadow-2xl backdrop-blur-2xl sm:p-16"><div className="absolute inset-x-20 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent" /><CalendarCheck className="mx-auto h-12 w-12 text-cyan-200" /><h2 className="mt-8 text-4xl font-semibold tracking-[-0.04em] sm:text-6xl">Make every student feel personally guided.</h2><p className="mx-auto mt-5 max-w-2xl text-slate-300">A premium AI academic experience that turns confusion into clarity from day one.</p><div className="mt-9 flex flex-col justify-center gap-4 sm:flex-row"><Button asChild size="lg" className="h-14 rounded-full bg-white px-8 text-slate-950 hover:bg-cyan-100"><a href="/register">Launch Murshid<Zap className="ms-2 h-5 w-5" /></a></Button><Button asChild size="lg" variant="outline" className="h-14 rounded-full border-white/15 bg-white/5 px-8 text-white hover:bg-white/10"><a href="/login">Sign in</a></Button></div></motion.div></section>
 
       <footer className="relative z-10 border-t border-white/10 px-5 py-8 text-center text-sm text-slate-500"><div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 md:flex-row"><p>© 2026 Murshid AI. Next-generation academic intelligence.</p><div className="flex items-center gap-4"><span className="flex items-center gap-2"><Languages className="h-4 w-4" /> Arabic + English</span><span className="flex items-center gap-2"><ShieldCheck className="h-4 w-4" /> Secure by design</span></div></div></footer>
 
-      <motion.a href="/chat" animate={{ y: [0, -8, 0] }} transition={{ duration: 2.8, repeat: Infinity }} className="fixed bottom-6 right-6 z-50 flex h-16 w-16 items-center justify-center rounded-full bg-cyan-300 text-slate-950 shadow-[0_0_60px_rgba(103,232,249,.55)]"><span className="absolute inset-0 rounded-full bg-cyan-300 opacity-40 blur-xl" /><span className="absolute inset-0 animate-ping rounded-full bg-cyan-300/40" /><Bot className="relative h-7 w-7" /></motion.a>
+      <motion.button
+        title="Open AI Assistant"
+        onClick={() => {
+          if (!user) {
+            toast.info("Please log in to use the AI assistant");
+            setLocation("/login");
+            return;
+          }
+          if (user.role === "student") {
+            setLocation("/chat");
+          } else if (user.role === "advisor") {
+            setLocation("/advisor/ai-review");
+          } else {
+            setLocation("/login");
+          }
+        }}
+        animate={{ y: [0, -8, 0] }}
+        transition={{ duration: 2.8, repeat: Infinity }}
+        className="fixed bottom-6 end-6 z-50 flex h-16 w-16 items-center justify-center rounded-full bg-cyan-300 text-slate-950 shadow-[0_0_60px_rgba(103,232,249,.55)] cursor-pointer"
+      >
+        <span className="absolute inset-0 rounded-full bg-cyan-300 opacity-40 blur-xl" />
+        <span className="absolute inset-0 animate-ping rounded-full bg-cyan-300/40" />
+        <Bot className="relative h-7 w-7" />
+      </motion.button>
     </main>
   );
 }

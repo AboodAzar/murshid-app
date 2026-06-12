@@ -100,12 +100,13 @@ export const faqsRouter = router({
   create: advisorProcedure
     .input(
       z.object({
-        question: z.string().min(10),
-        questionAr: z.string().min(10),
-        answer: z.string().min(20),
-        answerAr: z.string().min(20),
+        question: z.string().min(3),
+        questionAr: z.string().min(3),
+        answer: z.string().min(3),
+        answerAr: z.string().min(3),
         category: z.string(),
         categoryAr: z.string(),
+        isActive: z.boolean().default(true),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -125,23 +126,25 @@ export const faqsRouter = router({
           category: input.category,
           categoryAr: input.categoryAr,
           createdBy: ctx.user.id,
-          isActive: true,
+          isActive: input.isActive,
         });
 
-        // Sync with Runpod
-        const runpodUrl = process.env.RUNPOD_API_URL;
-        if (runpodUrl) {
-          try {
-            await fetch(`${runpodUrl.replace(/\/$/, '')}/add_faq`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                question: input.question,
-                answer: input.answer
-              }),
-            });
-          } catch (e) {
-            console.error("[FAQs] Runpod sync failed:", e);
+        // Sync with Runpod only for published FAQs
+        if (input.isActive) {
+          const runpodUrl = process.env.RUNPOD_API_URL;
+          if (runpodUrl) {
+            try {
+              await fetch(`${runpodUrl.replace(/\/$/, '')}/add_faq`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  question: input.question,
+                  answer: input.answer
+                }),
+              });
+            } catch (e) {
+              console.error("[FAQs] Runpod sync failed:", e);
+            }
           }
         }
 
@@ -209,6 +212,100 @@ export const faqsRouter = router({
         return { success: true };
       } catch (error) {
         console.error("[FAQs] Failed to delete FAQ:", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      }
+    }),
+
+  getStats: advisorProcedure.query(async ({ ctx }) => {
+    const db = await getDb();
+    if (!db)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Database unavailable",
+      });
+
+    try {
+      const isAdmin = ctx.user.role === "admin";
+      const baseQuery = isAdmin
+        ? db.select().from(faqs)
+        : db.select().from(faqs).where(eq(faqs.createdBy, ctx.user.id));
+
+      const all = await baseQuery;
+      const total = all.length;
+      const published = all.filter((f) => f.isActive).length;
+      const draft = total - published;
+
+      return { total, published, draft };
+    } catch (error) {
+      console.error("[FAQs] Failed to get stats:", error);
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+    }
+  }),
+
+  advisorList: advisorProcedure
+    .input(
+      z
+        .object({
+          category: z.string().optional(),
+          isActive: z.boolean().optional(),
+          page: z.number().min(1).default(1),
+          limit: z.number().min(1).max(100).default(20),
+        })
+        .optional()
+    )
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Database unavailable",
+        });
+
+      try {
+        const isAdmin = ctx.user.role === "admin";
+        const conditions = [];
+
+        if (!isAdmin) {
+          conditions.push(eq(faqs.createdBy, ctx.user.id));
+        }
+        if (input?.category) {
+          conditions.push(eq(faqs.category, input.category));
+        }
+        if (input?.isActive !== undefined) {
+          conditions.push(eq(faqs.isActive, input.isActive));
+        }
+
+        const page = input?.page || 1;
+        const limit = input?.limit || 20;
+        const offset = (page - 1) * limit;
+
+        const query =
+          conditions.length > 0
+            ? db.select().from(faqs).where(and(...conditions))
+            : db.select().from(faqs);
+
+        const results = await query.limit(limit).offset(offset);
+
+        const countQuery =
+          conditions.length > 0
+            ? db.select().from(faqs).where(and(...conditions))
+            : db.select().from(faqs);
+        const allResults = await countQuery;
+        const total = allResults.length;
+
+        return {
+          data: results,
+          pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+            hasNextPage: page < Math.ceil(total / limit),
+            hasPrevPage: page > 1,
+          },
+        };
+      } catch (error) {
+        console.error("[FAQs] Failed to list advisor FAQs:", error);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
     }),

@@ -38,10 +38,10 @@ export default function AdvisorAIReview() {
             <div className="space-y-2 max-h-[500px] overflow-y-auto">
               {students.map((s: any) => (
                 <button key={s.id} onClick={() => { setSelectedStudentId(s.id); setSelectedConversation(null); }}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-colors ${selectedStudentId === s.id ? "bg-blue-600/20 border border-blue-500/30" : "bg-white/[0.04] hover:bg-white/[0.07]"}`}>
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl text-start transition-colors ${selectedStudentId === s.id ? "bg-blue-600/20 border border-blue-500/30" : "bg-white/[0.04] hover:bg-white/[0.07]"}`}>
                   <div className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center"><User className="w-4 h-4 text-slate-300" /></div>
                   <span className="text-sm font-medium text-white">{s.name || s.email}</span>
-                  <ChevronRight className="w-4 h-4 text-slate-500 ml-auto" />
+                  <ChevronRight className="w-4 h-4 text-slate-500 ms-auto rtl:rotate-180" />
                 </button>
               ))}
             </div>
@@ -79,7 +79,7 @@ export default function AdvisorAIReview() {
               <div className="space-y-4">
                 <button onClick={() => setSelectedConversation(null)} className="text-sm text-blue-400 hover:text-blue-300">← {t("common.back")}</button>
                 <h3 className="text-lg font-semibold text-white">{selectedConversation.title || t("advisor.untitledConversation")}</h3>
-                <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+                <div className="space-y-3 max-h-[500px] overflow-y-auto pe-2">
                   {selectedConversation.messages?.map((msg: any, idx: number) => (
                     <div key={idx} className={`flex gap-3 ${msg.role === "user" ? "" : ""}`}>
                       <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${msg.role === "user" ? "bg-blue-500/15" : "bg-emerald-500/15"}`}>

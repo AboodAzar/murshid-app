@@ -155,7 +155,8 @@
     "department": "Department",
     "viewStudyPlan": "View Study Plan",
     "approveRecommendation": "Approve Recommendation",
-    "rejectRecommendation": "Reject Recommendation"
+    "rejectRecommendation": "Reject Recommendation",
+    "aiReview": "AI Review"
   },
   "admin": {
     "dashboard": "Admin Dashboard",
@@ -165,6 +166,12 @@
     "analytics": "Analytics",
     "aiStatistics": "AI Statistics",
     "systemSettings": "System Settings",
+    "academicManagement": "Academic Management",
+    "advisorManagement": "Advisor Management",
+    "campusManagement": "Campus Management",
+    "contentManagement": "Content Management",
+    "aiManagement": "AI Management",
+    "reportsAnalytics": "Reports & Analytics",
     "totalUsers": "Total Users",
     "totalStudents": "Total Students",
     "totalAdvisors": "Total Advisors",
@@ -200,6 +207,9 @@
     "deleteConversation": "Delete Conversation",
     "startNewChat": "Start a new conversation",
     "noMessages": "No messages yet"
+  },
+  "analytics": {
+    "title": "Academic Analytics"
   },
   "map": {
     "title": "Campus Navigation",

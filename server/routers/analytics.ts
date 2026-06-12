@@ -266,7 +266,10 @@ export const analyticsRouter = router({
       const attRows = await db.select({ status: attendance.status, courseId: attendance.courseId }).from(attendance).where(eq(attendance.studentId, targetStudentId));
       const overdueAssignments = await db.select({ courseId: assignments.courseId }).from(studentAssignments).leftJoin(assignments, eq(studentAssignments.assignmentId, assignments.id))
         .where(and(eq(studentAssignments.studentId, targetStudentId), eq(studentAssignments.status, "pending"), lte(assignments.dueDate, new Date())));
-      const inProgressCourses = await db.select({ courseId: studentCourses.courseId }).from(studentCourses).where(and(eq(studentCourses.studentId, targetStudentId), eq(studentCourses.status, "in_progress")));
+      const inProgressCoursesRaw = await db.select({ courseId: studentCourses.courseId }).from(studentCourses).where(and(eq(studentCourses.studentId, targetStudentId), eq(studentCourses.status, "in_progress")));
+      const inProgressCourses = inProgressCoursesRaw.filter((c: any, index: number, self: any[]) =>
+        index === self.findIndex((x: any) => x.courseId === c.courseId)
+      );
 
       const gpa = parseFloat(plan?.currentGPA ?? "0");
       const warnings: Array<{ id: string; type: string; severity: "low" | "medium" | "high" | "critical"; title: string; titleAr: string; message: string; messageAr: string; actionable: boolean; actionText: string; actionTextAr: string }> = [];

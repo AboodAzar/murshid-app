@@ -52,15 +52,20 @@ export default function AcademicAnalytics() {
   const { t } = useI18n();
   const { user } = useAuth();
   const utils = trpc.useUtils();
-  const { data: risk, isLoading: riskLoading } = trpc.analytics.graduationRisk.useQuery({});
-  const { data: health, isLoading: healthLoading } = trpc.analytics.academicHealth.useQuery({});
-  const { data: forecast, isLoading: forecastLoading } = trpc.analytics.successForecast.useQuery({});
-  const { data: warnings, isLoading: warningsLoading } = trpc.analytics.earlyWarnings.useQuery({});
-  const { data: roadmap, isLoading: roadmapLoading } = trpc.analytics.degreeRoadmap.useQuery({});
-  const { data: planner } = trpc.analytics.semesterPlanner.useQuery({});
-  const { data: career } = trpc.analytics.careerPaths.useQuery({});
-  const { data: recommendations } = trpc.analytics.smartRecommendations.useQuery({});
+  const [selectedStudentId] = useState(() =>
+    user?.role === "advisor" ? Number(localStorage.getItem("advisorSelectedStudentId") || 0) : 0
+  );
+  const studentIdParam = user?.role === "advisor" && selectedStudentId ? { studentId: selectedStudentId } : {};
+  const { data: risk, isLoading: riskLoading } = trpc.analytics.graduationRisk.useQuery(studentIdParam);
+  const { data: health, isLoading: healthLoading } = trpc.analytics.academicHealth.useQuery(studentIdParam);
+  const { data: forecast, isLoading: forecastLoading } = trpc.analytics.successForecast.useQuery(studentIdParam);
+  const { data: warnings, isLoading: warningsLoading } = trpc.analytics.earlyWarnings.useQuery(studentIdParam);
+  const { data: roadmap, isLoading: roadmapLoading } = trpc.analytics.degreeRoadmap.useQuery(studentIdParam);
+  const { data: planner } = trpc.analytics.semesterPlanner.useQuery(studentIdParam);
+  const { data: career } = trpc.analytics.careerPaths.useQuery(studentIdParam);
+  const { data: recommendations } = trpc.analytics.smartRecommendations.useQuery(studentIdParam);
   const { data: gpaSim } = trpc.analytics.gpaSimulator.useQuery({
+    ...studentIdParam,
     scenarios: [
       { name: "All A's", nameAr: "كلها A", courseGrades: [{ courseId: 1, grade: "A", credits: 3 }, { courseId: 2, grade: "A", credits: 3 }, { courseId: 3, grade: "A", credits: 3 }] },
       { name: "Mixed B+/A-", nameAr: "B+/A- متنوع", courseGrades: [{ courseId: 1, grade: "B+", credits: 3 }, { courseId: 2, grade: "A-", credits: 3 }, { courseId: 3, grade: "B+", credits: 3 }] },
@@ -85,11 +90,12 @@ export default function AcademicAnalytics() {
   const seedKey = user ? `murshid-seeded-${user.id}` : "";
 
   useEffect(() => {
+    if (user?.role === "advisor" && !selectedStudentId) return;
     if (hasNoData && !seedMutation.isPending && seedKey && !localStorage.getItem(seedKey)) {
       localStorage.setItem(seedKey, "true");
       seedMutation.mutate();
     }
-  }, [hasNoData, seedMutation, seedKey]);
+  }, [hasNoData, seedMutation, seedKey, user?.role, selectedStudentId]);
 
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -114,6 +120,13 @@ export default function AcademicAnalytics() {
             </div>
           )}
         </motion.div>
+
+        {user?.role === "advisor" && !selectedStudentId && (
+          <motion.div {...fadeInUp} className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 text-center">
+            <p className="text-amber-200 font-medium mb-2">Select a student first to view their analytics</p>
+            <p className="text-amber-300/70 text-sm mb-4">Go to My Students, select a student, then return here.</p>
+          </motion.div>
+        )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-slate-800/50 border border-slate-700 p-1 flex flex-wrap h-auto gap-1">
@@ -188,7 +201,7 @@ export default function AcademicAnalytics() {
                             <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
                               <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${cat.score}%`, backgroundColor: STATUS_COLORS[cat.status] }} />
                             </div>
-                            <div className="w-8 text-right text-sm font-semibold" style={{ color: STATUS_COLORS[cat.status] }}>{cat.score}</div>
+                            <div className="w-8 text-end text-sm font-semibold" style={{ color: STATUS_COLORS[cat.status] }}>{cat.score}</div>
                           </div>
                         ))}
                       </div>
@@ -200,7 +213,7 @@ export default function AcademicAnalytics() {
                           <>
                             <Activity className="w-10 h-10 text-slate-600 mb-2" />
                             <p className="text-sm text-slate-400">No health data available yet</p>
-                            <Button variant="outline" size="sm" className="mt-3 border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => seedMutation.mutate()}><Sparkles className="w-3 h-3 mr-1" /> Generate Demo Data</Button>
+                            <Button variant="outline" size="sm" className="mt-3 border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => seedMutation.mutate()}><Sparkles className="w-3 h-3 me-1" /> Generate Demo Data</Button>
                           </>
                         )}
                       </div>
@@ -215,7 +228,7 @@ export default function AcademicAnalytics() {
                   </CardHeader>
                   <CardContent>
                     {recommendations && recommendations.recommendations.length > 0 ? (
-                      <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
+                      <div className="space-y-2 max-h-[280px] overflow-y-auto pe-1">
                         {recommendations.recommendations.slice(0, 5).map((rec: any) => (
                           <div key={rec.id} className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors cursor-pointer">
                             <BookOpen className="w-4 h-4 text-blue-400 shrink-0" />
@@ -223,7 +236,7 @@ export default function AcademicAnalytics() {
                               <p className="text-sm font-medium text-white truncate">{rec.name}</p>
                               <p className="text-xs text-slate-400">{rec.code} • {rec.credits} credits • {rec.reason}</p>
                             </div>
-                            <ChevronRight className="w-4 h-4 text-slate-500 shrink-0" />
+                            <ChevronRight className="w-4 h-4 text-slate-500 shrink-0 rtl:rotate-180" />
                           </div>
                         ))}
                       </div>
@@ -235,7 +248,7 @@ export default function AcademicAnalytics() {
                           <>
                             <Lightbulb className="w-10 h-10 text-slate-600 mb-2" />
                             <p className="text-sm text-slate-400">No recommendations yet</p>
-                            <Button variant="outline" size="sm" className="mt-3 border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => seedMutation.mutate()}><Sparkles className="w-3 h-3 mr-1" /> Generate Demo Data</Button>
+                            <Button variant="outline" size="sm" className="mt-3 border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => seedMutation.mutate()}><Sparkles className="w-3 h-3 me-1" /> Generate Demo Data</Button>
                           </>
                         )}
                       </div>
@@ -316,7 +329,7 @@ export default function AcademicAnalytics() {
                           <>
                             <ShieldAlert className="w-10 h-10 text-slate-600 mb-2" />
                             <p className="text-sm text-slate-400">No risk data available yet</p>
-                            <Button variant="outline" size="sm" className="mt-3 border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => seedMutation.mutate()}><Sparkles className="w-3 h-3 mr-1" /> Generate Demo Data</Button>
+                            <Button variant="outline" size="sm" className="mt-3 border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => seedMutation.mutate()}><Sparkles className="w-3 h-3 me-1" /> Generate Demo Data</Button>
                           </>
                         )}
                       </div>
@@ -331,8 +344,10 @@ export default function AcademicAnalytics() {
                   </CardHeader>
                   <CardContent>
                     {warnings && warnings.warnings.length > 0 ? (
-                      <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
-                        {warnings.warnings.map((w: any) => (
+                      <div className="space-y-2 max-h-[400px] overflow-y-auto pe-1">
+                        {warnings.warnings.filter((w: any, index: number, self: any[]) =>
+                          index === self.findIndex((x: any) => x.id === w.id)
+                        ).map((w: any) => (
                           <div key={w.id} className={`p-3 rounded-lg border ${w.severity === "critical" ? "bg-red-500/10 border-red-500/30" : w.severity === "high" ? "bg-orange-500/10 border-orange-500/30" : "bg-amber-500/10 border-amber-500/30"}`}>
                             <div className="flex items-center justify-between mb-1">
                               <p className="text-sm font-semibold text-white">{w.title}</p>
@@ -403,7 +418,7 @@ export default function AcademicAnalytics() {
                           <>
                             <TrendingUp className="w-10 h-10 text-slate-600 mb-2" />
                             <p className="text-sm text-slate-400">Complete more courses to see forecast data</p>
-                            <Button variant="outline" size="sm" className="mt-3 border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => seedMutation.mutate()}><Sparkles className="w-3 h-3 mr-1" /> Generate Demo Data</Button>
+                            <Button variant="outline" size="sm" className="mt-3 border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => seedMutation.mutate()}><Sparkles className="w-3 h-3 me-1" /> Generate Demo Data</Button>
                           </>
                         )}
                       </div>
@@ -426,7 +441,7 @@ export default function AcademicAnalytics() {
                           </div>
                           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${planner.estimatedWorkload === "heavy" ? "bg-red-500/15 text-red-400" : planner.estimatedWorkload === "medium" ? "bg-amber-500/15 text-amber-400" : "bg-emerald-500/15 text-emerald-400"}`}>{planner.estimatedWorkload}</span>
                         </div>
-                        <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                        <div className="space-y-2 max-h-[300px] overflow-y-auto pe-1">
                           {planner.plan.courses.map((c: any) => (
                             <div key={c.id} className="flex items-center gap-3 p-2 bg-slate-700/30 rounded-lg">
                               <div className={`w-2 h-2 rounded-full ${c.isRequired ? "bg-violet-400" : "bg-slate-400"}`} />
@@ -450,7 +465,7 @@ export default function AcademicAnalytics() {
                           <>
                             <Zap className="w-10 h-10 text-slate-600 mb-2" />
                             <p className="text-sm text-slate-400">No planner data available yet</p>
-                            <Button variant="outline" size="sm" className="mt-3 border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => seedMutation.mutate()}><Sparkles className="w-3 h-3 mr-1" /> Generate Demo Data</Button>
+                            <Button variant="outline" size="sm" className="mt-3 border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => seedMutation.mutate()}><Sparkles className="w-3 h-3 me-1" /> Generate Demo Data</Button>
                           </>
                         )}
                       </div>
@@ -472,7 +487,7 @@ export default function AcademicAnalytics() {
                   </CardHeader>
                   <CardContent>
                     {roadmap && roadmap.roadmap.length > 0 ? (
-                      <div className="space-y-1 max-h-[450px] overflow-y-auto pr-1">
+                      <div className="space-y-1 max-h-[450px] overflow-y-auto pe-1">
                         {Array.from(new Set(roadmap.roadmap.map((c: any) => c.semester))).sort((a, b) => a - b).map((sem: number) => (
                           <div key={sem} className="mb-3">
                             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Semester {sem}</p>
@@ -497,7 +512,7 @@ export default function AcademicAnalytics() {
                           <>
                             <Route className="w-10 h-10 text-slate-600 mb-2" />
                             <p className="text-sm text-slate-400">No roadmap data available yet</p>
-                            <Button variant="outline" size="sm" className="mt-3 border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => seedMutation.mutate()}><Sparkles className="w-3 h-3 mr-1" /> Generate Demo Data</Button>
+                            <Button variant="outline" size="sm" className="mt-3 border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => seedMutation.mutate()}><Sparkles className="w-3 h-3 me-1" /> Generate Demo Data</Button>
                           </>
                         )}
                       </div>
@@ -520,7 +535,7 @@ export default function AcademicAnalytics() {
                                 <p className="font-semibold text-white">{match.title}</p>
                                 <p className="text-xs text-slate-400">{match.titleAr}</p>
                               </div>
-                              <div className="text-right">
+                              <div className="text-end">
                                 <span className={`text-[10px] px-2 py-0.5 rounded-full ${match.readinessLevel === "ready" ? "bg-emerald-500/15 text-emerald-400" : match.readinessLevel === "developing" ? "bg-amber-500/15 text-amber-400" : "bg-slate-500/15 text-slate-400"}`}>{match.readinessLevel}</span>
                                 <p className="text-lg font-bold text-white mt-1">{match.matchScore}%</p>
                               </div>
@@ -537,7 +552,7 @@ export default function AcademicAnalytics() {
                               </div>
                               {match.missingCourses.length > 0 && (
                                 <div className="flex items-start gap-2 text-xs">
-                                  <ArrowRight className="w-3 h-3 text-violet-400 mt-0.5" />
+                                  <ArrowRight className="w-3 h-3 text-violet-400 mt-0.5 rtl:rotate-180" />
                                   <span className="text-slate-400">Recommended next: <span className="text-violet-300">{match.missingCourses.slice(0, 3).join(", ")}</span></span>
                                 </div>
                               )}
@@ -557,7 +572,7 @@ export default function AcademicAnalytics() {
                           <>
                             <Briefcase className="w-10 h-10 text-slate-600 mb-2" />
                             <p className="text-sm text-slate-400">Complete more courses to see career matches</p>
-                            <Button variant="outline" size="sm" className="mt-3 border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => seedMutation.mutate()}><Sparkles className="w-3 h-3 mr-1" /> Generate Demo Data</Button>
+                            <Button variant="outline" size="sm" className="mt-3 border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => seedMutation.mutate()}><Sparkles className="w-3 h-3 me-1" /> Generate Demo Data</Button>
                           </>
                         )}
                       </div>
@@ -606,7 +621,7 @@ export default function AcademicAnalytics() {
                         <>
                           <Calculator className="w-10 h-10 text-slate-600 mb-2" />
                           <p className="text-sm text-slate-400">No simulator data available yet</p>
-                          <Button variant="outline" size="sm" className="mt-3 border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => seedMutation.mutate()}><Sparkles className="w-3 h-3 mr-1" /> Generate Demo Data</Button>
+                          <Button variant="outline" size="sm" className="mt-3 border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => seedMutation.mutate()}><Sparkles className="w-3 h-3 me-1" /> Generate Demo Data</Button>
                         </>
                       )}
                     </div>

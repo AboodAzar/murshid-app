@@ -120,7 +120,7 @@ export default function Grades() {
                       <p className="text-sm text-slate-400">{c.code} • {c.credits} {t("student.credits")}</p>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <span className={`text-sm font-bold px-3 py-1 rounded-full ${gradeColors[c.grade ?? ""] ?? "bg-slate-500/15 text-slate-400"}`}>
                       {c.grade ?? "—"}
                     </span>

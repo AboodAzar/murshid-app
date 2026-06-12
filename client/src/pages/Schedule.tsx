@@ -12,13 +12,13 @@ const fadeInUp = {
 };
 
 const dayColors = [
-  "border-l-blue-500",
-  "border-l-violet-500",
-  "border-l-emerald-500",
-  "border-l-amber-500",
-  "border-l-rose-500",
-  "border-l-sky-500",
-  "border-l-indigo-500",
+  "border-s-blue-500",
+  "border-s-violet-500",
+  "border-s-emerald-500",
+  "border-s-amber-500",
+  "border-s-rose-500",
+  "border-s-sky-500",
+  "border-s-indigo-500",
 ];
 
 export default function Schedule() {
@@ -76,7 +76,7 @@ export default function Schedule() {
                   </h3>
                   <div className="space-y-3">
                     {items.map((s) => (
-                      <div key={s.id} className={`flex items-center justify-between p-4 rounded-xl bg-slate-800/30 border-l-4 ${dayColors[day]} border-y border-r border-white/5`}>
+                      <div key={s.id} className={`flex items-center justify-between p-4 rounded-xl bg-slate-800/30 border-s-4 ${dayColors[day]} border-y border-e border-white/5`}>
                         <div className="flex items-center gap-4">
                           <div className="text-center min-w-[70px]">
                             <p className="text-white font-bold text-lg">{s.startTime}</p>
@@ -88,7 +88,7 @@ export default function Schedule() {
                             <p className="text-sm text-slate-400">{s.courseCode}</p>
                           </div>
                         </div>
-                        <div className="text-right space-y-1">
+                        <div className="text-end space-y-1">
                           <p className="text-sm text-slate-300 flex items-center justify-end gap-1.5">
                             <MapPin className="w-3.5 h-3.5 text-slate-500" /> {s.buildingName} • {t("student.room")} {s.roomNumber}
                           </p>

@@ -47,12 +47,15 @@ export const advisorRouter = router({
     if (!student) throw new TRPCError({ code: "NOT_FOUND" });
     const [dept] = await db.select({ name: departments.name, nameAr: departments.nameAr }).from(departments)
       .where(eq(departments.id, student.departmentId ?? 0)).limit(1);
-    const enrollments = await db.select({ courseId: studentCourses.courseId, status: studentCourses.status, grade: studentCourses.grade, gradePoints: studentCourses.gradePoints, semester: studentCourses.semester })
+    const enrollments = await db.select({ id: studentCourses.id, courseId: studentCourses.courseId, status: studentCourses.status, grade: studentCourses.grade, gradePoints: studentCourses.gradePoints, semester: studentCourses.semester })
       .from(studentCourses).where(eq(studentCourses.studentId, input.studentId));
     const courseIds = enrollments.map((e: any) => e.courseId);
     const courseDetails = courseIds.length > 0 ? await db.select().from(courses).where(inArray(courses.id, courseIds)) : [];
     const courseMap = new Map(courseDetails.map((c: any) => [c.id, c]));
-    const enrichedCourses = enrollments.map((e: any) => ({ ...e, course: courseMap.get(e.courseId) ?? null }));
+    const uniqueEnrollments = enrollments.filter((e: any, index: number, self: any[]) =>
+      index === self.findIndex((x: any) => x.courseId === e.courseId)
+    );
+    const enrichedCourses = uniqueEnrollments.map((e: any) => ({ ...e, course: courseMap.get(e.courseId) ?? null }));
     const [plan] = await db.select().from(studyPlans).where(eq(studyPlans.studentId, input.studentId)).limit(1);
     const attRows = await db.select({ status: attendance.status }).from(attendance).where(eq(attendance.studentId, input.studentId));
     const attTotal = attRows.length;

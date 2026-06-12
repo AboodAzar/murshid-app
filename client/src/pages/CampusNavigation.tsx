@@ -214,14 +214,14 @@ export default function CampusNavigation() {
                 className="border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white"
                 onClick={() => facultyBuilding && openGoogleDirections(facultyBuilding.lat, facultyBuilding.lng)}
               >
-                <Navigation className="w-4 h-4 mr-2" />
+                <Navigation className="w-4 h-4 me-2" />
                 Directions
               </Button>
               <Button
                 className="bg-emerald-600 hover:bg-emerald-500 text-white"
                 onClick={() => window.open("https://vt.zuj.edu.jo/", "_blank")}
               >
-                <Video className="w-4 h-4 mr-2" />
+                <Video className="w-4 h-4 me-2" />
                 360° Tour
               </Button>
             </div>
@@ -285,7 +285,7 @@ export default function CampusNavigation() {
                     <div className="absolute inset-0 flex items-center justify-center">
                       <Building2 className="w-20 h-20 text-blue-400/20" />
                     </div>
-                    <div className="absolute bottom-4 left-5">
+                    <div className="absolute bottom-4 start-5">
                       <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30">{facultyBuilding?.code ?? "FST"}</Badge>
                     </div>
                   </div>
@@ -308,7 +308,7 @@ export default function CampusNavigation() {
                       className="w-full bg-blue-600 hover:bg-blue-500"
                       onClick={() => facultyBuilding && openGoogleDirections(facultyBuilding.lat, facultyBuilding.lng)}
                     >
-                      <Navigation className="w-4 h-4 mr-2" />
+                      <Navigation className="w-4 h-4 me-2" />
                       Navigate to Faculty
                     </Button>
                   </CardContent>
@@ -383,7 +383,7 @@ export default function CampusNavigation() {
                       className="bg-emerald-600 hover:bg-emerald-500 text-white shrink-0"
                       onClick={() => window.open("https://vt.zuj.edu.jo/", "_blank")}
                     >
-                      <ExternalLink className="w-4 h-4 mr-2" />
+                      <ExternalLink className="w-4 h-4 me-2" />
                       Launch Virtual Tour
                     </Button>
                   </div>
@@ -408,7 +408,7 @@ export default function CampusNavigation() {
                       <button
                         key={i}
                         onClick={() => setActiveFloor(i)}
-                        className={`w-full p-3 rounded-lg text-left transition-all border ${
+                        className={`w-full p-3 rounded-lg text-start transition-all border ${
                           activeFloor === i
                             ? "bg-blue-600/15 border-blue-500/40 text-white"
                             : "bg-white/[0.03] border-white/5 text-slate-400 hover:bg-white/[0.06]"
@@ -459,8 +459,8 @@ export default function CampusNavigation() {
               <CardContent className="p-5 space-y-4">
                 <div className="flex flex-col md:flex-row gap-3">
                   <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                    <Input placeholder="Search by room number, name, or course..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10 bg-white/[0.03] border-white/10 text-white placeholder:text-slate-500" />
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                    <Input placeholder="Search by room number, name, or course..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="ps-10 bg-white/[0.03] border-white/10 text-white placeholder:text-slate-500" />
                   </div>
                   <div className="flex gap-2 flex-wrap">
                     {["all", "classroom", "lab", "office", "lecture_hall"].map(type => (
@@ -492,10 +492,10 @@ export default function CampusNavigation() {
                           </div>
                           <div className="flex gap-2 mt-3">
                             <Button size="sm" className="flex-1 bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 border border-blue-500/30" onClick={() => { setActiveFloor(room.floor); setActiveTab("building"); setSelectedRoom(room); }}>
-                              <MousePointerClick className="w-3 h-3 mr-1" />Locate
+                              <MousePointerClick className="w-3 h-3 me-1" />Locate
                             </Button>
                             <Button size="sm" variant="outline" className="flex-1 border-white/10 text-slate-400 hover:bg-white/[0.06]" onClick={() => facultyBuilding && openGoogleDirections(facultyBuilding.lat, facultyBuilding.lng)}>
-                              <Navigation className="w-3 h-3 mr-1" />Navigate
+                              <Navigation className="w-3 h-3 me-1" />Navigate
                             </Button>
                           </div>
                         </CardContent>
@@ -543,7 +543,7 @@ export default function CampusNavigation() {
                       <div className="flex items-center gap-2 shrink-0">
                         {lecture.status === "upcoming" && <span className="text-xs text-blue-400">in {lecture.countdownMinutes} min</span>}
                         <Button size="sm" className="bg-blue-600 hover:bg-blue-500" onClick={() => { if (lecture.floor != null) { setActiveFloor(lecture.floor); setActiveTab("building"); } }}>
-                          <Navigation className="w-3 h-3 mr-1" />Go
+                          <Navigation className="w-3 h-3 me-1" />Go
                         </Button>
                       </div>
                     </motion.div>
@@ -629,7 +629,7 @@ export default function CampusNavigation() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {Object.entries(ROUTES).map(([key, route]) => (
-                    <button key={key} onClick={() => setSelectedRoute(key)} className={`p-3 rounded-lg text-left border transition-all ${selectedRoute === key ? "bg-blue-600/15 border-blue-500/40 text-white" : "bg-white/[0.03] border-white/5 text-slate-400 hover:bg-white/[0.06]"}`}>
+                    <button key={key} onClick={() => setSelectedRoute(key)} className={`p-3 rounded-lg text-start border transition-all ${selectedRoute === key ? "bg-blue-600/15 border-blue-500/40 text-white" : "bg-white/[0.03] border-white/5 text-slate-400 hover:bg-white/[0.06]"}`}>
                       <div className="flex items-center gap-2"><Footprints className="w-4 h-4" /><span className="text-sm font-medium">{route.label}</span></div>
                     </button>
                   ))}
@@ -653,7 +653,7 @@ export default function CampusNavigation() {
                                   <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{step.eta}</span>
                                 </div>
                               </div>
-                              {i < ROUTES[selectedRoute].steps.length - 1 && <ChevronRight className="w-4 h-4 text-slate-600 self-center" />}
+                              {i < ROUTES[selectedRoute].steps.length - 1 && <ChevronRight className="w-4 h-4 text-slate-600 self-center rtl:rotate-180" />}
                             </div>
                           ))}
                         </div>

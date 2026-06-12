@@ -125,19 +125,20 @@ export default function Register() {
 
   return (
     <div
-      className={`min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-4 ${dir === "rtl" ? "rtl" : "ltr"}`}
+      dir={dir}
+      className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-4"
     >
       {/* Background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           animate={{ x: [0, 100, 0], y: [0, 50, 0] }}
           transition={{ duration: 20, repeat: Infinity }}
-          className="absolute top-20 right-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"
+          className="absolute top-20 end-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"
         />
         <motion.div
           animate={{ x: [0, -100, 0], y: [0, -50, 0] }}
           transition={{ duration: 25, repeat: Infinity }}
-          className="absolute bottom-20 left-10 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl"
+          className="absolute bottom-20 start-10 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl"
         />
       </div>
 
@@ -150,16 +151,16 @@ export default function Register() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <Logo size={48} className="rounded-xl shadow-lg shadow-blue-500/25" />
+            <Logo size={80} className="rounded-2xl shadow-lg shadow-blue-500/25" />
             <span className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
               {t("common.appName")}
             </span>
           </div>
-          <p className="text-slate-400">{t("common.appDescription")}</p>
+          <p className="text-muted-foreground">{t("common.appDescription")}</p>
         </div>
 
         {/* Register Card */}
-        <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50 shadow-2xl">
+        <Card className="bg-card backdrop-blur-xl border-border shadow-2xl">
           <CardHeader className="space-y-2">
             <CardTitle className="text-2xl">
               {t("auth.createAccount")}
@@ -177,14 +178,14 @@ export default function Register() {
                       {t("auth.fullName")}
                     </label>
                     <div className="relative">
-                      <User className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
+                      <User className="absolute start-3 top-3 w-5 h-5 text-muted-foreground" />
                       <Input
                         type="text"
                         name="name"
                         placeholder={t("auth.namePlaceholder")}
                         value={formData.name}
                         onChange={handleInputChange}
-                        className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
+                        className="ps-10 bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
                         required
                         disabled={isLoading}
                       />
@@ -197,14 +198,14 @@ export default function Register() {
                       {t("auth.email")}
                     </label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
+                      <Mail className="absolute start-3 top-3 w-5 h-5 text-muted-foreground" />
                       <Input
                         type="email"
                         name="email"
                         placeholder={t("auth.emailPlaceholder")}
                         value={formData.email}
                         onChange={handleInputChange}
-                        className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
+                        className="ps-10 bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
                         required
                         disabled={isLoading}
                       />
@@ -219,14 +220,14 @@ export default function Register() {
                       {t("auth.password")}
                     </label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
+                      <Lock className="absolute start-3 top-3 w-5 h-5 text-muted-foreground" />
                       <Input
                         type="password"
                         name="password"
                         placeholder="••••••••"
                         value={formData.password}
                         onChange={handleInputChange}
-                        className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
+                        className="ps-10 bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
                         required
                         disabled={isLoading}
                       />
@@ -239,14 +240,14 @@ export default function Register() {
                       {t("auth.confirmPassword")}
                     </label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
+                      <Lock className="absolute start-3 top-3 w-5 h-5 text-muted-foreground" />
                       <Input
                         type="password"
                         name="confirmPassword"
                         placeholder="••••••••"
                         value={formData.confirmPassword}
                         onChange={handleInputChange}
-                        className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
+                        className="ps-10 bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
                         required
                         disabled={isLoading}
                       />
@@ -258,12 +259,12 @@ export default function Register() {
                   {/* OTP Input */}
                   <div className="space-y-4 text-center">
                     <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Mail className="w-8 h-8 text-blue-400" />
+                      <Mail className="w-8 h-8 text-primary" />
                     </div>
                     <h3 className="text-xl font-bold text-white">Check your email</h3>
-                    <p className="text-slate-400 text-sm">
+                    <p className="text-muted-foreground text-sm">
                       We've sent a 6-digit verification code to<br/>
-                      <span className="text-blue-400 font-semibold">{formData.email}</span>
+                      <span className="text-primary font-semibold">{formData.email}</span>
                     </p>
                     
                     <div className="pt-4">
@@ -307,16 +308,16 @@ export default function Register() {
                   className={`flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white py-6 text-base font-semibold ${page === 1 ? "w-full" : ""}`}
                 >
                   {page === 1 ? t("common.next") : page === 2 ? t("auth.createAccount") : "Verify Email"}
-                  <ArrowRight className="ml-2 w-4 h-4" />
+                  <ArrowRight className="ms-2 w-4 h-4 rtl:rotate-180" />
                 </Button>
               </div>
 
               {/* Login Link */}
-              <p className="text-center text-slate-400">
+              <p className="text-center text-muted-foreground">
                 {t("auth.alreadyHaveAccount")}{" "}
                 <a
                   href="/login"
-                  className="text-blue-400 hover:text-blue-300 font-semibold transition-colors"
+                  className="text-primary hover:text-blue-300 font-semibold transition-colors"
                 >
                   {t("auth.signIn")}
                 </a>

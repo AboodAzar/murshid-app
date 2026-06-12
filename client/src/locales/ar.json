@@ -155,7 +155,8 @@
     "department": "القسم",
     "viewStudyPlan": "عرض خطة الدراسة",
     "approveRecommendation": "الموافقة على التوصية",
-    "rejectRecommendation": "رفض التوصية"
+    "rejectRecommendation": "رفض التوصية",
+    "aiReview": "مراجعة الذكاء الاصطناعي"
   },
   "admin": {
     "dashboard": "لوحة تحكم المسؤول",
@@ -165,6 +166,12 @@
     "analytics": "التحليلات",
     "aiStatistics": "إحصائيات الذكاء الاصطناعي",
     "systemSettings": "إعدادات النظام",
+    "academicManagement": "إدارة أكاديمية",
+    "advisorManagement": "إدارة المستشارين",
+    "campusManagement": "إدارة الحرم الجامعي",
+    "contentManagement": "إدارة المحتوى",
+    "aiManagement": "إدارة الذكاء الاصطناعي",
+    "reportsAnalytics": "التقارير والتحليلات",
     "totalUsers": "إجمالي المستخدمين",
     "totalStudents": "إجمالي الطلاب",
     "totalAdvisors": "إجمالي المستشارين",
@@ -200,6 +207,9 @@
     "deleteConversation": "حذف المحادثة",
     "startNewChat": "ابدأ محادثة جديدة",
     "noMessages": "لا توجد رسائل حتى الآن"
+  },
+  "analytics": {
+    "title": "التحليلات الأكاديمية"
   },
   "map": {
     "title": "ملاحة الحرم الجامعي",

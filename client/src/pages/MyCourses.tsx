@@ -64,7 +64,7 @@ export default function MyCourses() {
                 onClick={() => setLocation(`/courses/${course.courseId}`)}
                 className="cursor-pointer group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-2xl hover:bg-white/[0.07] transition-all hover:-translate-y-1"
               >
-                <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${courseColors[i % courseColors.length]}`} />
+                <div className={`absolute top-0 start-0 w-full h-1 bg-gradient-to-r ${courseColors[i % courseColors.length]}`} />
                 <div className="flex items-start justify-between mb-4">
                   <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${courseColors[i % courseColors.length]} flex items-center justify-center`}>
                     <BookOpen className="w-5 h-5 text-white" />
@@ -100,7 +100,7 @@ export default function MyCourses() {
                   </div>
                 </div>
                 <div className="mt-4 flex items-center text-sm text-blue-400 group-hover:text-blue-300 transition-colors">
-                  {t("student.viewDetails")} <ChevronRight className="w-4 h-4 ml-1" />
+                  {t("student.viewDetails")} <ChevronRight className="w-4 h-4 ms-1 rtl:rotate-180" />
                 </div>
               </motion.div>
             ))}

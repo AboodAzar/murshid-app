@@ -24,7 +24,7 @@ export async function getDb() {
         }
       });
       
-      _db = drizzle(poolConnection);
+      _db = drizzle(poolConnection as any);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;

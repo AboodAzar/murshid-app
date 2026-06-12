@@ -231,6 +231,17 @@ export default function AdminDashboard() {
     window.location.hash = activeTab;
   }, [activeTab]);
 
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace("#", "");
+      if (["users", "advisors", "courses", "content", "analytics", "aiStats", "reports"].includes(hash)) {
+        setActiveTab(hash);
+      }
+    };
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+
   // ── queries ────────────────────────────────────────────
   const utils = trpc.useUtils();
   const { data: dashboard, isLoading } = trpc.admin.dashboard.useQuery();
@@ -436,7 +447,7 @@ export default function AdminDashboard() {
               <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
                 {t("admin.dashboard")}
               </h1>
-              <p className="text-sm text-slate-500">{t("admin.systemOverview")}</p>
+              <p className="text-sm text-muted-foreground">{t("admin.systemOverview")}</p>
             </div>
           </div>
         </motion.div>
@@ -488,11 +499,11 @@ export default function AdminDashboard() {
             const Icon = stat.icon;
             return (
               <motion.div key={i} variants={fadeInUp}>
-                <Card className="bg-slate-900/70 border-slate-800 hover:border-slate-700 transition-colors overflow-hidden">
+                <Card className="bg-card border-border hover:border-border/80 transition-colors overflow-hidden">
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-xs text-slate-500 mb-1">{stat.label}</p>
+                        <p className="text-xs text-muted-foreground mb-1">{stat.label}</p>
                         <p className="text-2xl font-bold">
                           {isLoading ? (
                             <span className="inline-block w-10 h-7 bg-slate-800 rounded animate-pulse" />
@@ -517,7 +528,7 @@ export default function AdminDashboard() {
         {/* ── Main Tabs ── */}
         <motion.div initial="initial" animate="animate" variants={stagger}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 md:grid-cols-7 bg-slate-900/70 border border-slate-800 rounded-xl p-1 mb-6">
+            <TabsList className="grid w-full grid-cols-4 md:grid-cols-7 bg-slate-900/70 border border-border rounded-xl p-1 mb-6">
               {[
                 { value: "users", label: t("admin.userManagement"), icon: Users },
                 { value: "advisors", label: "Advisors", icon: UserCheck },
@@ -544,7 +555,7 @@ export default function AdminDashboard() {
             {/* ══ USER MANAGEMENT TAB ══ */}
             <TabsContent value="users" className="space-y-5">
               <motion.div variants={fadeInUp}>
-                <Card className="bg-slate-900/70 border-slate-800">
+                <Card className="bg-slate-900/70 border-border">
                   <CardHeader className="pb-4">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div>
@@ -560,12 +571,12 @@ export default function AdminDashboard() {
                       {/* Search + Filters */}
                       <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
                         <div className="relative">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+                          <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                           <Input
                             placeholder="Search by name or email…"
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
-                            className="pl-9 bg-slate-800 border-slate-700 w-full sm:w-56 text-sm"
+                            className="ps-9 bg-accent border-border w-full sm:w-56 text-sm"
                           />
                         </div>
 
@@ -573,11 +584,11 @@ export default function AdminDashboard() {
                           value={roleFilter}
                           onValueChange={v => setRoleFilter(v as FilterRole)}
                         >
-                          <SelectTrigger className="bg-slate-800 border-slate-700 w-full sm:w-36 text-sm">
-                            <Filter className="w-3.5 h-3.5 mr-1 text-slate-400" />
+                          <SelectTrigger className="bg-accent border-border w-full sm:w-36 text-sm">
+                            <Filter className="w-3.5 h-3.5 me-1 text-muted-foreground" />
                             <SelectValue placeholder="Role" />
                           </SelectTrigger>
-                          <SelectContent className="bg-slate-800 border-slate-700">
+                          <SelectContent className="bg-accent border-border">
                             <SelectItem value="all">All roles</SelectItem>
                             <SelectItem value="admin">Admin</SelectItem>
                             <SelectItem value="advisor">Advisor</SelectItem>
@@ -591,10 +602,10 @@ export default function AdminDashboard() {
                             setStatusFilter(v as "all" | "active" | "inactive")
                           }
                         >
-                          <SelectTrigger className="bg-slate-800 border-slate-700 w-full sm:w-36 text-sm">
+                          <SelectTrigger className="bg-accent border-border w-full sm:w-36 text-sm">
                             <SelectValue placeholder="Status" />
                           </SelectTrigger>
-                          <SelectContent className="bg-slate-800 border-slate-700">
+                          <SelectContent className="bg-accent border-border">
                             <SelectItem value="all">All statuses</SelectItem>
                             <SelectItem value="active">Active</SelectItem>
                             <SelectItem value="inactive">Inactive</SelectItem>
@@ -606,7 +617,7 @@ export default function AdminDashboard() {
 
                   <CardContent className="p-0">
                     {/* Table header */}
-                    <div className="hidden sm:grid grid-cols-[auto_1fr_auto_auto_auto_auto] items-center gap-4 px-6 py-2.5 border-t border-slate-800 text-xs font-medium text-slate-500 uppercase tracking-wide">
+                    <div className="hidden sm:grid grid-cols-[auto_1fr_auto_auto_auto_auto] items-center gap-4 px-6 py-2.5 border-t border-border text-xs font-medium text-muted-foreground uppercase tracking-wide">
                       <span />
                       <span>User</span>
                       <span className="text-center w-24">Role</span>
@@ -621,7 +632,7 @@ export default function AdminDashboard() {
                           {[...Array(5)].map((_, i) => (
                             <div
                               key={i}
-                              className="h-16 rounded-xl bg-slate-800/50 animate-pulse"
+                              className="h-16 rounded-xl bg-accent/50 animate-pulse"
                             />
                           ))}
                         </div>
@@ -629,13 +640,13 @@ export default function AdminDashboard() {
                         <motion.div
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
-                          className="flex flex-col items-center justify-center py-16 text-slate-500"
+                          className="flex flex-col items-center justify-center py-16 text-muted-foreground"
                         >
                           <Users className="w-10 h-10 mb-3 opacity-30" />
                           <p className="text-sm">No users match your search</p>
                         </motion.div>
                       ) : (
-                        <div className="divide-y divide-slate-800/60">
+                        <div className="divide-y divide-border/60">
                           {filteredUsers.map(u => {
                             const meta = roleMeta[u.role];
                             return (
@@ -645,7 +656,7 @@ export default function AdminDashboard() {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto_auto_auto_auto] items-center gap-3 sm:gap-4 px-6 py-4 hover:bg-slate-800/30 transition-colors"
+                                className="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto_auto_auto_auto] items-center gap-3 sm:gap-4 px-6 py-4 hover:bg-accent/30 transition-colors"
                               >
                                 {/* Avatar */}
                                 <div
@@ -659,7 +670,7 @@ export default function AdminDashboard() {
                                   <p className="font-medium text-sm text-white truncate">
                                     {u.name ?? "(No name)"}
                                   </p>
-                                  <p className="text-xs text-slate-500 truncate">
+                                  <p className="text-xs text-muted-foreground truncate">
                                     {u.email}
                                   </p>
                                   {u.role === "student" && u.advisorId && (
@@ -692,7 +703,7 @@ export default function AdminDashboard() {
                                       {meta.icon}
                                       <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-slate-800 border-slate-700">
+                                    <SelectContent className="bg-accent border-border">
                                       <SelectItem value="student">Student</SelectItem>
                                       <SelectItem value="advisor">Advisor</SelectItem>
                                       <SelectItem value="admin">Admin</SelectItem>
@@ -712,7 +723,7 @@ export default function AdminDashboard() {
                                     className={`flex items-center gap-1.5 h-7 px-3 rounded-full text-xs font-medium border transition-all hover:scale-105 ${
                                       u.isActive
                                         ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20"
-                                        : "bg-slate-500/10 text-slate-400 border-slate-500/30 hover:bg-slate-500/20"
+                                        : "bg-slate-500/10 text-muted-foreground border-slate-500/30 hover:bg-slate-500/20"
                                     }`}
                                   >
                                     {u.isActive ? (
@@ -730,7 +741,7 @@ export default function AdminDashboard() {
                                     size="sm"
                                     variant="outline"
                                     onClick={() => openDetails(u)}
-                                    className="h-7 w-7 p-0 border-slate-700 bg-transparent hover:bg-slate-700 text-slate-400 hover:text-white"
+                                    className="h-7 w-7 p-0 border-slate-700 bg-transparent hover:bg-accent text-muted-foreground hover:text-white"
                                     title="View details"
                                   >
                                     <MoreVertical className="w-3.5 h-3.5" />
@@ -752,7 +763,7 @@ export default function AdminDashboard() {
                                     variant="outline"
                                     onClick={() => setPendingDeleteUser(u)}
                                     disabled={u.id === currentUser?.id}
-                                    className="h-7 w-7 p-0 border-slate-700 bg-transparent hover:bg-rose-900/40 hover:border-rose-700 text-slate-500 hover:text-rose-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                    className="h-7 w-7 p-0 border-slate-700 bg-transparent hover:bg-rose-900/40 hover:border-rose-700 text-muted-foreground hover:text-rose-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                                     title={
                                       u.id === currentUser?.id
                                         ? "Cannot delete your own account"
@@ -781,7 +792,7 @@ export default function AdminDashboard() {
             {/* ══ ANALYTICS TAB ══ */}
             <TabsContent value="analytics" className="space-y-4">
               <motion.div variants={fadeInUp}>
-                <Card className="bg-slate-900/70 border-slate-800">
+                <Card className="bg-slate-900/70 border-border">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <TrendingUp className="w-4 h-4 text-indigo-400" />
@@ -823,7 +834,7 @@ export default function AdminDashboard() {
             {/* ══ AI STATISTICS TAB ══ */}
             <TabsContent value="aiStats" className="space-y-4">
               <motion.div variants={fadeInUp}>
-                <Card className="bg-slate-900/70 border-slate-800">
+                <Card className="bg-slate-900/70 border-border">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Activity className="w-4 h-4 text-indigo-400" />
@@ -851,22 +862,22 @@ export default function AdminDashboard() {
               </motion.div>
 
               <motion.div variants={fadeInUp} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="bg-slate-900/70 border-slate-800">
+                <Card className="bg-slate-900/70 border-border">
                   <CardHeader>
                     <CardTitle className="text-base">{t("admin.averageResponseTime")}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-3xl font-bold text-blue-400">2.25s</p>
-                    <p className="text-sm text-slate-500 mt-1">↓ 5% from last week</p>
+                    <p className="text-3xl font-bold text-primary">2.25s</p>
+                    <p className="text-sm text-muted-foreground mt-1">↓ 5% from last week</p>
                   </CardContent>
                 </Card>
-                <Card className="bg-slate-900/70 border-slate-800">
+                <Card className="bg-slate-900/70 border-border">
                   <CardHeader>
                     <CardTitle className="text-base">AI Accuracy Rate</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-3xl font-bold text-emerald-400">94.1%</p>
-                    <p className="text-sm text-slate-500 mt-1">↑ 2% from last week</p>
+                    <p className="text-sm text-muted-foreground mt-1">↑ 2% from last week</p>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -875,7 +886,7 @@ export default function AdminDashboard() {
             {/* ══ CONTENT TAB ══ */}
             <TabsContent value="content" className="space-y-4">
               <motion.div variants={fadeInUp}>
-                <Card className="bg-slate-900/70 border-slate-800">
+                <Card className="bg-slate-900/70 border-border">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <MessageSquare className="w-4 h-4 text-indigo-400" />
@@ -888,13 +899,13 @@ export default function AdminDashboard() {
                         placeholder="Title (English)"
                         value={announcementForm.title}
                         onChange={e => setAnnouncementForm({ ...announcementForm, title: e.target.value })}
-                        className="bg-slate-800 border-slate-700"
+                        className="bg-accent border-border"
                       />
                       <Input
                         placeholder="Title (Arabic)"
                         value={announcementForm.titleAr}
                         onChange={e => setAnnouncementForm({ ...announcementForm, titleAr: e.target.value })}
-                        className="bg-slate-800 border-slate-700"
+                        className="bg-accent border-border"
                         dir="rtl"
                       />
                     </div>
@@ -902,13 +913,13 @@ export default function AdminDashboard() {
                       placeholder="Content (English)"
                       value={announcementForm.content}
                       onChange={e => setAnnouncementForm({ ...announcementForm, content: e.target.value })}
-                      className="bg-slate-800 border-slate-700 min-h-24"
+                      className="bg-accent border-border min-h-24"
                     />
                     <Textarea
                       placeholder="Content (Arabic)"
                       value={announcementForm.contentAr}
                       onChange={e => setAnnouncementForm({ ...announcementForm, contentAr: e.target.value })}
-                      className="bg-slate-800 border-slate-700 min-h-24"
+                      className="bg-accent border-border min-h-24"
                       dir="rtl"
                     />
                     <div className="flex gap-2">
@@ -935,11 +946,11 @@ export default function AdminDashboard() {
 
               <motion.div variants={fadeInUp} className="space-y-3">
                 {announcements.map(ann => (
-                  <Card key={ann.id} className="bg-slate-900/70 border-slate-800 hover:border-slate-700 transition-colors">
+                  <Card key={ann.id} className="bg-card border-border hover:border-border/80 transition-colors">
                     <CardContent className="p-4 flex justify-between gap-4 items-start">
                       <div className="min-w-0">
                         <p className="font-semibold text-sm">{ann.title}</p>
-                        <p className="text-xs text-slate-500 mt-1 line-clamp-2">{ann.content}</p>
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{ann.content}</p>
                       </div>
                       <div className="flex gap-2 shrink-0">
                         <Button
@@ -976,13 +987,13 @@ export default function AdminDashboard() {
             {/* ══ COURSES TAB ══ */}
             <TabsContent value="courses" className="space-y-4">
               <motion.div variants={fadeInUp}>
-                <Card className="bg-slate-900/70 border-slate-800">
+                <Card className="bg-slate-900/70 border-border">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <BookOpen className="w-4 h-4 text-indigo-400" />
                       Course Management
                     </CardTitle>
-                    <CardDescription className="text-slate-500">
+                    <CardDescription className="text-muted-foreground">
                       {coursesData?.data?.length ?? 0} total courses in the system
                     </CardDescription>
                   </CardHeader>
@@ -994,16 +1005,16 @@ export default function AdminDashboard() {
                         ))}
                       </div>
                     ) : coursesData.data.length === 0 ? (
-                      <p className="text-slate-500 text-sm">No courses found.</p>
+                      <p className="text-muted-foreground text-sm">No courses found.</p>
                     ) : (
                       <div className="space-y-2">
                         {coursesData.data.map((course: any) => (
-                          <div key={course.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-800/50 border border-slate-700/50">
+                          <div key={course.id} className="flex items-center justify-between p-3 rounded-lg bg-accent/50 border border-border/50">
                             <div>
                               <p className="text-sm font-medium text-white">{course.name}</p>
-                              <p className="text-xs text-slate-500">{course.code} • {course.credits} credits • Semester {course.semester}</p>
+                              <p className="text-xs text-muted-foreground">{course.code} • {course.credits} credits • Semester {course.semester}</p>
                             </div>
-                            <Badge variant="outline" className="border-slate-700 text-slate-400 text-[10px]">
+                            <Badge variant="outline" className="border-slate-700 text-muted-foreground text-[10px]">
                               {course.isRequired ? "Required" : "Elective"}
                             </Badge>
                           </div>
@@ -1018,7 +1029,7 @@ export default function AdminDashboard() {
             {/* ══ REPORTS TAB ══ */}
             <TabsContent value="reports" className="space-y-4">
               <motion.div variants={fadeInUp}>
-                <Card className="bg-slate-900/70 border-slate-800">
+                <Card className="bg-slate-900/70 border-border">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Database className="w-4 h-4 text-indigo-400" />
@@ -1028,16 +1039,16 @@ export default function AdminDashboard() {
                   <CardContent className="space-y-4">
                     {advisorInsights ? (
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 text-center">
-                          <p className="text-xs text-slate-500 uppercase">Total Students</p>
+                        <div className="p-4 rounded-xl bg-accent/50 border border-border/50 text-center">
+                          <p className="text-xs text-muted-foreground uppercase">Total Students</p>
                           <p className="text-2xl font-bold text-white mt-1">{advisorInsights.totalStudents}</p>
                         </div>
-                        <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 text-center">
-                          <p className="text-xs text-slate-500 uppercase">At Risk</p>
+                        <div className="p-4 rounded-xl bg-accent/50 border border-border/50 text-center">
+                          <p className="text-xs text-muted-foreground uppercase">At Risk</p>
                           <p className="text-2xl font-bold text-red-400 mt-1">{advisorInsights.atRiskCount}</p>
                         </div>
-                        <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 text-center">
-                          <p className="text-xs text-slate-500 uppercase">Average GPA</p>
+                        <div className="p-4 rounded-xl bg-accent/50 border border-border/50 text-center">
+                          <p className="text-xs text-muted-foreground uppercase">Average GPA</p>
                           <p className="text-2xl font-bold text-emerald-400 mt-1">{advisorInsights.averageGpa}</p>
                         </div>
                       </div>
@@ -1070,7 +1081,7 @@ export default function AdminDashboard() {
               )}
               <div>
                 <p className="font-semibold">{selectedUser?.name ?? "(No name)"}</p>
-                <p className="text-xs text-slate-500 font-normal">{selectedUser?.email}</p>
+                <p className="text-xs text-muted-foreground font-normal">{selectedUser?.email}</p>
               </div>
             </DialogTitle>
           </DialogHeader>
@@ -1086,7 +1097,7 @@ export default function AdminDashboard() {
                   className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${
                     selectedUser.isActive
                       ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                      : "bg-slate-500/10 text-slate-400 border-slate-500/30"
+                      : "bg-slate-500/10 text-muted-foreground border-slate-500/30"
                   }`}
                 >
                   {selectedUser.isActive ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
@@ -1102,23 +1113,23 @@ export default function AdminDashboard() {
 
               <div className="grid grid-cols-1 gap-3 text-sm">
                 {selectedUser.phone && (
-                  <div className="flex items-center gap-3 text-slate-400">
-                    <Phone className="w-4 h-4 text-slate-600 shrink-0" />
+                  <div className="flex items-center gap-3 text-muted-foreground">
+                    <Phone className="w-4 h-4 text-muted-foreground shrink-0" />
                     {selectedUser.phone}
                   </div>
                 )}
-                <div className="flex items-center gap-3 text-slate-400">
-                  <Calendar className="w-4 h-4 text-slate-600 shrink-0" />
+                <div className="flex items-center gap-3 text-muted-foreground">
+                  <Calendar className="w-4 h-4 text-muted-foreground shrink-0" />
                   Joined {formatDate(selectedUser.createdAt)}
                 </div>
-                <div className="flex items-center gap-3 text-slate-400">
-                  <Clock className="w-4 h-4 text-slate-600 shrink-0" />
+                <div className="flex items-center gap-3 text-muted-foreground">
+                  <Clock className="w-4 h-4 text-muted-foreground shrink-0" />
                   Last signed in {formatDate(selectedUser.lastSignedIn)}
                 </div>
               </div>
 
               {selectedUser.bio && (
-                <div className="p-3 bg-slate-800/60 rounded-lg text-sm text-slate-400 border border-slate-700">
+                <div className="p-3 bg-slate-800/60 rounded-lg text-sm text-muted-foreground border border-slate-700">
                   {selectedUser.bio}
                 </div>
               )}
@@ -1140,7 +1151,7 @@ export default function AdminDashboard() {
               }}
               className="bg-indigo-600 hover:bg-indigo-500"
             >
-              <Edit3 className="w-3.5 h-3.5 mr-1.5" />
+              <Edit3 className="w-3.5 h-3.5 me-1.5" />
               Edit User
             </Button>
           </DialogFooter>
@@ -1162,29 +1173,29 @@ export default function AdminDashboard() {
 
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-400 uppercase tracking-wide">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 Full Name
               </label>
               <Input
                 value={editForm.name}
                 onChange={e => setEditForm({ ...editForm, name: e.target.value })}
                 placeholder="Enter full name"
-                className="bg-slate-800 border-slate-700"
+                className="bg-accent border-border"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-400 uppercase tracking-wide">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 Role
               </label>
               <Select
                 value={editForm.role}
                 onValueChange={val => setEditForm({ ...editForm, role: val as Role })}
               >
-                <SelectTrigger className="bg-slate-800 border-slate-700">
+                <SelectTrigger className="bg-accent border-border">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-700">
+                <SelectContent className="bg-accent border-border">
                   <SelectItem value="student">
                     <div className="flex items-center gap-2">
                       <GraduationCap className="w-3.5 h-3.5 text-sky-400" />
@@ -1235,7 +1246,7 @@ export default function AdminDashboard() {
         <AlertDialogContent className="bg-slate-900 border-slate-700">
           <AlertDialogHeader>
             <AlertDialogTitle>Change Role</AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400">
+            <AlertDialogDescription className="text-muted-foreground">
               Are you sure you want to change{" "}
               <span className="font-semibold text-white">
                 {pendingRoleChange?.user.name ?? pendingRoleChange?.user.email}
@@ -1278,7 +1289,7 @@ export default function AdminDashboard() {
             <AlertDialogTitle>
               {pendingStatusChange?.newStatus ? "Activate User" : "Deactivate User"}
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400">
+            <AlertDialogDescription className="text-muted-foreground">
               Are you sure you want to{" "}
               {pendingStatusChange?.newStatus ? "activate" : "deactivate"}{" "}
               <span className="font-semibold text-white">
@@ -1321,7 +1332,7 @@ export default function AdminDashboard() {
               <AlertTriangle className="w-5 h-5" />
               Delete User
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400 space-y-2">
+            <AlertDialogDescription className="text-muted-foreground space-y-2">
               <span className="block">
                 You are about to permanently delete{" "}
                 <span className="font-semibold text-white">

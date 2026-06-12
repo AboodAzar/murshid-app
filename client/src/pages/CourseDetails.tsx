@@ -38,7 +38,7 @@ export default function CourseDetails() {
       <div className="space-y-6 pb-10">
         <motion.div {...fadeInUp}>
           <button onClick={() => setLocation("/courses")} className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-4">
-            <ArrowLeft className="w-4 h-4" /> {t("common.back")}
+            <ArrowLeft className="w-4 h-4 rtl:rotate-180" /> {t("common.back")}
           </button>
         </motion.div>
 
@@ -118,7 +118,7 @@ export default function CourseDetails() {
                           <p className="text-sm text-slate-400">{s.startTime} - {s.endTime}</p>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-end">
                         <p className="text-white text-sm">{s.buildingName}</p>
                         <p className="text-xs text-slate-400">{t("student.room")} {s.roomNumber} • {t("student.floor")} {s.floor}</p>
                       </div>
@@ -142,7 +142,7 @@ export default function CourseDetails() {
                         <p className="text-white font-medium">{a.title}</p>
                         <p className="text-xs text-slate-400">{a.totalPoints} {t("student.points")}</p>
                       </div>
-                      <div className="text-right">
+                      <div className="text-end">
                         <span className={`text-xs font-medium px-2 py-1 rounded-full ${
                           a.saStatus === "graded" ? "bg-emerald-500/15 text-emerald-400" :
                           a.saStatus === "submitted" ? "bg-blue-500/15 text-blue-400" :

@@ -15,7 +15,10 @@ export default function Attendance() {
   const { t } = useI18n();
   const { user } = useAuth();
   const advisorStudentId = user?.role === "advisor" ? Number(localStorage.getItem("advisorSelectedStudentId") || 0) || undefined : undefined;
-  const { data: records = [], isLoading } = trpc.student.attendance.useQuery(advisorStudentId ? { studentId: advisorStudentId } : undefined);
+  const { data: rawRecords = [], isLoading } = trpc.student.attendance.useQuery(advisorStudentId ? { studentId: advisorStudentId } : undefined);
+  const records = rawRecords.filter((r: any, index: number, self: any[]) =>
+    index === self.findIndex((rec: any) => rec.id === r.id)
+  );
 
   if (!user) return null;
 
@@ -91,7 +94,7 @@ export default function Attendance() {
                         <p className="text-xs text-slate-400">{r.courseCode}</p>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-end">
                       <span className={`text-xs font-medium px-2 py-1 rounded-full ${config.color}`}>
                         {config.label}
                       </span>

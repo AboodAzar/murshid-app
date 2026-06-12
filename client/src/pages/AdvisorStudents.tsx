@@ -57,12 +57,12 @@ export default function AdvisorStudents() {
 
         <motion.div {...fadeInUp} className="mb-6">
           <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <Input
               placeholder={t("advisor.searchStudents")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 bg-white/[0.04] border-white/10 text-white placeholder:text-slate-500"
+              className="ps-10 bg-white/[0.04] border-white/10 text-white placeholder:text-slate-500"
             />
           </div>
         </motion.div>
@@ -118,7 +118,7 @@ export default function AdvisorStudents() {
                       </div>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-blue-400 transition-colors" />
+                  <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-blue-400 transition-colors rtl:rotate-180" />
                 </div>
               </motion.div>
             ))}

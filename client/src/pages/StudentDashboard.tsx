@@ -42,13 +42,13 @@ function StatusBadge({ status, t }: { status: string; t: (k: string) => string }
   const map: Record<string, string> = {
     upcoming: "bg-amber-500/15 text-amber-400 border-amber-500/30",
     ongoing: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30 animate-pulse-slow",
-    completed: "bg-slate-500/15 text-slate-400 border-slate-500/30",
+    completed: "bg-slate-500/15 text-muted-foreground border-slate-500/30",
     present: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
     absent: "bg-red-500/15 text-red-400 border-red-500/30",
     excused: "bg-blue-500/15 text-blue-400 border-blue-500/30",
     late: "bg-amber-500/15 text-amber-400 border-amber-500/30",
     in_progress: "bg-blue-500/15 text-blue-400 border-blue-500/30",
-    planned: "bg-slate-500/15 text-slate-400 border-slate-500/30",
+    planned: "bg-slate-500/15 text-muted-foreground border-slate-500/30",
     submitted: "bg-blue-500/15 text-blue-400 border-blue-500/30",
     graded: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
     overdue: "bg-red-500/15 text-red-400 border-red-500/30",
@@ -94,7 +94,7 @@ function HealthRing({ score, t }: { score: number; t: (k: string) => string }) {
       </svg>
       <div className="absolute flex flex-col items-center">
         <span className="text-lg font-bold" style={{ color }}>{score}</span>
-        <span className="text-[9px] text-slate-400 uppercase tracking-wider">{label}</span>
+        <span className="text-[9px] text-muted-foreground uppercase tracking-wider">{label}</span>
       </div>
     </div>
   );
@@ -116,8 +116,8 @@ function AlertBorder(type: string) {
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="glass-card-strong rounded-lg px-3 py-2 border border-white/10">
-      <p className="text-xs text-slate-400">Semester {label}</p>
+    <div className="glass-card-strong rounded-lg px-3 py-2 border border-border">
+      <p className="text-xs text-muted-foreground">Semester {label}</p>
       <p className="text-sm font-bold text-white">GPA {payload[0].value}</p>
     </div>
   );
@@ -215,13 +215,20 @@ export default function StudentDashboard() {
     );
   }, [alertsData]);
 
+  const uniqueActivity = useMemo(() => {
+    const all = (overview?.recentActivity ?? EMPTY_ACTIVITY);
+    return all.filter((act: any, index: number, self: any[]) =>
+      index === self.findIndex((a: any) => a.id === act.id)
+    );
+  }, [overview?.recentActivity]);
+
   const gradientText = "bg-gradient-to-r from-blue-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent";
 
   if (!user) {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-96">
-          <p className="text-slate-400">{t("common.loading")}</p>
+          <p className="text-muted-foreground">{t("common.loading")}</p>
         </div>
       </DashboardLayout>
     );
@@ -234,23 +241,23 @@ export default function StudentDashboard() {
         <motion.div initial="initial" animate="animate" variants={fadeInUp} className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
           <div className="space-y-1">
             <h1 className={`text-3xl sm:text-4xl font-bold ${gradientText}`}>{t("student.dashboard")}</h1>
-            <p className="text-slate-400 text-base">{t("common.welcome")}, {userName}</p>
+            <p className="text-muted-foreground text-base">{t("common.welcome")}, {userName}</p>
           </div>
           <div className="flex items-center gap-3">
             {(!alertsL || (alertsData ?? EMPTY_ALERTS)) && (
-              <div className="glass-card rounded-xl px-4 py-2 flex items-center gap-3 border border-white/5">
+              <div className="glass-card rounded-xl px-4 py-2 flex items-center gap-3 border border-border">
                 <HealthRing score={(alertsData ?? EMPTY_ALERTS).healthScore} t={t} />
                 <div className="hidden sm:block">
-                  <p className="text-[10px] text-slate-400 uppercase tracking-wider">{t("student.academicHealthScore")}</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{t("student.academicHealthScore")}</p>
                   <p className={`text-sm font-bold ${(alertsData ?? EMPTY_ALERTS).healthScore >= 75 ? "text-emerald-400" : (alertsData ?? EMPTY_ALERTS).healthScore >= 60 ? "text-amber-400" : "text-red-400"}`}>
                     {(alertsData ?? EMPTY_ALERTS).healthScore >= 90 ? t("student.excellent") : (alertsData ?? EMPTY_ALERTS).healthScore >= 75 ? t("student.good") : (alertsData ?? EMPTY_ALERTS).healthScore >= 60 ? t("student.needsAttention") : t("student.critical")}
                   </p>
                 </div>
               </div>
             )}
-            <div className="glass-card rounded-xl px-4 py-2 flex items-center gap-2 border border-white/5">
-              <Calendar className="w-4 h-4 text-slate-400" />
-              <span className="text-xs text-slate-300">{new Date().toLocaleDateString(dir === "rtl" ? "ar-SA" : "en-US", { weekday: "short", month: "short", day: "numeric" })}</span>
+            <div className="glass-card rounded-xl px-4 py-2 flex items-center gap-2 border border-border">
+              <Calendar className="w-4 h-4 text-muted-foreground" />
+              <span className="text-xs text-secondary-foreground">{new Date().toLocaleDateString(dir === "rtl" ? "ar-SA" : "en-US", { weekday: "short", month: "short", day: "numeric" })}</span>
             </div>
           </div>
         </motion.div>
@@ -259,7 +266,7 @@ export default function StudentDashboard() {
         {(risk || health || warnings) && (
           <motion.div initial="initial" animate="animate" variants={fadeInUp} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {risk && (
-              <div className="glass-card rounded-2xl p-4 border border-white/5 hover:border-red-500/20 transition-colors cursor-pointer" onClick={() => setLocation("/analytics")}>
+              <div className="glass-card rounded-2xl p-4 border border-border hover:border-red-500/20 transition-colors cursor-pointer" onClick={() => setLocation("/analytics")}>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <ShieldAlert className="w-4 h-4 text-red-400" />
@@ -267,12 +274,12 @@ export default function StudentDashboard() {
                   </div>
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${risk.overallRisk === "low" ? "bg-emerald-500/15 text-emerald-400" : risk.overallRisk === "medium" ? "bg-amber-500/15 text-amber-400" : "bg-red-500/15 text-red-400"}`}>{risk.overallRisk}</span>
                 </div>
-                <p className="text-2xl font-bold text-white">{risk.score}<span className="text-sm text-slate-500">/100</span></p>
-                <p className="text-[10px] text-slate-400 mt-1">Est. graduation: Semester {risk.predictedGraduationSemester}</p>
+                <p className="text-2xl font-bold text-white">{risk.score}<span className="text-sm text-muted-foreground">/100</span></p>
+                <p className="text-[10px] text-muted-foreground mt-1">Est. graduation: Semester {risk.predictedGraduationSemester}</p>
               </div>
             )}
             {health && (
-              <div className="glass-card rounded-2xl p-4 border border-white/5 hover:border-violet-500/20 transition-colors cursor-pointer" onClick={() => setLocation("/analytics")}>
+              <div className="glass-card rounded-2xl p-4 border border-border hover:border-violet-500/20 transition-colors cursor-pointer" onClick={() => setLocation("/analytics")}>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <BrainCircuit className="w-4 h-4 text-violet-400" />
@@ -280,12 +287,12 @@ export default function StudentDashboard() {
                   </div>
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${health.overallScore >= 70 ? "bg-emerald-500/15 text-emerald-400" : health.overallScore >= 50 ? "bg-amber-500/15 text-amber-400" : "bg-red-500/15 text-red-400"}`}>{health.overallScore >= 70 ? "Good" : health.overallScore >= 50 ? "Fair" : "Poor"}</span>
                 </div>
-                <p className="text-2xl font-bold text-white">{health.overallScore}<span className="text-sm text-slate-500">/100</span></p>
-                <p className="text-[10px] text-slate-400 mt-1">Trend: <span className={health.trend === "improving" ? "text-emerald-400" : health.trend === "declining" ? "text-red-400" : "text-amber-400"}>{health.trend}</span></p>
+                <p className="text-2xl font-bold text-white">{health.overallScore}<span className="text-sm text-muted-foreground">/100</span></p>
+                <p className="text-[10px] text-muted-foreground mt-1">Trend: <span className={health.trend === "improving" ? "text-emerald-400" : health.trend === "declining" ? "text-red-400" : "text-amber-400"}>{health.trend}</span></p>
               </div>
             )}
             {warnings && warnings.warnings.length > 0 && (
-              <div className="glass-card rounded-2xl p-4 border border-white/5 hover:border-amber-500/20 transition-colors cursor-pointer" onClick={() => setLocation("/analytics")}>
+              <div className="glass-card rounded-2xl p-4 border border-border hover:border-amber-500/20 transition-colors cursor-pointer" onClick={() => setLocation("/analytics")}>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4 text-amber-400" />
@@ -293,12 +300,12 @@ export default function StudentDashboard() {
                   </div>
                   <span className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase bg-amber-500/15 text-amber-400">{warnings.warnings.length} active</span>
                 </div>
-                <p className="text-sm text-slate-300 line-clamp-2">{warnings.warnings[0].message}</p>
-                <p className="text-[10px] text-slate-400 mt-1">{warnings.warnings[0].title}</p>
+                <p className="text-sm text-secondary-foreground line-clamp-2">{warnings.warnings[0].message}</p>
+                <p className="text-[10px] text-muted-foreground mt-1">{warnings.warnings[0].title}</p>
               </div>
             )}
             {warnings && warnings.warnings.length === 0 && (
-              <div className="glass-card rounded-2xl p-4 border border-white/5 hover:border-emerald-500/20 transition-colors cursor-pointer" onClick={() => setLocation("/analytics")}>
+              <div className="glass-card rounded-2xl p-4 border border-border hover:border-emerald-500/20 transition-colors cursor-pointer" onClick={() => setLocation("/analytics")}>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
@@ -306,8 +313,8 @@ export default function StudentDashboard() {
                   </div>
                   <span className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase bg-emerald-500/15 text-emerald-400">All Clear</span>
                 </div>
-                <p className="text-sm text-slate-300">No early warnings detected.</p>
-                <p className="text-[10px] text-slate-400 mt-1">Keep up the great work!</p>
+                <p className="text-sm text-secondary-foreground">No early warnings detected.</p>
+                <p className="text-[10px] text-muted-foreground mt-1">Keep up the great work!</p>
               </div>
             )}
           </motion.div>
@@ -335,7 +342,7 @@ export default function StudentDashboard() {
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-400 mb-1 uppercase tracking-wide">{s.label}</p>
+                  <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wide">{s.label}</p>
                   <p className="text-2xl font-bold text-white">{s.value}</p>
                 </motion.div>
               </motion.div>
@@ -358,9 +365,9 @@ export default function StudentDashboard() {
                   </div>
                   <h2 className="text-lg font-bold text-white">{t("student.myCourses")}</h2>
                 </div>
-                <span className="text-[10px] text-slate-500 bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50">{activeCourses.length} {t("student.courses")}</span>
-                <button onClick={() => setLocation("/courses")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ml-auto">
-                  {t("student.viewAll")} <ChevronRight className="w-3 h-3" />
+                <span className="text-[10px] text-muted-foreground bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50">{activeCourses.length} {t("student.courses")}</span>
+                <button onClick={() => setLocation("/courses")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ms-auto">
+                  {t("student.viewAll")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
                 </button>
               </motion.div>
 
@@ -370,8 +377,8 @@ export default function StudentDashboard() {
                 ) : activeCourses.length === 0 ? (
                   <div className="md:col-span-2 glass-card rounded-2xl p-8 text-center">
                     <BookOpen className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-                    <p className="text-slate-400 text-sm">{t("student.noActiveCourses")}</p>
-                    <p className="text-slate-500 text-xs mt-1">{t("student.enrollToGetStarted")}</p>
+                    <p className="text-muted-foreground text-sm">{t("student.noActiveCourses")}</p>
+                    <p className="text-muted-foreground text-xs mt-1">{t("student.enrollToGetStarted")}</p>
                   </div>
                 ) : (
                   activeCourses.map((course, i) => {
@@ -381,21 +388,21 @@ export default function StudentDashboard() {
                         <div className="flex justify-between items-start mb-3">
                           <div className="min-w-0">
                             <p className="font-semibold text-white text-sm truncate">{course.name}</p>
-                            <p className="text-[11px] text-slate-400">{course.code}</p>
+                            <p className="text-[11px] text-muted-foreground">{course.code}</p>
                           </div>
                           <StatusBadge status={course.status} t={t} />
                         </div>
-                        <div className="flex items-center gap-2 mb-3 text-[11px] text-slate-400">
+                        <div className="flex items-center gap-2 mb-3 text-[11px] text-muted-foreground">
                           <User className="w-3 h-3" /> {course.instructorName}
                           <span className="mx-1">·</span>
                           <span>{course.credits} {t("student.credits")}</span>
                           <span className="mx-1">·</span>
-                          <span className={`font-semibold ${typeof course.currentGrade === "string" && course.currentGrade !== "—" ? "text-blue-400" : "text-slate-500"}`}>{t("student.currentGrade")}: {course.currentGrade}</span>
+                          <span className={`font-semibold ${typeof course.currentGrade === "string" && course.currentGrade !== "—" ? "text-blue-400" : "text-muted-foreground"}`}>{t("student.currentGrade")}: {course.currentGrade}</span>
                         </div>
                         {/* Attendance */}
                         <div className="space-y-1.5">
                           <div className="flex justify-between text-[11px]">
-                            <span className="text-slate-400">{t("student.attendance")}</span>
+                            <span className="text-muted-foreground">{t("student.attendance")}</span>
                             <span className={`font-bold ${course.attendance >= 85 ? "text-emerald-400" : course.attendance >= 75 ? "text-amber-400" : "text-red-400"}`}>{course.attendance}%</span>
                           </div>
                           <div className="h-1.5 rounded-full bg-slate-700/50 overflow-hidden">
@@ -405,17 +412,17 @@ export default function StudentDashboard() {
                         {/* Progress */}
                         <div className="space-y-1.5 mt-2">
                           <div className="flex justify-between text-[11px]">
-                            <span className="text-slate-400">{t("student.progress")}</span>
+                            <span className="text-muted-foreground">{t("student.progress")}</span>
                             <span className="text-white font-bold">{course.progress}%</span>
                           </div>
                           <div className="h-1.5 rounded-full bg-slate-700/50 overflow-hidden progress-shine">
                             <motion.div initial={{ width: 0 }} animate={{ width: `${course.progress}%` }} transition={{ duration: 0.8, delay: i * 0.1 + 0.2 }} className="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-400" />
                           </div>
                         </div>
-                        <div className="flex justify-between items-center mt-3 pt-2 border-t border-white/5">
-                          <span className="text-[10px] text-slate-500">{course.completedAssignments}/{course.totalAssignments} {t("student.completed")}</span>
+                        <div className="flex justify-between items-center mt-3 pt-2 border-t border-border">
+                          <span className="text-[10px] text-muted-foreground">{course.completedAssignments}/{course.totalAssignments} {t("student.completed")}</span>
                           <button onClick={() => setLocation(`/courses/${course.courseId}`)} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                            {t("student.viewDetails")} <ChevronRight className="w-3 h-3" />
+                            {t("student.viewDetails")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
                           </button>
                         </div>
                       </motion.div>
@@ -434,9 +441,9 @@ export default function StudentDashboard() {
                   </div>
                   <h2 className="text-lg font-bold text-white">{t("student.upcomingAssignments")}</h2>
                 </div>
-                <span className="text-[10px] text-slate-500 bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50">{(overview?.upcomingAssignments ?? []).length} {t("student.pending")}</span>
-                <button onClick={() => setLocation("/assignments")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ml-auto">
-                  {t("student.viewAll")} <ChevronRight className="w-3 h-3" />
+                <span className="text-[10px] text-muted-foreground bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50">{(overview?.upcomingAssignments ?? []).length} {t("student.pending")}</span>
+                <button onClick={() => setLocation("/assignments")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ms-auto">
+                  {t("student.viewAll")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
                 </button>
               </motion.div>
 
@@ -445,17 +452,17 @@ export default function StudentDashboard() {
                   [1, 2, 3].map(i => <Skeleton key={i} className="h-16 rounded-xl bg-slate-800/50" />)
                 ) : (
                   (overview?.upcomingAssignments ?? []).slice(0, 5).map((a, i) => (
-                    <motion.div key={a.id} variants={fadeInUp} whileHover={{ x: dir === "rtl" ? -3 : 3, transition: { duration: 0.2 } }} className="glass-card rounded-xl p-3.5 border border-white/5 hover:border-white/10 transition-all duration-300 flex items-center gap-3">
+                    <motion.div key={a.id} variants={fadeInUp} whileHover={{ x: dir === "rtl" ? -3 : 3, transition: { duration: 0.2 } }} className="glass-card rounded-xl p-3.5 border border-border hover:border-border transition-all duration-300 flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${a.daysLeft <= 1 ? "bg-red-500/15" : a.daysLeft <= 3 ? "bg-amber-500/15" : "bg-blue-500/15"}`}>
                         <FileText className={`w-4 h-4 ${a.daysLeft <= 1 ? "text-red-400" : a.daysLeft <= 3 ? "text-amber-400" : "text-blue-400"}`} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-white truncate">{a.title}</p>
-                        <p className="text-[11px] text-slate-400">{a.courseCode} · {a.courseName}</p>
+                        <p className="text-[11px] text-muted-foreground">{a.courseCode} · {a.courseName}</p>
                       </div>
-                      <div className="text-right shrink-0">
+                      <div className="text-end shrink-0">
                         <p className={`text-xs font-bold ${a.daysLeft <= 1 ? "text-red-400" : a.daysLeft <= 3 ? "text-amber-400" : "text-blue-400"}`}>{a.daysLeft}d</p>
-                        <p className="text-[10px] text-slate-500">{t("student.dueIn")}</p>
+                        <p className="text-[10px] text-muted-foreground">{t("student.dueIn")}</p>
                       </div>
                     </motion.div>
                   ))
@@ -466,14 +473,14 @@ export default function StudentDashboard() {
             {/* GPA Trend Chart + Credits */}
             <motion.div initial="initial" animate="animate" variants={staggerContainer} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* GPA Trend */}
-              <motion.div variants={fadeInUp} className="glass-card-strong rounded-2xl p-5 border border-white/5">
+              <motion.div variants={fadeInUp} className="glass-card-strong rounded-2xl p-5 border border-border">
                 <div className="flex items-center gap-2 mb-4">
                   <TrendingUp className="w-4 h-4 text-violet-400" />
                   <h3 className="text-sm font-bold text-white">{t("student.gpaTrend")}</h3>
                 </div>
                 {overviewL || !gpaData.length ? (
                   <div className="h-40 flex items-center justify-center">
-                    <p className="text-xs text-slate-500">{overviewL ? "" : t("common.noResults")}</p>
+                    <p className="text-xs text-muted-foreground">{overviewL ? "" : t("common.noResults")}</p>
                   </div>
                 ) : (
                   <div className="h-40">
@@ -497,7 +504,7 @@ export default function StudentDashboard() {
               </motion.div>
 
               {/* Credits Progress */}
-              <motion.div variants={fadeInUp} className="glass-card-strong rounded-2xl p-5 border border-white/5 flex flex-col">
+              <motion.div variants={fadeInUp} className="glass-card-strong rounded-2xl p-5 border border-border flex flex-col">
                 <div className="flex items-center gap-2 mb-2">
                   <Target className="w-4 h-4 text-blue-400" />
                   <h3 className="text-sm font-bold text-white">{t("student.creditsProgress")}</h3>
@@ -513,13 +520,13 @@ export default function StudentDashboard() {
                     </ResponsiveContainer>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <span className="text-2xl font-bold text-white">{dashboard?.stats.progress ?? 0}%</span>
-                      <span className="text-[9px] text-slate-400 uppercase tracking-wider">{t("common.complete")}</span>
+                      <span className="text-[9px] text-muted-foreground uppercase tracking-wider">{t("common.complete")}</span>
                     </div>
                   </div>
                 </div>
-                <div className="flex justify-between text-[11px] text-slate-400 mt-2 pt-2 border-t border-white/5">
+                <div className="flex justify-between text-[11px] text-muted-foreground mt-2 pt-2 border-t border-border">
                   <span>{t("student.earnedCredits")}: <strong className="text-blue-400">{dashboard?.stats.earnedCredits ?? 0}</strong></span>
-                  <span>{t("student.remainingCredits")}: <strong className="text-slate-300">{Math.max(0, (dashboard?.stats.totalCredits ?? 0) - (dashboard?.stats.earnedCredits ?? 0))}</strong></span>
+                  <span>{t("student.remainingCredits")}: <strong className="text-secondary-foreground">{Math.max(0, (dashboard?.stats.totalCredits ?? 0) - (dashboard?.stats.earnedCredits ?? 0))}</strong></span>
                 </div>
               </motion.div>
             </motion.div>
@@ -534,11 +541,11 @@ export default function StudentDashboard() {
                   <h2 className="text-lg font-bold text-white">{t("student.recentActivity")}</h2>
                 </div>
               </motion.div>
-              <div className="glass-card rounded-2xl p-4 border border-white/5 max-h-72 overflow-y-auto scrollbar-thin space-y-3">
+              <div className="glass-card rounded-2xl p-4 border border-border max-h-72 overflow-y-auto scrollbar-thin space-y-3">
                 {overviewL ? (
                   [1, 2, 3, 4].map(i => <Skeleton key={i} className="h-12 rounded-lg bg-slate-800/50" />)
                 ) : (
-                  (overview?.recentActivity ?? EMPTY_ACTIVITY).map((act) => (
+                  uniqueActivity.map((act) => (
                     <div key={act.id} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors">
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                         act.type === "attendance" ? (act.status === "present" ? "bg-emerald-500/15" : act.status === "absent" ? "bg-red-500/15" : "bg-amber-500/15") : "bg-blue-500/15"
@@ -555,7 +562,7 @@ export default function StudentDashboard() {
                         <p className="text-xs text-white truncate">
                           {act.type === "attendance" ? `${t(`student.${act.status}`)} ${t("student.attendance")}` : `${t("student.submitted")}: ${act.title}`}
                         </p>
-                        <p className="text-[10px] text-slate-500">{act.type === "submission" && act.courseName ? act.courseName : ""} · {new Date(act.date).toLocaleDateString()}</p>
+                        <p className="text-[10px] text-muted-foreground">{act.type === "submission" && act.courseName ? act.courseName : ""} · {new Date(act.date).toLocaleDateString()}</p>
                       </div>
                       {act.type === "submission" && act.score != null && (
                         <span className="text-xs font-bold text-emerald-400">{act.score}</span>
@@ -579,8 +586,8 @@ export default function StudentDashboard() {
                   </div>
                   <h2 className="text-lg font-bold text-white">{t("student.todaySchedule")}</h2>
                 </div>
-                <button onClick={() => setLocation("/schedule")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ml-auto">
-                  {t("student.viewFull")} <ChevronRight className="w-3 h-3" />
+                <button onClick={() => setLocation("/schedule")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ms-auto">
+                  {t("student.viewFull")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
                 </button>
                 {nextUpcoming && <CountdownTimer minutes={nextUpcoming.countdownMinutes} t={t} />}
               </motion.div>
@@ -588,19 +595,19 @@ export default function StudentDashboard() {
               {/* Featured lecture card */}
               {(nextUpcoming || currentLecture) && (
                 <motion.div variants={fadeInUp} className="glass-card-strong rounded-2xl p-5 glow-emerald border border-emerald-500/20 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                  <div className="absolute top-0 end-0 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                   <div className="relative z-10">
                     <div className="flex items-center gap-2 mb-2">
                       <Zap className="w-4 h-4 text-emerald-400" />
                       <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">{currentLecture ? t("student.live") : t("student.nextUp")}</span>
                     </div>
                     <h3 className="text-xl font-bold text-white mb-1">{(currentLecture || nextUpcoming)?.courseName}</h3>
-                    <p className="text-sm text-slate-400 mb-1">{(currentLecture || nextUpcoming)?.courseCode}</p>
-                    <p className="text-xs text-slate-500 mb-3 flex items-center gap-1"><User className="w-3 h-3" /> {(currentLecture || nextUpcoming)?.lecturerName}</p>
-                    <div className="flex flex-wrap gap-2 text-xs text-slate-300">
-                      <span className="flex items-center gap-1 bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50"><Clock className="w-3 h-3 text-slate-400" /> {(currentLecture || nextUpcoming)?.startTime} - {(currentLecture || nextUpcoming)?.endTime}</span>
-                      <span className="flex items-center gap-1 bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50"><MapPin className="w-3 h-3 text-slate-400" /> {(currentLecture || nextUpcoming)?.buildingName} · {(currentLecture || nextUpcoming)?.roomNumber}</span>
-                      <span className="flex items-center gap-1 bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50"><BarChart3 className="w-3 h-3 text-slate-400" /> {t("student.floor")} {(currentLecture || nextUpcoming)?.floor}</span>
+                    <p className="text-sm text-muted-foreground mb-1">{(currentLecture || nextUpcoming)?.courseCode}</p>
+                    <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1"><User className="w-3 h-3" /> {(currentLecture || nextUpcoming)?.lecturerName}</p>
+                    <div className="flex flex-wrap gap-2 text-xs text-secondary-foreground">
+                      <span className="flex items-center gap-1 bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50"><Clock className="w-3 h-3 text-muted-foreground" /> {(currentLecture || nextUpcoming)?.startTime} - {(currentLecture || nextUpcoming)?.endTime}</span>
+                      <span className="flex items-center gap-1 bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50"><MapPin className="w-3 h-3 text-muted-foreground" /> {(currentLecture || nextUpcoming)?.buildingName} · {(currentLecture || nextUpcoming)?.roomNumber}</span>
+                      <span className="flex items-center gap-1 bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50"><BarChart3 className="w-3 h-3 text-muted-foreground" /> {t("student.floor")} {(currentLecture || nextUpcoming)?.floor}</span>
                     </div>
                   </div>
                 </motion.div>
@@ -612,25 +619,25 @@ export default function StudentDashboard() {
                   [1, 2, 3].map(i => <Skeleton key={i} className="h-20 rounded-2xl bg-slate-800/50" />)
                 ) : scheduleFallback.length === 0 ? (
                   <div className="glass-card rounded-2xl p-8 text-center">
-                    <Calendar className="w-8 h-8 text-slate-500 mx-auto mb-2" />
-                    <p className="text-slate-400 text-sm">{t("student.noLecturesToday")}</p>
+                    <Calendar className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-muted-foreground text-sm">{t("student.noLecturesToday")}</p>
                   </div>
                 ) : (
                   scheduleFallback.map((lec, i) => {
                     const isNext = lec.status === "upcoming" && !scheduleFallback.slice(0, i).some(s => s.status === "upcoming");
                     return (
-                      <motion.div key={lec.id} variants={fadeInUp} whileHover={{ x: dir === "rtl" ? -4 : 4, transition: { duration: 0.2 } }} className={`glass-card rounded-xl p-4 transition-all duration-300 ${lec.status === "ongoing" ? "border-emerald-500/30 glow-emerald" : isNext ? "border-amber-500/20" : "border-white/5 hover:border-white/10"}`}>
+                      <motion.div key={lec.id} variants={fadeInUp} whileHover={{ x: dir === "rtl" ? -4 : 4, transition: { duration: 0.2 } }} className={`glass-card rounded-xl p-4 transition-all duration-300 ${lec.status === "ongoing" ? "border-emerald-500/30 glow-emerald" : isNext ? "border-amber-500/20" : "border-border hover:border-border"}`}>
                         <div className="flex items-center gap-3">
                           <div className={`shrink-0 w-14 text-center py-2 rounded-lg ${lec.status === "ongoing" ? "bg-emerald-500/15" : lec.status === "upcoming" ? "bg-amber-500/10" : "bg-slate-700/40"}`}>
                             <p className="text-xs font-bold text-white">{lec.startTime}</p>
-                            <p className="text-[9px] text-slate-400">{lec.endTime}</p>
+                            <p className="text-[9px] text-muted-foreground">{lec.endTime}</p>
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
                               <p className="text-sm font-semibold text-white truncate">{lec.courseName}</p>
                               <StatusBadge status={lec.status} t={t} />
                             </div>
-                            <div className="flex items-center gap-3 text-[11px] text-slate-400">
+                            <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
                               <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {lec.buildingName}</span>
                               <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" /> {lec.roomNumber}</span>
                               <span className="flex items-center gap-1"><User className="w-3 h-3" /> {lec.lecturerName}</span>
@@ -666,7 +673,7 @@ export default function StudentDashboard() {
                   ].map((pill, i) => (
                     <div key={i} className={`${pill.bg} rounded-xl p-3 text-center border ${pill.border}`}>
                       <p className={`text-xl font-bold ${pill.color}`}>{pill.count}</p>
-                      <p className="text-[9px] text-slate-400 leading-tight mt-1">{pill.label}</p>
+                      <p className="text-[9px] text-muted-foreground leading-tight mt-1">{pill.label}</p>
                     </div>
                   ))}
                 </motion.div>
@@ -678,26 +685,26 @@ export default function StudentDashboard() {
                   [1, 2, 3, 4].map(i => <Skeleton key={i} className="h-24 rounded-2xl bg-slate-800/50" />)
                 ) : (
                   <ScrollArea className="h-[320px]">
-                    <AnimatePresence>
-                      <div className="space-y-2 pr-2">
+                    <div className="space-y-2 pe-2">
+                      <AnimatePresence>
                         {uniqueAlerts.map((alert) => (
                           <motion.div key={alert.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className={`glass-card rounded-xl p-4 border ${AlertBorder(alert.type)} hover:border-white/15 transition-all duration-300`}>
                             <div className="flex items-start gap-3">
                               <div className="mt-0.5"><AlertIcon type={alert.type} /></div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-semibold text-white leading-tight">{dir === "rtl" && alert.titleAr ? alert.titleAr : alert.title}</p>
-                                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">{dir === "rtl" && alert.messageAr ? alert.messageAr : alert.message}</p>
+                                <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">{dir === "rtl" && alert.messageAr ? alert.messageAr : alert.message}</p>
                                 {alert.action && (
                                   <button className="mt-2 text-[11px] font-medium text-blue-400 hover:text-blue-300 flex items-center gap-0.5">
-                                    {dir === "rtl" && alert.actionAr ? alert.actionAr : alert.action} <ChevronRight className="w-3 h-3" />
+                                    {dir === "rtl" && alert.actionAr ? alert.actionAr : alert.action} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
                                   </button>
                                 )}
                               </div>
                             </div>
                           </motion.div>
                         ))}
-                      </div>
-                    </AnimatePresence>
+                      </AnimatePresence>
+                    </div>
                   </ScrollArea>
                 )}
               </div>
@@ -712,7 +719,7 @@ export default function StudentDashboard() {
                     <h3 className="text-sm font-bold text-white">{t("student.studyStreak")}</h3>
                   </div>
                   {(!overviewL || (overview ?? { streak: { current: 7, best: 14 } })) && (
-                    <span className="text-xs text-slate-400">{t("student.bestStreak")}: <strong className="text-orange-400">{(overview ?? { streak: { current: 7, best: 14 } }).streak.best}</strong></span>
+                    <span className="text-xs text-muted-foreground">{t("student.bestStreak")}: <strong className="text-orange-400">{(overview ?? { streak: { current: 7, best: 14 } }).streak.best}</strong></span>
                   )}
                 </div>
                 {overviewL ? (
@@ -723,15 +730,15 @@ export default function StudentDashboard() {
                       <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-lg">
                         <span className="text-2xl font-bold text-white">{(overview ?? { streak: { current: 7, best: 14 } }).streak.current}</span>
                       </div>
-                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center ring-2 ring-slate-900">
+                      <div className="absolute -top-1 -end-1 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center ring-2 ring-slate-900">
                         <CheckCircle2 className="w-3 h-3 text-white" />
                       </div>
                     </div>
                     <div>
                       <p className="text-lg font-bold text-white">{(overview ?? { streak: { current: 7, best: 14 } }).streak.current} {t("student.days")}</p>
-                      <p className="text-xs text-slate-400">{t("student.currentStreak")}</p>
+                      <p className="text-xs text-muted-foreground">{t("student.currentStreak")}</p>
                     </div>
-                    <div className="ml-auto flex gap-1">
+                    <div className="ms-auto flex gap-1">
                       {[...Array(7)].map((_, i) => (
                         <div key={i} className={`w-3 h-8 rounded-full ${i < (overview ?? { streak: { current: 7, best: 14 } }).streak.current ? "bg-gradient-to-t from-orange-500 to-amber-400" : "bg-slate-700/50"}`} />
                       ))}
@@ -750,11 +757,11 @@ export default function StudentDashboard() {
                   </div>
                   <h2 className="text-lg font-bold text-white">{t("student.achievements")}</h2>
                 </div>
-                <span className="text-[10px] text-slate-500 bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50">
+                <span className="text-[10px] text-muted-foreground bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50">
                   {(overview?.achievements ?? EMPTY_ACHIEVEMENTS).filter(a => a.unlocked).length}/{(overview?.achievements ?? EMPTY_ACHIEVEMENTS).length}
                 </span>
-                <button onClick={() => setLocation("/achievements")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ml-auto">
-                  {t("student.viewAll")} <ChevronRight className="w-3 h-3" />
+                <button onClick={() => setLocation("/achievements")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ms-auto">
+                  {t("student.viewAll")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
                 </button>
               </motion.div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -762,12 +769,12 @@ export default function StudentDashboard() {
                   [1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-24 rounded-xl bg-slate-800/50" />)
                 ) : (
                   (overview?.achievements ?? EMPTY_ACHIEVEMENTS).map((ach) => (
-                    <motion.div key={ach.id} variants={fadeInUp} whileHover={{ y: -3, transition: { duration: 0.2 } }} className={`glass-card rounded-xl p-3 text-center border transition-all duration-300 ${ach.unlocked ? "border-amber-500/20 achievement-glow" : "border-white/5 opacity-60"}`}>
+                    <motion.div key={ach.id} variants={fadeInUp} whileHover={{ y: -3, transition: { duration: 0.2 } }} className={`glass-card rounded-xl p-3 text-center border transition-all duration-300 ${ach.unlocked ? "border-amber-500/20 achievement-glow" : "border-border opacity-60"}`}>
                       <div className={`w-9 h-9 rounded-lg flex items-center justify-center mx-auto mb-2 ${ach.unlocked ? "bg-gradient-to-br from-amber-500 to-orange-500" : "bg-slate-700/50"}`}>
                         <AchievementIcon icon={ach.icon} />
                       </div>
-                      <p className={`text-[11px] font-semibold truncate ${ach.unlocked ? "text-white" : "text-slate-500"}`}>{ach.title}</p>
-                      <p className="text-[9px] text-slate-500 mt-0.5 truncate">{ach.description}</p>
+                      <p className={`text-[11px] font-semibold truncate ${ach.unlocked ? "text-white" : "text-muted-foreground"}`}>{ach.title}</p>
+                      <p className="text-[9px] text-muted-foreground mt-0.5 truncate">{ach.description}</p>
                       {ach.unlocked && <p className="text-[9px] text-amber-400 mt-1">{t("student.achievementUnlocked")}</p>}
                     </motion.div>
                   ))
@@ -792,7 +799,7 @@ export default function StudentDashboard() {
                 ].map((action, i) => {
                   const Icon = action.icon;
                   return (
-                    <motion.button key={i} onClick={() => setLocation(action.path)} variants={fadeInUp} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className={`glass-card rounded-xl p-3 border border-white/5 hover:border-white/15 transition-all duration-300 flex items-center gap-3 text-left`}>
+                    <motion.button key={i} onClick={() => setLocation(action.path)} variants={fadeInUp} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className={`glass-card rounded-xl p-3 border border-border hover:border-white/15 transition-all duration-300 flex items-center gap-3 text-start`}>
                       <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${action.color} flex items-center justify-center shrink-0`}>
                         <Icon className="w-4 h-4 text-white" />
                       </div>
@@ -814,14 +821,14 @@ export default function StudentDashboard() {
                     <h2 className="text-lg font-bold text-white">{t("student.announcements")}</h2>
                   </div>
                   <button onClick={() => setLocation("/announcements")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5">
-                    {t("student.viewAll")} <ChevronRight className="w-3 h-3" />
+                    {t("student.viewAll")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
                   </button>
                 </motion.div>
-                <div className="glass-card rounded-2xl p-4 border border-white/5 space-y-2">
+                <div className="glass-card rounded-2xl p-4 border border-border space-y-2">
                   {announcements.slice(0, 3).map(a => (
-                    <div key={a.id} className="p-2.5 bg-slate-800/40 rounded-lg border-l-2 border-cyan-500/50 hover:bg-slate-800/60 transition-colors">
+                    <div key={a.id} className="p-2.5 bg-slate-800/40 rounded-lg border-s-2 border-cyan-500/50 hover:bg-slate-800/60 transition-colors">
                       <p className="text-xs font-medium text-slate-200 truncate">{a.title}</p>
-                      <p className="text-[10px] text-slate-500 mt-0.5 line-clamp-1">{a.content}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{a.content}</p>
                     </div>
                   ))}
                 </div>
@@ -846,7 +853,7 @@ export default function StudentDashboard() {
                     {dashboard.advisorAlerts.map((alert: any) => (
                       <div key={alert.id} className="p-2.5 bg-rose-500/5 rounded-lg border border-rose-500/10">
                         <p className="text-xs font-medium text-rose-300">{alert.title}</p>
-                        <p className="text-[10px] text-slate-400 mt-0.5">{alert.message}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{alert.message}</p>
                       </div>
                     ))}
                   </div>
@@ -860,7 +867,7 @@ export default function StudentDashboard() {
                     {dashboard.advisorRecommendations.map((rec: any) => (
                       <div key={rec.id} className="p-2.5 bg-emerald-500/5 rounded-lg border border-emerald-500/10">
                         <p className="text-xs font-medium text-emerald-300">{rec.title}</p>
-                        <p className="text-[10px] text-slate-400 mt-0.5">{rec.description}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{rec.description}</p>
                       </div>
                     ))}
                   </div>
@@ -874,7 +881,7 @@ export default function StudentDashboard() {
                     {dashboard.advisorAppointments.map((appt: any) => (
                       <div key={appt.id} className="p-2.5 bg-violet-500/5 rounded-lg border border-violet-500/10">
                         <p className="text-xs font-medium text-violet-300">{appt.title}</p>
-                        <p className="text-[10px] text-slate-400 mt-0.5">{new Date(appt.scheduledAt).toLocaleString()}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{new Date(appt.scheduledAt).toLocaleString()}</p>
                       </div>
                     ))}
                   </div>
@@ -889,32 +896,32 @@ export default function StudentDashboard() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div>
               <h3 className="text-lg font-bold text-white">{t("student.graduationProgress")}</h3>
-              <p className="text-xs text-slate-400 mt-0.5">{(dashboard?.stats ?? EMPTY_STATS).earnedCredits} / {(dashboard?.stats ?? EMPTY_STATS).totalCredits} {t("student.completedHours")}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{(dashboard?.stats ?? EMPTY_STATS).earnedCredits} / {(dashboard?.stats ?? EMPTY_STATS).totalCredits} {t("student.completedHours")}</p>
             </div>
-            <div className="text-right">
+            <div className="text-end">
               <p className="text-2xl font-bold text-blue-400">{(dashboard?.stats ?? EMPTY_STATS).progress}%</p>
-              <p className="text-[10px] text-slate-400 uppercase tracking-wider">{t("common.complete")}</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{t("common.complete")}</p>
             </div>
           </div>
           <div className="h-3 rounded-full bg-slate-700/50 overflow-hidden progress-shine">
             <motion.div initial={{ width: 0 }} animate={{ width: `${(dashboard?.stats ?? EMPTY_STATS).progress}%` }} transition={{ duration: 1.2, ease: "easeOut" }} className="h-full rounded-full bg-gradient-to-r from-blue-500 via-violet-500 to-cyan-400" />
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 pt-4 border-t border-white/5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 pt-4 border-t border-border">
             <div className="text-center">
-              <p className="text-xl font-bold text-slate-300">{(dashboard?.stats ?? EMPTY_STATS).semestersLeft}</p>
-              <p className="text-[10px] text-slate-500 uppercase tracking-wider">{t("student.semestersLeft")}</p>
+              <p className="text-xl font-bold text-secondary-foreground">{(dashboard?.stats ?? EMPTY_STATS).semestersLeft}</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{t("student.semestersLeft")}</p>
             </div>
             <div className="text-center">
               <p className="text-xl font-bold text-emerald-400">{(dashboard?.stats ?? EMPTY_STATS).gpa}</p>
-              <p className="text-[10px] text-slate-500 uppercase tracking-wider">{t("student.currentGPA")}</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{t("student.currentGPA")}</p>
             </div>
             <div className="text-center">
               <p className="text-xl font-bold text-violet-400">{activeCourses.length}</p>
-              <p className="text-[10px] text-slate-500 uppercase tracking-wider">{t("student.currentCourses")}</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{t("student.currentCourses")}</p>
             </div>
             <div className="text-center">
               <p className="text-xl font-bold text-amber-400">{(overview?.achievements ?? EMPTY_ACHIEVEMENTS).filter(a => a.unlocked).length}</p>
-              <p className="text-[10px] text-slate-500 uppercase tracking-wider">{t("student.achievements")}</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{t("student.achievements")}</p>
             </div>
           </div>
         </motion.div>

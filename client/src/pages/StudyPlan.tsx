@@ -110,11 +110,11 @@ export default function StudyPlan() {
                             <p className="text-xs text-slate-400">{c.code} • {c.credits} {t("student.credits")}</p>
                           </div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-end">
                           {c.grade && (
                             <span className="text-sm font-medium text-emerald-400">{c.grade}</span>
                           )}
-                          <span className={`ml-2 text-xs font-medium px-2 py-0.5 rounded-full ${
+                          <span className={`ms-2 text-xs font-medium px-2 py-0.5 rounded-full ${
                             c.status === "completed" ? "bg-emerald-500/15 text-emerald-400" :
                             c.status === "in_progress" ? "bg-blue-500/15 text-blue-400" :
                             "bg-slate-500/15 text-slate-400"

@@ -366,14 +366,14 @@ export default function StudentDashboard() {
                     className="w-full bg-blue-600 hover:bg-blue-700 justify-start"
                     variant="default"
                   >
-                    <MessageSquare className="w-4 h-4 mr-2" />
+                    <MessageSquare className="w-4 h-4 me-2" />
                     {t("student.aiAssistant")}
                   </Button>
                   <Button
                     className="w-full bg-slate-700 hover:bg-slate-600 justify-start"
                     variant="outline"
                   >
-                    <BookOpen className="w-4 h-4 mr-2" />
+                    <BookOpen className="w-4 h-4 me-2" />
                     {t("student.studyPlan")}
                   </Button>
                 </CardContent>
@@ -394,7 +394,7 @@ export default function StudentDashboard() {
                     {announcements.slice(0, 5).map(announcement => (
                       <div
                         key={announcement.id}
-                        className="p-3 bg-slate-700/50 rounded-lg text-sm border-l-2 border-cyan-500"
+                        className="p-3 bg-slate-700/50 rounded-lg text-sm border-s-2 border-cyan-500"
                       >
                         <p className="font-medium text-slate-200">
                           {announcement.title}
@@ -425,7 +425,7 @@ export default function StudentDashboard() {
                     {notifications.map(notif => (
                       <div
                         key={notif.id}
-                        className="p-3 bg-slate-700/50 rounded-lg text-sm border-l-2 border-blue-500"
+                        className="p-3 bg-slate-700/50 rounded-lg text-sm border-s-2 border-blue-500"
                       >
                         <p className="font-medium text-slate-200">
                           {notif.title}

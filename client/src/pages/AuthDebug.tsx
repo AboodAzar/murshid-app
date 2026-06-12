@@ -59,7 +59,7 @@ export default function AuthDebug() {
               Server Diagnostics
             </h2>
             <Button onClick={() => debugQuery.refetch()} variant="outline" size="sm" className="border-white/10 text-slate-300">
-              <RefreshCw className="w-4 h-4 mr-1" /> Refresh
+              <RefreshCw className="w-4 h-4 me-1" /> Refresh
             </Button>
           </div>
 
@@ -67,7 +67,7 @@ export default function AuthDebug() {
             <div className="space-y-2">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-10 rounded-xl bg-white/[0.04] animate-pulse" />)}</div>
           ) : debugQuery.error ? (
             <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300">
-              <AlertCircle className="w-5 h-5 inline mr-2" />
+              <AlertCircle className="w-5 h-5 inline me-2" />
               {debugQuery.error.message}
             </div>
           ) : (
@@ -119,27 +119,27 @@ export default function AuthDebug() {
               Sample Users in Database
             </h2>
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+              <table className="w-full text-start text-sm">
                 <thead>
                   <tr className="text-xs text-slate-400 border-b border-white/10">
-                    <th className="pb-2 pr-4">ID</th>
-                    <th className="pb-2 pr-4">Email</th>
-                    <th className="pb-2 pr-4">Name</th>
-                    <th className="pb-2 pr-4">Role</th>
-                    <th className="pb-2 pr-4">Verified</th>
-                    <th className="pb-2 pr-4">Active</th>
+                    <th className="pb-2 pe-4">ID</th>
+                    <th className="pb-2 pe-4">Email</th>
+                    <th className="pb-2 pe-4">Name</th>
+                    <th className="pb-2 pe-4">Role</th>
+                    <th className="pb-2 pe-4">Verified</th>
+                    <th className="pb-2 pe-4">Active</th>
                     <th className="pb-2">Has Password</th>
                   </tr>
                 </thead>
                 <tbody>
                   {diag.sampleUsers.map((u: any) => (
                     <tr key={u.id} className="border-b border-white/5 text-slate-300">
-                      <td className="py-2 pr-4">{u.id}</td>
-                      <td className="py-2 pr-4">{u.email}</td>
-                      <td className="py-2 pr-4">{u.name || "—"}</td>
-                      <td className="py-2 pr-4"><span className="px-2 py-0.5 rounded bg-blue-500/15 text-blue-400 text-xs">{u.role}</span></td>
-                      <td className="py-2 pr-4">{u.isEmailVerified ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <AlertCircle className="w-4 h-4 text-amber-400" />}</td>
-                      <td className="py-2 pr-4">{u.isActive ? "Yes" : "No"}</td>
+                      <td className="py-2 pe-4">{u.id}</td>
+                      <td className="py-2 pe-4">{u.email}</td>
+                      <td className="py-2 pe-4">{u.name || "—"}</td>
+                      <td className="py-2 pe-4"><span className="px-2 py-0.5 rounded bg-blue-500/15 text-blue-400 text-xs">{u.role}</span></td>
+                      <td className="py-2 pe-4">{u.isEmailVerified ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <AlertCircle className="w-4 h-4 text-amber-400" />}</td>
+                      <td className="py-2 pe-4">{u.isActive ? "Yes" : "No"}</td>
                       <td className="py-2">{u.hasPassword ? "Yes" : "No"}</td>
                     </tr>
                   ))}
@@ -182,7 +182,7 @@ export default function AuthDebug() {
                 </div>
               </div>
               <Button onClick={() => logoutMutation.mutate()} variant="outline" className="mt-2 border-white/10 text-slate-300">
-                <Lock className="w-4 h-4 mr-2" /> Logout
+                <Lock className="w-4 h-4 me-2" /> Logout
               </Button>
             </div>
           ) : (
@@ -213,27 +213,27 @@ export default function AuthDebug() {
           </div>
           <div className="flex gap-2 flex-wrap">
             <Button onClick={() => loginMutation.mutate({ email: testEmail, password: testPassword })} className="bg-blue-600 hover:bg-blue-700">
-              <KeyRound className="w-4 h-4 mr-2" /> Test Login
+              <KeyRound className="w-4 h-4 me-2" /> Test Login
             </Button>
             <Button onClick={() => createTestUser.mutate({ email: testEmail, password: testPassword, name: testName, role: testRole })} variant="outline" className="border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10">
-              <Server className="w-4 h-4 mr-2" /> Create Test User
+              <Server className="w-4 h-4 me-2" /> Create Test User
             </Button>
           </div>
           {loginMutation.error && (
             <div className="mt-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm">
-              <AlertCircle className="w-4 h-4 inline mr-2" />
+              <AlertCircle className="w-4 h-4 inline me-2" />
               Login failed: {loginMutation.error.message}
             </div>
           )}
           {loginMutation.data?.success && (
             <div className="mt-3 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm">
-              <CheckCircle2 className="w-4 h-4 inline mr-2" />
+              <CheckCircle2 className="w-4 h-4 inline me-2" />
               Login successful! User: {loginMutation.data.user?.email} ({loginMutation.data.user?.role})
             </div>
           )}
           {createTestUser.data?.success && (
             <div className="mt-3 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm">
-              <CheckCircle2 className="w-4 h-4 inline mr-2" />
+              <CheckCircle2 className="w-4 h-4 inline me-2" />
               {createTestUser.data.message} (ID: {createTestUser.data.userId})
             </div>
           )}

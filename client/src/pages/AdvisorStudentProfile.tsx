@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useI18n } from "@/contexts/I18nContext";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -48,6 +48,13 @@ export default function AdvisorStudentProfile() {
   const resolveAlert = trpc.advisor.resolveAlert.useMutation({ onSuccess: () => utils.advisor.getAlerts.invalidate({ studentId }) });
   const addNote = trpc.advisor.addNote.useMutation({ onSuccess: () => { utils.advisor.getNotes.invalidate({ studentId }); setShowNoteForm(false); } });
   const scheduleAppt = trpc.advisor.scheduleAppointment.useMutation({ onSuccess: () => { utils.advisor.getAppointments.invalidate({ studentId }); setShowApptForm(false); } });
+
+  const uniqueCourses = useMemo(() => {
+    const all = profile?.courses ?? [];
+    return all.filter((c: any, index: number, self: any[]) =>
+      index === self.findIndex((x: any) => x.courseId === c.courseId)
+    );
+  }, [profile?.courses]);
   const createRec = trpc.advisor.createRecommendation.useMutation({ onSuccess: () => utils.advisor.getRecommendations.invalidate({ studentId }) });
 
   if (!user) return null;
@@ -79,7 +86,7 @@ export default function AdvisorStudentProfile() {
         {/* Header */}
         <motion.div {...fadeInUp} className="flex items-center gap-4">
           <button onClick={() => setLocation("/advisor/students")} className="p-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] text-slate-300">
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
           </button>
           <div>
             <h1 className="text-2xl font-bold text-white flex items-center gap-2">
@@ -128,10 +135,10 @@ export default function AdvisorStudentProfile() {
             <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2"><BookOpen className="w-5 h-5 text-blue-400" />{t("student.myCourses")}</h3>
-                {profile?.courses && profile.courses.length > 0 ? (
+                {uniqueCourses.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {profile.courses.map((c: any) => (
-                      <div key={c.courseId} className="p-3 rounded-xl bg-white/[0.04] flex items-center justify-between">
+                    {uniqueCourses.map((c: any) => (
+                      <div key={c.id ?? `${c.courseId}-${c.semester}`} className="p-3 rounded-xl bg-white/[0.04] flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium text-white">{c.course?.name || c.course?.code}</p>
                           <p className="text-xs text-slate-400">{c.course?.code} • {c.semester}</p>
@@ -165,7 +172,7 @@ export default function AdvisorStudentProfile() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-white">{t("advisor.academicAlerts")}</h3>
-                <Button onClick={() => setShowAlertForm(true)} size="sm" className="bg-rose-600 hover:bg-rose-700"><Plus className="w-4 h-4 mr-1" />{t("advisor.createAlert")}</Button>
+                <Button onClick={() => setShowAlertForm(true)} size="sm" className="bg-rose-600 hover:bg-rose-700"><Plus className="w-4 h-4 me-1" />{t("advisor.createAlert")}</Button>
               </div>
               {(() => {
                 const uniqueAlerts = alerts.filter((alert: any, index: number, self: any[]) =>
@@ -175,7 +182,7 @@ export default function AdvisorStudentProfile() {
                   <p className="text-slate-400 text-center py-8">{t("advisor.noAlerts")}</p>
                 ) : (
                   <ScrollArea className="h-[400px]">
-                    <div className="space-y-3 pr-2">
+                    <div className="space-y-3 pe-2">
                       {uniqueAlerts.map((alert: any) => (
                         <div key={alert.id} className={`p-4 rounded-xl border bg-white/[0.04] ${alert.isResolved ? "opacity-60" : ""}`}>
                           <div className="flex items-start justify-between">
@@ -205,7 +212,7 @@ export default function AdvisorStudentProfile() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-white">{t("advisor.advisingNotes")}</h3>
-                <Button onClick={() => setShowNoteForm(true)} size="sm" className="bg-amber-600 hover:bg-amber-700"><Plus className="w-4 h-4 mr-1" />{t("advisor.addNote")}</Button>
+                <Button onClick={() => setShowNoteForm(true)} size="sm" className="bg-amber-600 hover:bg-amber-700"><Plus className="w-4 h-4 me-1" />{t("advisor.addNote")}</Button>
               </div>
               {notes.length === 0 ? <p className="text-slate-400 text-center py-8">{t("advisor.noNotes")}</p> : (
                 <div className="space-y-3">
@@ -231,7 +238,7 @@ export default function AdvisorStudentProfile() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-white">{t("advisor.appointments")}</h3>
-                <Button onClick={() => setShowApptForm(true)} size="sm" className="bg-violet-600 hover:bg-violet-700"><Plus className="w-4 h-4 mr-1" />{t("advisor.scheduleAppointment")}</Button>
+                <Button onClick={() => setShowApptForm(true)} size="sm" className="bg-violet-600 hover:bg-violet-700"><Plus className="w-4 h-4 me-1" />{t("advisor.scheduleAppointment")}</Button>
               </div>
               {appointments.length === 0 ? <p className="text-slate-400 text-center py-8">{t("advisor.noAppointments")}</p> : (
                 <div className="space-y-3">
@@ -259,7 +266,7 @@ export default function AdvisorStudentProfile() {
                   const title = prompt(t("advisor.recommendationTitle") || "Enter recommendation title");
                   const desc = prompt(t("advisor.recommendationDesc") || "Enter description");
                   if (title && desc) createRec.mutate({ studentId, title, description: desc });
-                }} size="sm" className="bg-emerald-600 hover:bg-emerald-700"><Plus className="w-4 h-4 mr-1" />{t("advisor.createRecommendation")}</Button>
+                }} size="sm" className="bg-emerald-600 hover:bg-emerald-700"><Plus className="w-4 h-4 me-1" />{t("advisor.createRecommendation")}</Button>
               </div>
               {recommendations.length === 0 ? <p className="text-slate-400 text-center py-8">{t("advisor.noRecommendations")}</p> : (
                 <div className="space-y-3">

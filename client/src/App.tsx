@@ -32,6 +32,8 @@ import AdvisorStudents from "./pages/AdvisorStudents";
 import AdvisorStudentProfile from "./pages/AdvisorStudentProfile";
 import AdvisorAppointments from "./pages/AdvisorAppointments";
 import AdvisorAIReview from "./pages/AdvisorAIReview";
+import AdvisorFAQs from "./pages/AdvisorFAQs";
+import AdvisorDocuments from "./pages/AdvisorDocuments";
 import AuthDebug from "./pages/AuthDebug";
 
 function Router() {
@@ -88,6 +90,22 @@ function Router() {
         {() => (
           <ProtectedRoute requiredRole="advisor">
             <AdvisorAIReview />
+          </ProtectedRoute>
+        )}
+      </Route>
+
+      <Route path={"/advisor/faqs"}>
+        {() => (
+          <ProtectedRoute requiredRole="advisor">
+            <AdvisorFAQs />
+          </ProtectedRoute>
+        )}
+      </Route>
+
+      <Route path={"/advisor/documents"}>
+        {() => (
+          <ProtectedRoute requiredRole="advisor">
+            <AdvisorDocuments />
           </ProtectedRoute>
         )}
       </Route>

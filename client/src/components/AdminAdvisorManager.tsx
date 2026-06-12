@@ -108,12 +108,12 @@ export default function AdminAdvisorManager() {
                 </CardDescription>
               </div>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+                <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
                 <Input
                   placeholder="Search advisors…"
                   value={advisorSearch}
                   onChange={(e) => setAdvisorSearch(e.target.value)}
-                  className="pl-9 bg-slate-800 border-slate-700 w-full sm:w-56 text-sm"
+                  className="ps-9 bg-slate-800 border-slate-700 w-full sm:w-56 text-sm"
                 />
               </div>
             </div>
@@ -143,7 +143,7 @@ export default function AdminAdvisorManager() {
                         onClick={() =>
                           setExpandedAdvisor(isExpanded ? null : advisor.id)
                         }
-                        className="w-full grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 px-6 py-4 hover:bg-slate-800/30 transition-colors text-left"
+                        className="w-full grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 px-6 py-4 hover:bg-slate-800/30 transition-colors text-start"
                       >
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shrink-0">
                           {advisor.name
@@ -166,14 +166,14 @@ export default function AdminAdvisorManager() {
                           variant="outline"
                           className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
                         >
-                          <Users className="w-3 h-3 mr-1" />
+                          <Users className="w-3 h-3 me-1" />
                           {advisor.students.length} students
                         </Badge>
                         <div className="flex items-center justify-center w-8">
                           {isExpanded ? (
-                            <ChevronUp className="w-4 h-4 text-slate-400" />
+                            <ChevronUp className="w-4 h-4 text-slate-400 rtl:rotate-180" />
                           ) : (
-                            <ChevronDown className="w-4 h-4 text-slate-400" />
+                            <ChevronDown className="w-4 h-4 text-slate-400 rtl:rotate-180" />
                           )}
                         </div>
                       </button>
@@ -187,7 +187,7 @@ export default function AdminAdvisorManager() {
                             transition={{ duration: 0.2 }}
                             className="overflow-hidden"
                           >
-                            <div className="px-6 pb-4 pl-16">
+                            <div className="px-6 pb-4 ps-16">
                               {advisor.students.length === 0 ? (
                                 <p className="text-sm text-slate-500 py-2">
                                   No students assigned to this advisor.
@@ -221,7 +221,7 @@ export default function AdminAdvisorManager() {
                                         disabled={assignMutation.isPending}
                                         className="h-7 px-2 border-slate-700 bg-transparent hover:bg-rose-900/40 hover:border-rose-700 text-slate-400 hover:text-rose-400 text-xs shrink-0"
                                       >
-                                        <UserX className="w-3.5 h-3.5 mr-1" />
+                                        <UserX className="w-3.5 h-3.5 me-1" />
                                         Unassign
                                       </Button>
                                     </div>
@@ -256,12 +256,12 @@ export default function AdminAdvisorManager() {
                 </CardDescription>
               </div>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+                <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
                 <Input
                   placeholder="Search students…"
                   value={studentSearch}
                   onChange={(e) => setStudentSearch(e.target.value)}
-                  className="pl-9 bg-slate-800 border-slate-700 w-full sm:w-56 text-sm"
+                  className="ps-9 bg-slate-800 border-slate-700 w-full sm:w-56 text-sm"
                 />
               </div>
             </div>

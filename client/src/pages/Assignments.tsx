@@ -40,7 +40,7 @@ export default function Assignments() {
                   <p className="text-white font-medium">{a.title}</p>
                   <p className="text-sm text-slate-400">{a.courseCode} • {a.courseName}</p>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   {a.status === "pending" && daysLeft >= 0 && (
                     <p className="text-xs text-amber-400 flex items-center justify-end gap-1">
                       <Clock className="w-3 h-3" /> {daysLeft} {t("student.daysLeft")}

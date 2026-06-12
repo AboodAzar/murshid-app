@@ -36,7 +36,7 @@ export default function AdvisorAppointments() {
             <h1 className="text-3xl font-bold text-white">{t("advisor.appointments")}</h1>
             <p className="text-slate-400 mt-1">{t("advisor.appointmentsDesc")}</p>
           </div>
-          <Button onClick={() => setShowForm(true)} className="bg-violet-600 hover:bg-violet-700"><Plus className="w-4 h-4 mr-2" />{t("advisor.scheduleAppointment")}</Button>
+          <Button onClick={() => setShowForm(true)} className="bg-violet-600 hover:bg-violet-700"><Plus className="w-4 h-4 me-2" />{t("advisor.scheduleAppointment")}</Button>
         </motion.div>
 
         <div className="space-y-6">
