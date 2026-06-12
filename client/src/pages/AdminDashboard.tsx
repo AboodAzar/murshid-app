@@ -656,122 +656,128 @@ export default function AdminDashboard() {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto_auto_auto_auto] items-center gap-3 sm:gap-4 px-4 py-3 sm:px-6 sm:py-4 hover:bg-accent/30 transition-colors"
+                                className="flex flex-col gap-3 sm:grid sm:grid-cols-[auto_1fr_auto_auto_auto_auto] sm:items-center sm:gap-4 px-4 py-3 sm:px-6 sm:py-4 hover:bg-accent/30 transition-colors"
                               >
-                                {/* Avatar */}
-                                <div
-                                  className={`w-10 h-10 rounded-xl bg-gradient-to-br ${getAvatarGradient(u.id)} flex items-center justify-center text-white font-semibold text-sm shrink-0 shadow-sm`}
-                                >
-                                  {getInitials(u.name, u.email)}
-                                </div>
-
-                                {/* User info */}
-                                <div className="min-w-0">
-                                  <p className="font-medium text-sm text-white truncate">
-                                    {u.name ?? "(No name)"}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground truncate">
-                                    {u.email}
-                                  </p>
-                                  {u.role === "student" && u.advisorId && (
-                                    <p className="text-[10px] text-emerald-400 truncate mt-0.5">
-                                      Advisor: {advisorMap.get(u.advisorId) ?? "Unknown"}
-                                    </p>
-                                  )}
-                                  {u.role === "student" && !u.advisorId && (
-                                    <p className="text-[10px] text-amber-400 truncate mt-0.5">
-                                      No advisor assigned
-                                    </p>
-                                  )}
-                                </div>
-
-                                {/* Role badge */}
-                                <div className="flex sm:justify-center">
-                                  <Select
-                                    value={u.role}
-                                    onValueChange={val => {
-                                      if (val === u.role) return;
-                                      setPendingRoleChange({
-                                        user: u,
-                                        newRole: val as Role,
-                                      });
-                                    }}
+                                {/* Left: Avatar + User info */}
+                                <div className="flex items-center gap-3 sm:contents">
+                                  {/* Avatar */}
+                                  <div
+                                    className={`w-10 h-10 rounded-xl bg-gradient-to-br ${getAvatarGradient(u.id)} flex items-center justify-center text-white font-semibold text-sm shrink-0 shadow-sm`}
                                   >
-                                    <SelectTrigger
-                                      className={`h-7 text-xs border px-2 gap-1.5 w-28 ${meta.color} bg-transparent hover:bg-white/5`}
-                                    >
-                                      {meta.icon}
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-accent border-border">
-                                      <SelectItem value="student">Student</SelectItem>
-                                      <SelectItem value="advisor">Advisor</SelectItem>
-                                      <SelectItem value="admin">Admin</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
+                                    {getInitials(u.name, u.email)}
+                                  </div>
 
-                                {/* Status toggle */}
-                                <div className="flex sm:justify-center">
-                                  <button
-                                    onClick={() =>
-                                      setPendingStatusChange({
-                                        user: u,
-                                        newStatus: !u.isActive,
-                                      })
-                                    }
-                                    className={`flex items-center gap-1.5 h-7 px-3 rounded-full text-xs font-medium border transition-all hover:scale-105 ${
-                                      u.isActive
-                                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20"
-                                        : "bg-slate-500/10 text-muted-foreground border-slate-500/30 hover:bg-slate-500/20"
-                                    }`}
-                                  >
-                                    {u.isActive ? (
-                                      <CheckCircle2 className="w-3 h-3" />
-                                    ) : (
-                                      <XCircle className="w-3 h-3" />
+                                  {/* User info */}
+                                  <div className="min-w-0">
+                                    <p className="font-medium text-sm text-white truncate">
+                                      {u.name ?? "(No name)"}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground truncate">
+                                      {u.email}
+                                    </p>
+                                    {u.role === "student" && u.advisorId && (
+                                      <p className="text-[10px] text-emerald-400 truncate mt-0.5">
+                                        Advisor: {advisorMap.get(u.advisorId) ?? "Unknown"}
+                                      </p>
                                     )}
-                                    {u.isActive ? "Active" : "Inactive"}
-                                  </button>
+                                    {u.role === "student" && !u.advisorId && (
+                                      <p className="text-[10px] text-amber-400 truncate mt-0.5">
+                                        No advisor assigned
+                                      </p>
+                                    )}
+                                  </div>
                                 </div>
 
-                                {/* Actions */}
-                                <div className="flex sm:justify-center gap-1.5">
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => openDetails(u)}
-                                    className="h-7 w-7 p-0 border-slate-700 bg-transparent hover:bg-accent text-muted-foreground hover:text-white"
-                                    title="View details"
-                                  >
-                                    <MoreVertical className="w-3.5 h-3.5" />
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    onClick={() => openEdit(u)}
-                                    className="h-7 w-7 p-0 bg-indigo-600 hover:bg-indigo-500 text-white"
-                                    title="Edit user"
-                                  >
-                                    <Edit3 className="w-3.5 h-3.5" />
-                                  </Button>
-                                </div>
+                                {/* Right: Role + Status + Actions */}
+                                <div className="flex items-center gap-2 flex-wrap justify-end sm:contents">
+                                  {/* Role badge */}
+                                  <div className="flex sm:justify-center">
+                                    <Select
+                                      value={u.role}
+                                      onValueChange={val => {
+                                        if (val === u.role) return;
+                                        setPendingRoleChange({
+                                          user: u,
+                                          newRole: val as Role,
+                                        });
+                                      }}
+                                    >
+                                      <SelectTrigger
+                                        className={`h-7 text-xs border px-2 gap-1.5 w-28 ${meta.color} bg-transparent hover:bg-white/5`}
+                                      >
+                                        {meta.icon}
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent className="bg-accent border-border">
+                                        <SelectItem value="student">Student</SelectItem>
+                                        <SelectItem value="advisor">Advisor</SelectItem>
+                                        <SelectItem value="admin">Admin</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
 
-                                {/* Delete */}
-                                <div className="flex sm:justify-center">
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => setPendingDeleteUser(u)}
-                                    disabled={u.id === currentUser?.id}
-                                    className="h-7 w-7 p-0 border-slate-700 bg-transparent hover:bg-rose-900/40 hover:border-rose-700 text-muted-foreground hover:text-rose-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                                    title={
-                                      u.id === currentUser?.id
-                                        ? "Cannot delete your own account"
-                                        : "Delete user"
-                                    }
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </Button>
+                                  {/* Status toggle */}
+                                  <div className="flex sm:justify-center">
+                                    <button
+                                      onClick={() =>
+                                        setPendingStatusChange({
+                                          user: u,
+                                          newStatus: !u.isActive,
+                                        })
+                                      }
+                                      className={`flex items-center gap-1.5 h-7 px-3 rounded-full text-xs font-medium border transition-all hover:scale-105 ${
+                                        u.isActive
+                                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20"
+                                          : "bg-slate-500/10 text-muted-foreground border-slate-500/30 hover:bg-slate-500/20"
+                                      }`}
+                                    >
+                                      {u.isActive ? (
+                                        <CheckCircle2 className="w-3 h-3" />
+                                      ) : (
+                                        <XCircle className="w-3 h-3" />
+                                      )}
+                                      {u.isActive ? "Active" : "Inactive"}
+                                    </button>
+                                  </div>
+
+                                  {/* Actions */}
+                                  <div className="flex sm:justify-center gap-1.5">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => openDetails(u)}
+                                      className="h-8 w-8 p-0 border-slate-700 bg-transparent hover:bg-accent text-muted-foreground hover:text-white"
+                                      title="View details"
+                                    >
+                                      <MoreVertical className="w-3.5 h-3.5" />
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      onClick={() => openEdit(u)}
+                                      className="h-8 w-8 p-0 bg-indigo-600 hover:bg-indigo-500 text-white"
+                                      title="Edit user"
+                                    >
+                                      <Edit3 className="w-3.5 h-3.5" />
+                                    </Button>
+                                  </div>
+
+                                  {/* Delete */}
+                                  <div className="flex sm:justify-center">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => setPendingDeleteUser(u)}
+                                      disabled={u.id === currentUser?.id}
+                                      className="h-8 w-8 p-0 border-slate-700 bg-transparent hover:bg-rose-900/40 hover:border-rose-700 text-muted-foreground hover:text-rose-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                      title={
+                                        u.id === currentUser?.id
+                                          ? "Cannot delete your own account"
+                                          : "Delete user"
+                                      }
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </Button>
+                                  </div>
                                 </div>
                               </motion.div>
                             );
