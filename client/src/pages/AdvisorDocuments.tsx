@@ -438,12 +438,12 @@ export default function AdvisorDocuments() {
                       <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" />
                       {t("advisor.officialUniversitySource") || "Official University Source"}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <a
                         href={res.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs font-medium bg-white/[0.06] text-blue-300 hover:bg-white/[0.1] border border-white/10 transition-colors"
+                        className="w-full sm:flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs font-medium bg-white/[0.06] text-blue-300 hover:bg-white/[0.1] border border-white/10 transition-colors"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         {t("advisor.openLink") || "Open Link"}
@@ -452,14 +452,14 @@ export default function AdvisorDocuments() {
                         onClick={() => importResource.mutate({ resourceId: res.id, indexForAI: false })}
                         disabled={importResource.isPending}
                         variant="outline"
-                        className="flex-1 border-white/10 text-slate-300 hover:bg-white/[0.07] text-xs py-2"
+                        className="w-full sm:flex-1 border-white/10 text-slate-300 hover:bg-white/[0.07] text-xs py-2"
                       >
                         {t("advisor.import") || "Import"}
                       </Button>
                       <Button
                         onClick={() => importResource.mutate({ resourceId: res.id, indexForAI: true })}
                         disabled={importResource.isPending}
-                        className="flex-1 bg-violet-600 hover:bg-violet-700 text-xs py-2"
+                        className="w-full sm:flex-1 bg-violet-600 hover:bg-violet-700 text-xs py-2"
                       >
                         {t("advisor.importAndIndex") || "Import & Index"}
                       </Button>

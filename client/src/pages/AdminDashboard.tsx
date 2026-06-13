@@ -543,7 +543,7 @@ export default function AdminDashboard() {
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
-                    className="flex items-center gap-1.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-white rounded-lg transition-all shrink-0"
+                    className="flex items-center gap-1.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-white rounded-lg transition-all shrink-0 min-w-fit"
                   >
                     <Icon className="w-3.5 h-3.5 shrink-0" />
                     <span className="text-xs whitespace-nowrap">{tab.label}</span>
