@@ -120,11 +120,11 @@ export default function AdvisorStudentProfile() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 overflow-x-auto pb-2">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
           {tabs.map((tab) => (
             <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${activeTab === tab.key ? "bg-blue-600 text-white" : "bg-white/[0.04] text-slate-400 hover:bg-white/[0.07]"}`}>
-              <tab.icon className="w-4 h-4" />{tab.label}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors shrink-0 ${activeTab === tab.key ? "bg-blue-600 text-white" : "bg-white/[0.04] text-slate-400 hover:bg-white/[0.07]"}`}>
+              <tab.icon className="w-4 h-4 shrink-0" />{tab.label}
             </button>
           ))}
         </div>
