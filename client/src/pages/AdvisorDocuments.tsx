@@ -332,26 +332,26 @@ export default function AdvisorDocuments() {
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95 }}
-                      className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur-2xl flex items-center gap-4 group"
+                      className="rounded-2xl border border-white/10 bg-white/[0.04] p-3 sm:p-4 backdrop-blur-2xl flex items-center gap-3 sm:gap-4 group overflow-hidden"
                     >
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${iconColor}`}>
-                        {isLink ? <Globe className="w-5 h-5" /> : <File className="w-5 h-5" />}
+                      <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0 ${iconColor}`}>
+                        {isLink ? <Globe className="w-4 h-4 sm:w-5 sm:h-5" /> : <File className="w-4 h-4 sm:w-5 sm:h-5" />}
                       </div>
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 overflow-hidden">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-sm font-semibold text-white truncate max-w-[90px] sm:max-w-none">{doc.title}</h3>
-                          <span className="text-[10px] font-medium px-2 py-0.5 rounded border bg-white/[0.06] text-slate-300 border-white/10 uppercase shrink-0">
+                          <h3 className="text-sm font-semibold text-white truncate max-w-[50px] sm:max-w-none">{doc.title}</h3>
+                          <span className="hidden sm:inline-flex text-[10px] font-medium px-2 py-0.5 rounded border bg-white/[0.06] text-slate-300 border-white/10 uppercase shrink-0">
                             {doc.fileType}
                           </span>
-                          <span className="text-[10px] font-medium px-2 py-0.5 rounded border bg-emerald-500/15 text-emerald-300 border-emerald-500/20 shrink-0">
+                          <span className="hidden sm:inline-flex text-[10px] font-medium px-2 py-0.5 rounded border bg-emerald-500/15 text-emerald-300 border-emerald-500/20 shrink-0">
                             {doc.category}
                           </span>
-                          <span className={`text-[10px] font-medium px-2 py-0.5 rounded border ${status.bg} ${status.color} border-white/10 flex items-center gap-1 shrink-0`}>
+                          <span className={`text-[10px] font-medium px-1.5 sm:px-2 py-0.5 rounded border ${status.bg} ${status.color} border-white/10 flex items-center gap-1 shrink-0`}>
                             <StatusIcon className="w-3 h-3" />
-                            {status.label}
+                            <span className="hidden sm:inline">{status.label}</span>
                           </span>
                         </div>
-                        <p className="text-xs text-slate-500">{t("advisor.uploadedOn")} {formatDate(doc.createdAt)}</p>
+                        <p className="text-xs text-slate-500 truncate">{t("advisor.uploadedOn")} {formatDate(doc.createdAt)}</p>
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
                         {doc.fileUrl && (
