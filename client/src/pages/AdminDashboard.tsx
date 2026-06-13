@@ -528,7 +528,7 @@ export default function AdminDashboard() {
         {/* ── Main Tabs ── */}
         <motion.div initial="initial" animate="animate" variants={stagger}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 md:grid-cols-7 bg-slate-900/70 border border-border rounded-xl p-1 mb-6">
+            <TabsList className="flex flex-nowrap overflow-x-auto scrollbar-hide md:grid md:grid-cols-7 w-full bg-slate-900/70 border border-border rounded-xl p-1 mb-6">
               {[
                 { value: "users", label: t("admin.userManagement"), icon: Users },
                 { value: "advisors", label: "Advisors", icon: UserCheck },
@@ -543,10 +543,10 @@ export default function AdminDashboard() {
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
-                    className="flex items-center gap-1.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-white rounded-lg transition-all"
+                    className="flex items-center gap-1.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-white rounded-lg transition-all shrink-0"
                   >
-                    <Icon className="w-3.5 h-3.5" />
-                    <span className="hidden lg:inline text-xs">{tab.label}</span>
+                    <Icon className="w-3.5 h-3.5 shrink-0" />
+                    <span className="text-xs whitespace-nowrap">{tab.label}</span>
                   </TabsTrigger>
                 );
               })}
