@@ -338,31 +338,31 @@ export default function AdvisorDocuments() {
                         {isLink ? <Globe className="w-5 h-5" /> : <File className="w-5 h-5" />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <h3 className="text-sm font-semibold text-white truncate">{doc.title}</h3>
-                          <span className="text-[10px] font-medium px-2 py-0.5 rounded border bg-white/[0.06] text-slate-300 border-white/10 uppercase">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-sm font-semibold text-white truncate max-w-[90px] sm:max-w-none">{doc.title}</h3>
+                          <span className="text-[10px] font-medium px-2 py-0.5 rounded border bg-white/[0.06] text-slate-300 border-white/10 uppercase shrink-0">
                             {doc.fileType}
                           </span>
-                          <span className="text-[10px] font-medium px-2 py-0.5 rounded border bg-emerald-500/15 text-emerald-300 border-emerald-500/20">
+                          <span className="text-[10px] font-medium px-2 py-0.5 rounded border bg-emerald-500/15 text-emerald-300 border-emerald-500/20 shrink-0">
                             {doc.category}
                           </span>
-                          <span className={`text-[10px] font-medium px-2 py-0.5 rounded border ${status.bg} ${status.color} border-white/10 flex items-center gap-1`}>
+                          <span className={`text-[10px] font-medium px-2 py-0.5 rounded border ${status.bg} ${status.color} border-white/10 flex items-center gap-1 shrink-0`}>
                             <StatusIcon className="w-3 h-3" />
                             {status.label}
                           </span>
                         </div>
                         <p className="text-xs text-slate-500">{t("advisor.uploadedOn")} {formatDate(doc.createdAt)}</p>
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 shrink-0">
                         {doc.fileUrl && (
                           <a
                             href={doc.fileUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-white/[0.06] text-blue-300 hover:bg-white/[0.1] border border-white/10 transition-colors shrink-0"
+                            className="flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium bg-white/[0.06] text-blue-300 hover:bg-white/[0.1] border border-white/10 transition-colors shrink-0"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
-                            {t("advisor.openDocument")}
+                            <span className="hidden sm:inline">{t("advisor.openDocument")}</span>
                           </a>
                         )}
                         {!doc.isProcessed && (
@@ -370,7 +370,7 @@ export default function AdvisorDocuments() {
                             onClick={() => retryIndexing.mutate(doc.id)}
                             size="icon"
                             variant="ghost"
-                            className="w-8 h-8 text-slate-400 hover:text-amber-400"
+                            className="w-8 h-8 text-slate-400 hover:text-amber-400 shrink-0"
                             title={t("advisor.retryIndexing") || "Retry indexing"}
                           >
                             <RotateCw className="w-4 h-4" />
@@ -380,7 +380,7 @@ export default function AdvisorDocuments() {
                           onClick={() => setDeleteTarget(doc)}
                           size="icon"
                           variant="ghost"
-                          className="w-8 h-8 text-slate-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="w-8 h-8 text-slate-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>

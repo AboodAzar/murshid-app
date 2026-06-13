@@ -170,9 +170,9 @@ export default function AdvisorStudentProfile() {
 
           {activeTab === "alerts" && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <h3 className="text-lg font-semibold text-white">{t("advisor.academicAlerts")}</h3>
-                <Button onClick={() => setShowAlertForm(true)} size="sm" className="bg-rose-600 hover:bg-rose-700"><Plus className="w-4 h-4 me-1" />{t("advisor.createAlert")}</Button>
+                <Button onClick={() => setShowAlertForm(true)} size="sm" className="bg-rose-600 hover:bg-rose-700 w-full sm:w-auto"><Plus className="w-4 h-4 me-1" />{t("advisor.createAlert")}</Button>
               </div>
               {(() => {
                 const uniqueAlerts = alerts.filter((alert: any, index: number, self: any[]) =>
@@ -210,9 +210,9 @@ export default function AdvisorStudentProfile() {
 
           {activeTab === "notes" && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <h3 className="text-lg font-semibold text-white">{t("advisor.advisingNotes")}</h3>
-                <Button onClick={() => setShowNoteForm(true)} size="sm" className="bg-amber-600 hover:bg-amber-700"><Plus className="w-4 h-4 me-1" />{t("advisor.addNote")}</Button>
+                <Button onClick={() => setShowNoteForm(true)} size="sm" className="bg-amber-600 hover:bg-amber-700 w-full sm:w-auto"><Plus className="w-4 h-4 me-1" />{t("advisor.addNote")}</Button>
               </div>
               {notes.length === 0 ? <p className="text-slate-400 text-center py-8">{t("advisor.noNotes")}</p> : (
                 <div className="space-y-3">
@@ -236,9 +236,9 @@ export default function AdvisorStudentProfile() {
 
           {activeTab === "appointments" && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <h3 className="text-lg font-semibold text-white">{t("advisor.appointments")}</h3>
-                <Button onClick={() => setShowApptForm(true)} size="sm" className="bg-violet-600 hover:bg-violet-700"><Plus className="w-4 h-4 me-1" />{t("advisor.scheduleAppointment")}</Button>
+                <Button onClick={() => setShowApptForm(true)} size="sm" className="bg-violet-600 hover:bg-violet-700 w-full sm:w-auto"><Plus className="w-4 h-4 me-1" />{t("advisor.scheduleAppointment")}</Button>
               </div>
               {appointments.length === 0 ? <p className="text-slate-400 text-center py-8">{t("advisor.noAppointments")}</p> : (
                 <div className="space-y-3">
@@ -260,13 +260,13 @@ export default function AdvisorStudentProfile() {
 
           {activeTab === "recommendations" && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <h3 className="text-lg font-semibold text-white">{t("advisor.recommendations")}</h3>
                 <Button onClick={() => {
                   const title = prompt(t("advisor.recommendationTitle") || "Enter recommendation title");
                   const desc = prompt(t("advisor.recommendationDesc") || "Enter description");
                   if (title && desc) createRec.mutate({ studentId, title, description: desc });
-                }} size="sm" className="bg-emerald-600 hover:bg-emerald-700"><Plus className="w-4 h-4 me-1" />{t("advisor.createRecommendation")}</Button>
+                }} size="sm" className="bg-emerald-600 hover:bg-emerald-700 w-full sm:w-auto"><Plus className="w-4 h-4 me-1" />{t("advisor.createRecommendation")}</Button>
               </div>
               {recommendations.length === 0 ? <p className="text-slate-400 text-center py-8">{t("advisor.noRecommendations")}</p> : (
                 <div className="space-y-3">
