@@ -189,7 +189,7 @@ export default function AIChatPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-3 sm:p-4 md:p-6 max-w-none md:max-w-7xl mx-auto space-y-6">
+      <div className="p-3 sm:p-4 md:p-6 max-w-none md:max-w-7xl md:mx-auto space-y-6">
         {/* ─── Hero ─── */}
         <motion.div {...fadeInUp} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-900/40 via-slate-900/60 to-slate-900/80 border border-blue-500/20 backdrop-blur-2xl p-4 sm:p-6 md:p-8">
           <div className="absolute top-0 end-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
@@ -500,8 +500,8 @@ export default function AIChatPage() {
           </TabsContent>
 
           {/* ─── Chat Tab ─── */}
-          <TabsContent value="chat" className="mt-6 overflow-x-hidden">
-            <div className={isMobile ? "flex flex-col h-[calc(100dvh-180px)] -mx-3 sm:-mx-4" : "flex h-[calc(100dvh-220px)] gap-4"}>
+          <TabsContent value="chat" className="mt-6 overflow-x-hidden flex flex-col">
+            <div className={isMobile ? "flex flex-col h-[calc(100dvh-280px)] -mx-3 sm:-mx-4" : "flex h-[calc(100dvh-220px)] gap-4"}>
               {/* Sidebar — desktop only, conditionally rendered */}
               {!isMobile && (
                 <div className="w-60 lg:w-64 bg-card border border-border rounded-xl p-3 flex-col backdrop-blur-2xl shrink-0 flex">
@@ -553,12 +553,12 @@ export default function AIChatPage() {
                         <AnimatePresence>
                           {messages.map((msg, index) => (
                             <motion.div key={index} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                              <div className={`max-w-[90%] sm:max-w-[80%] md:max-w-md lg:max-w-lg px-3 py-2.5 md:px-4 md:py-3 rounded-2xl ${msg.role === "user" ? "bg-blue-600 text-white rounded-br-sm" : "bg-white/[0.06] border border-border text-slate-100 rounded-bl-sm"}`}>
+                              <div className={`${msg.role === "user" ? "max-w-[85%]" : "max-w-[90%]"} sm:max-w-[80%] md:max-w-md lg:max-w-lg px-3 py-2.5 md:px-4 md:py-3 rounded-2xl break-words ${msg.role === "user" ? "bg-blue-600 text-white rounded-br-sm" : "bg-white/[0.06] border border-border text-slate-100 rounded-bl-sm"}`}>
                                 <div className="flex items-center gap-2 mb-1">
                                   {msg.role === "assistant" ? <Bot className="w-3.5 h-3.5 text-primary" /> : <User className="w-3.5 h-3.5" />}
                                   <span className="text-[10px] opacity-70">{msg.role === "assistant" ? "Murshid AI" : "You"}</span>
                                 </div>
-                                {msg.role === "assistant" ? <Streamdown>{msg.content}</Streamdown> : <p className="text-sm">{msg.content}</p>}
+                                {msg.role === "assistant" ? <Streamdown className="break-words">{msg.content}</Streamdown> : <p className="text-sm break-words">{msg.content}</p>}
                                 {msg.role === "assistant" && msg.id && (
                                   <div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-end gap-2">
                                     <button onClick={() => handleRateMessage(msg.id!, "up")} disabled={msg.feedback === "up" || rateMsg.isPending} className={`p-1.5 rounded-md transition-colors ${msg.feedback === "up" ? "bg-emerald-500/20 text-emerald-400" : "hover:bg-white/10 text-muted-foreground hover:text-emerald-400"}`} title="Good response">
@@ -588,8 +588,8 @@ export default function AIChatPage() {
 
                     {/* Sticky Input */}
                     <div className="border-t border-border p-2.5 sm:p-3 md:p-4 bg-card/95 backdrop-blur shrink-0">
-                      <div className="flex gap-2 md:gap-3 max-w-4xl mx-auto">
-                        <Input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSendMessage()} placeholder={t("chat.placeholder")} className="bg-white/[0.05] border-border text-white placeholder-slate-500 h-11 text-sm" disabled={isLoading} />
+                      <div className="flex gap-2 md:gap-3 w-full md:max-w-4xl md:mx-auto">
+                        <Input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSendMessage()} placeholder={t("chat.placeholder")} className="bg-white/[0.05] border-border text-white placeholder-slate-500 h-11 text-sm flex-1" disabled={isLoading} />
                         <Button onClick={handleSendMessage} disabled={!input.trim() || isLoading} className="bg-blue-600 hover:bg-blue-500 h-11 w-11 p-0 shrink-0"><Send className="w-4 h-4" /></Button>
                       </div>
                     </div>
