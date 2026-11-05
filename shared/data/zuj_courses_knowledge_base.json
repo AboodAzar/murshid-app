@@ -1,0 +1,2186 @@
+{
+  "institution": "Al-Zaytoonah University of Jordan (ZUJ)",
+  "curriculumScale": 133,
+  "academicTimetable": "4-Day Week (Sunday to Wednesday)",
+  "totalCoursesCount": 125,
+  "modalitiesSummary": {
+    "inPerson": 58,
+    "blended": 51,
+    "online": 16
+  },
+  "courses": [
+    {
+      "courseId": "420101",
+      "courseNameAr": "العلوم العسكرية",
+      "courseNameEn": "Military Sciences",
+      "creditHours": 3,
+      "lectureModality": "إلكتروني كامل",
+      "modalityType": "online",
+      "prerequisite": null,
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات الجامعة",
+      "subCategory": "متطلبات جامعة اجبارية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "420151",
+      "courseNameAr": "التربية الوطنية",
+      "courseNameEn": "National Education",
+      "creditHours": 3,
+      "lectureModality": "إلكتروني كامل",
+      "modalityType": "online",
+      "prerequisite": null,
+      "studyYear": 1,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات الجامعة",
+      "subCategory": "متطلبات جامعة اجبارية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "420171",
+      "courseNameAr": "مهارات حياتية",
+      "courseNameEn": "Life Skills",
+      "creditHours": 3,
+      "lectureModality": "إلكتروني كامل",
+      "modalityType": "online",
+      "prerequisite": null,
+      "studyYear": 2,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات الجامعة",
+      "subCategory": "متطلبات جامعة اجبارية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "420115",
+      "courseNameAr": "الاتصال والتواصل باللغة العربية",
+      "courseNameEn": "Arabic Communication Skills",
+      "creditHours": 3,
+      "lectureModality": "إلكتروني كامل",
+      "modalityType": "online",
+      "prerequisite": "اللغة العربية الاستدراكية",
+      "studyYear": 1,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات الجامعة",
+      "subCategory": "متطلبات جامعة اجبارية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "420123",
+      "courseNameAr": "الاتصال والتواصل باللغة الإنجليزية",
+      "courseNameEn": "English Communication Skills",
+      "creditHours": 3,
+      "lectureModality": "إلكتروني كامل",
+      "modalityType": "online",
+      "prerequisite": "اللغة الإنجليزية الاستدراكية",
+      "studyYear": 1,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات الجامعة",
+      "subCategory": "متطلبات جامعة اجبارية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "420261",
+      "courseNameAr": "الريادة والابتكار",
+      "courseNameEn": "Entrepreneurship and Innovation",
+      "creditHours": 3,
+      "lectureModality": "إلكتروني كامل",
+      "modalityType": "online",
+      "prerequisite": null,
+      "studyYear": 2,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات الجامعة",
+      "subCategory": "متطلبات جامعة اجبارية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "420241",
+      "courseNameAr": "القيادة والمسؤولية المجتمعية",
+      "courseNameEn": "Leadership and Social Responsibility",
+      "creditHours": 3,
+      "lectureModality": "إلكتروني كامل",
+      "modalityType": "online",
+      "prerequisite": null,
+      "studyYear": 2,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات الجامعة",
+      "subCategory": "متطلبات جامعة اجبارية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "420142",
+      "courseNameAr": "الحضارة الانسانية",
+      "courseNameEn": "Human Civilization",
+      "creditHours": 3,
+      "lectureModality": "إلكتروني كامل",
+      "modalityType": "online",
+      "prerequisite": null,
+      "studyYear": 1,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات الجامعة",
+      "subCategory": "متطلبات جامعة اختيارية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "420253",
+      "courseNameAr": "التنمية والبيئة",
+      "courseNameEn": "Development and Environment",
+      "creditHours": 3,
+      "lectureModality": "إلكتروني كامل",
+      "modalityType": "online",
+      "prerequisite": null,
+      "studyYear": 2,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات الجامعة",
+      "subCategory": "متطلبات جامعة اختيارية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "420172",
+      "courseNameAr": "الثقافة الرقمية",
+      "courseNameEn": "Digital Culture",
+      "creditHours": 3,
+      "lectureModality": "إلكتروني كامل",
+      "modalityType": "online",
+      "prerequisite": "مهارات الحاسوب الاستدراكية",
+      "studyYear": 1,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات الجامعة",
+      "subCategory": "متطلبات جامعة اختيارية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "420201",
+      "courseNameAr": "الإسعافات الأولية",
+      "courseNameEn": "First Aid",
+      "creditHours": 3,
+      "lectureModality": "إلكتروني كامل",
+      "modalityType": "online",
+      "prerequisite": null,
+      "studyYear": 2,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات الجامعة",
+      "subCategory": "متطلبات جامعة اختيارية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "420134",
+      "courseNameAr": "الرياضة والصحة",
+      "courseNameEn": "Sports and Health",
+      "creditHours": 3,
+      "lectureModality": "إلكتروني كامل",
+      "modalityType": "online",
+      "prerequisite": null,
+      "studyYear": 1,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات الجامعة",
+      "subCategory": "متطلبات جامعة اختيارية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "420112",
+      "courseNameAr": "الثقافة الإسلامية",
+      "courseNameEn": "Islamic Culture",
+      "creditHours": 3,
+      "lectureModality": "إلكتروني كامل",
+      "modalityType": "online",
+      "prerequisite": null,
+      "studyYear": 2,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات الجامعة",
+      "subCategory": "متطلبات جامعة اختيارية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "420155",
+      "courseNameAr": "القانون في حياتنا",
+      "courseNameEn": "Law in Our Life",
+      "creditHours": 3,
+      "lectureModality": "إلكتروني كامل",
+      "modalityType": "online",
+      "prerequisite": null,
+      "studyYear": 1,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات الجامعة",
+      "subCategory": "متطلبات جامعة اختيارية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "420392",
+      "courseNameAr": "أساسيات علم النفس",
+      "courseNameEn": "Fundamentals of Psychology",
+      "creditHours": 3,
+      "lectureModality": "إلكتروني كامل",
+      "modalityType": "online",
+      "prerequisite": null,
+      "studyYear": 3,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات الجامعة",
+      "subCategory": "متطلبات جامعة اختيارية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "420341",
+      "courseNameAr": "أساسيات اللغة الألمانية",
+      "courseNameEn": "Fundamentals of German Language",
+      "creditHours": 3,
+      "lectureModality": "إلكتروني كامل",
+      "modalityType": "online",
+      "prerequisite": null,
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات الجامعة",
+      "subCategory": "متطلبات جامعة اختيارية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "130100",
+      "courseNameAr": "أساسيات تكنولوجيا المعلومات",
+      "courseNameEn": "Fundamentals of Information Technology",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "مهارات الحاسوب الاستدراكية (متزامن)",
+      "studyYear": 1,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات الكلية",
+      "subCategory": "متطلبات الكلية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "135101",
+      "courseNameAr": "اللغة الانجليزية التقنية لطلاب تكنولوجيا\nالمعلومات",
+      "courseNameEn": "اللغة الانجليزية التقنية لطلاب تكنولوجيا\nالمعلومات",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": null,
+      "studyYear": 1,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات الكلية",
+      "subCategory": "متطلبات الكلية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "تهدف هذه المادة إلى تطوير مهارات اللغة الإنجليزية لدى الطلاب في مجال تكنولوجيا المعلومات، مع التركيز على المصطلحات التقنية المستخدمة في هذا المجال. يتعلم الطلاب كيفية قراءة وفهم النصوص التقنية، كتابة تقارير ومقالات علمية، والتواصل الفعّال في البيئات التقنية. تشمل المواضيع مصطلحات البرمجة، الشبكات، الذكاء الاصطناعي، أمن المعلومات، وأنظمة التشغيل. بنهاية المادة، سيكون الطلاب قادرين على استخدام اللغة الإنجليزية بشكل فعال في مجال دراستهم وتطبيقاتها العملية."
+    },
+    {
+      "courseId": "133102",
+      "courseNameAr": "موضوعات حديثة في تكنولوجيا المعلومات",
+      "courseNameEn": "Modern Topics in Information Technology",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "أساسيات تكنولوجيا المعلومات",
+      "studyYear": 1,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات الكلية",
+      "subCategory": "متطلبات الكلية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "130110",
+      "courseNameAr": "الرياضيات المتقطعة",
+      "courseNameEn": "Discrete Mathematics",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": null,
+      "studyYear": 1,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات الكلية",
+      "subCategory": "متطلبات الكلية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "130130",
+      "courseNameAr": "البرمجة الحاسوبية",
+      "courseNameEn": "البرمجة الحاسوبية",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "أساسيات تكنولوجيا المعلومات\n+\nاللغة الانجليزية التقنية لطلاب\nتكنولوجيا المعلومات",
+      "studyYear": 1,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات الكلية",
+      "subCategory": "متطلبات الكلية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "130231",
+      "courseNameAr": "البرمجة التطبيقية",
+      "courseNameEn": "البرمجة التطبيقية",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "البرمجة الحاسوبية",
+      "studyYear": 2,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات الكلية",
+      "subCategory": "متطلبات الكلية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131390",
+      "courseNameAr": "الريادة وتخطيط المشاريع",
+      "courseNameEn": "الريادة وتخطيط المشاريع",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "اللغة الانجليزية التقنية لطلاب\nتكنولوجيا المعلومات",
+      "studyYear": 3,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات الكلية",
+      "subCategory": "متطلبات الكلية",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Computer Science",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131111",
+      "courseNameAr": "شبكات الحاسوب",
+      "courseNameEn": "Computer Networks",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "أساسيات تكنولوجيا المعلومات",
+      "studyYear": 1,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131112",
+      "courseNameAr": "تصميم المنطق الرقمي",
+      "courseNameEn": "Digital Logic Design",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "رياضيات متقطعة",
+      "studyYear": 1,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131203",
+      "courseNameAr": "تصميم وتطوير قواعد البيانات",
+      "courseNameEn": "تصميم وتطوير قواعد البيانات",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "البرمجة الحاسوبية",
+      "studyYear": 2,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131213",
+      "courseNameAr": "تنظيم ومعمارية الحاسوب",
+      "courseNameEn": "Computer Organization and Architecture",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "تصميم المنطق الرقمي",
+      "studyYear": 2,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131214",
+      "courseNameAr": "نظم التشغيل",
+      "courseNameEn": "Operating Systems",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "تصميم المنطق الرقمي",
+      "studyYear": 2,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131215",
+      "courseNameAr": "تراكيب البيانات والخوارزميات",
+      "courseNameEn": "Data Structures and Algorithms",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "البرمجة التطبيقية",
+      "studyYear": 2,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131232",
+      "courseNameAr": "تطبيقات البرمجة المرئية",
+      "courseNameEn": "Visual Programming Applications",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "البرمجة التطبيقية",
+      "studyYear": 2,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131333",
+      "courseNameAr": "برمجة تطبيقات الانترنت1",
+      "courseNameEn": "برمجة تطبيقات الانترنت1",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "تصميم وتطوير قواعد البيانات",
+      "studyYear": 3,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131304",
+      "courseNameAr": "تحليل وتصميم النظم",
+      "courseNameEn": "Systems Analysis and Design",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "تصميم وتطوير قواعد البيانات",
+      "studyYear": 3,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131305",
+      "courseNameAr": "ادارة نظم قواعد البيانات",
+      "courseNameEn": "Database Management Systems",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "تصميم وتطوير قواعد البيانات",
+      "studyYear": 3,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131106",
+      "courseNameAr": "أساسيات هندسة البرمجيات",
+      "courseNameEn": "أساسيات هندسة البرمجيات",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "مهارات الحاسوب الاستدراكية\n(متزامن)",
+      "studyYear": 1,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131220",
+      "courseNameAr": "هندسة متطلبات البرمجيات",
+      "courseNameEn": "هندسة متطلبات البرمجيات",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "اساسيات هندسة البرمجيات",
+      "studyYear": 2,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131221",
+      "courseNameAr": "هندسة معمارية البرمجيات",
+      "courseNameEn": "هندسة معمارية البرمجيات",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "هندسة متطلبات البرمجيات",
+      "studyYear": 2,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131322",
+      "courseNameAr": "فحص وصيانة البرمجيات",
+      "courseNameEn": "فحص وصيانة البرمجيات",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "هندسة معمارية البرمجيات",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131307",
+      "courseNameAr": "تطوير الانظمة الذكية",
+      "courseNameEn": "تطوير الانظمة الذكية",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "برمجة تطبيقات الانترنت1",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131308",
+      "courseNameAr": "تصميم تجربة واجهة المستخدم",
+      "courseNameEn": "تصميم تجربة واجهة المستخدم",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "تطبيقات البرمجة المرئية",
+      "studyYear": 3,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131323",
+      "courseNameAr": "ادارة المشاريع البرمجية",
+      "courseNameEn": "ادارة المشاريع البرمجية",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "تحليل وتصميم النظم",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131424",
+      "courseNameAr": "امن البرمجيات",
+      "courseNameEn": "امن البرمجيات",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "فحص وصيانة البرمجيات",
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131425",
+      "courseNameAr": "توثيق البرمجيات",
+      "courseNameEn": "توثيق البرمجيات",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "فحص وصيانة البرمجيات",
+      "studyYear": 4,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131491",
+      "courseNameAr": "التدريب الميداني",
+      "courseNameEn": "Field Training",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "استكمال 90 ساعة",
+      "studyYear": 4,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131492",
+      "courseNameAr": "مشروع تخرج 1",
+      "courseNameEn": "مشروع تخرج 1",
+      "creditHours": 2,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "موافقة القسم",
+      "studyYear": 4,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131493",
+      "courseNameAr": "مشروع تخرج 2",
+      "courseNameEn": "مشروع تخرج 2",
+      "creditHours": 2,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "مشروع تخرج 1",
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131494",
+      "courseNameAr": "مخيم الممارسات المهنية",
+      "courseNameEn": "مخيم الممارسات المهنية",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "موافقة القسم (90)\n+\nالريادة والتخطيط للمشاريع",
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131326",
+      "courseNameAr": "دعم عمليات الاعمال",
+      "courseNameEn": "دعم عمليات الاعمال",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "هندسة متطلبات البرمجيات",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131327",
+      "courseNameAr": "اقتصاديات البرمجيات",
+      "courseNameEn": "اقتصاديات البرمجيات",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "تحليل وتصميم النظم",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131335",
+      "courseNameAr": "برمجة تطبيقات الاجهزة المحمولة",
+      "courseNameEn": "برمجة تطبيقات الاجهزة المحمولة",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "تحليل وتصميم النظم",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131409",
+      "courseNameAr": "الحوسبة السحابية",
+      "courseNameEn": "الحوسبة السحابية",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "ادارة نظم قواعد البيانات",
+      "studyYear": 4,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131428",
+      "courseNameAr": "تحليل وتمثيل البيانات الضخمة",
+      "courseNameEn": "تحليل وتمثيل البيانات الضخمة",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "ادارة نظم قواعد البيانات",
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131429",
+      "courseNameAr": "ادارة جودة البرمجيات",
+      "courseNameEn": "ادارة جودة البرمجيات",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "فحص وصيانة البرمجيات",
+      "studyYear": 4,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131495",
+      "courseNameAr": "موضوعات مختارة في هندسة البرمجيات 1",
+      "courseNameEn": "موضوعات مختارة في هندسة البرمجيات 1",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "موافقة القسم",
+      "studyYear": 4,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131496",
+      "courseNameAr": "موضوعات مختارة في هندسة البرمجيات 2",
+      "courseNameEn": "موضوعات مختارة في هندسة البرمجيات 2",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "موافقة القسم",
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "131436",
+      "courseNameAr": "لغة برمجة خاصة",
+      "courseNameEn": "لغة برمجة خاصة",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "موافقة القسم",
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Software Engineering"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "101112",
+      "courseNameAr": "أسس الرياضيات",
+      "courseNameEn": "أسس الرياضيات",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "مهارات الحاسوب الاستدراكية (متزامن)",
+      "studyYear": 1,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص المساندة",
+      "subCategory": "متطلبات التخصص المساندة",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "101274",
+      "courseNameAr": "تطبيقات رياضية محوسبة",
+      "courseNameEn": "تطبيقات رياضية محوسبة",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "أسس الرياضيات",
+      "studyYear": 2,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص المساندة",
+      "subCategory": "متطلبات التخصص المساندة",
+      "offeredInDepartments": [
+        "Software Engineering",
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130111",
+      "courseNameAr": "تصميم المنطق الرقمي",
+      "courseNameEn": "Digital Logic Design",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "الرياضيات المتقطعة",
+      "studyYear": 1,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130212",
+      "courseNameAr": "تنظيم ومعمارية الحاسوب",
+      "courseNameEn": "Computer Organization and Architecture",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "تصميم المنطق الرقمي",
+      "studyYear": 2,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130221",
+      "courseNameAr": "تراكيب البيانات",
+      "courseNameEn": "Data Structures",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "البرمجة التطبيقية",
+      "studyYear": 2,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130232",
+      "courseNameAr": "برمجة مرئية",
+      "courseNameEn": "برمجة مرئية",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "البرمجة التطبيقية",
+      "studyYear": 2,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130233",
+      "courseNameAr": "برمجة تطبيقات الانترنت 1",
+      "courseNameEn": "برمجة تطبيقات الانترنت 1",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "البرمجة الحاسوبية",
+      "studyYear": 2,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130234",
+      "courseNameAr": "برمجة تطبيقات الانترنت 2",
+      "courseNameEn": "برمجة تطبيقات الانترنت 2",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "تطبيقات الانترنت 1",
+      "studyYear": 2,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130322",
+      "courseNameAr": "الخوارزميات",
+      "courseNameEn": "الخوارزميات",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "تراكيب البيانات",
+      "studyYear": 3,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130323",
+      "courseNameAr": "تصميم المترجمات ولغات البرمجة",
+      "courseNameEn": "تصميم المترجمات ولغات البرمجة",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "نظرية الحسابات",
+      "studyYear": 3,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130313",
+      "courseNameAr": "نظم التشغيل",
+      "courseNameEn": "Operating Systems",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "تنظيم ومعمارية الحاسوب",
+      "studyYear": 3,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130103",
+      "courseNameAr": "هندسة البرمجيات",
+      "courseNameEn": "هندسة البرمجيات",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "أساسيات تكنولوجيا المعلومات",
+      "studyYear": 1,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130204",
+      "courseNameAr": "قواعد البيانات1",
+      "courseNameEn": "قواعد البيانات1",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "البرمجة الحاسوبية",
+      "studyYear": 2,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130214",
+      "courseNameAr": "شبكات الحاسوب",
+      "courseNameEn": "Computer Networks",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "أساسيات تكنولوجيا المعلومات",
+      "studyYear": 2,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130220",
+      "courseNameAr": "نظرية الحسابات",
+      "courseNameEn": "نظرية الحسابات",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "الرياضيات المتقطعة",
+      "studyYear": 2,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130305",
+      "courseNameAr": "تحليل النظم وتصميمها",
+      "courseNameEn": "تحليل النظم وتصميمها",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "قواعد البيانات 1",
+      "studyYear": 3,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130335",
+      "courseNameAr": "برمجة علوم البيانات والذكاء الاصطناعي",
+      "courseNameEn": "برمجة علوم البيانات والذكاء الاصطناعي",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "البرمجة التطبيقية",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130315",
+      "courseNameAr": "أمن البيانات والمعلومات",
+      "courseNameEn": "أمن البيانات والمعلومات",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "شبكات الحاسوب",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130306",
+      "courseNameAr": "قواعد البيانات 2",
+      "courseNameEn": "قواعد البيانات 2",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "قواعد البيانات1",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130436",
+      "courseNameAr": "برمجة الاجهزة المحمولة",
+      "courseNameEn": "برمجة الاجهزة المحمولة",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "برمجة مرئية",
+      "studyYear": 4,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130424",
+      "courseNameAr": "الحوسبة السحابية والنظم الموزعة",
+      "courseNameEn": "الحوسبة السحابية والنظم الموزعة",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "نظم التشغيل",
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130437",
+      "courseNameAr": "برمجة الالعاب",
+      "courseNameEn": "برمجة الالعاب",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "برمجة مرئية",
+      "studyYear": 4,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130491",
+      "courseNameAr": "التدريب الميداني",
+      "courseNameEn": "Field Training",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "استكمال 90 ساعة",
+      "studyYear": 4,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130492",
+      "courseNameAr": "مشروع تخرج 1",
+      "courseNameEn": "مشروع تخرج 1",
+      "creditHours": 2,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "موافقة القسم",
+      "studyYear": 4,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130493",
+      "courseNameAr": "مشروع تخرج 2",
+      "courseNameEn": "مشروع تخرج 2",
+      "creditHours": 2,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "مشروع تخرج 1",
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130494",
+      "courseNameAr": "مخيم الممارسات المهنية",
+      "courseNameEn": "مخيم الممارسات المهنية",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "موافقة القسم (90)\n+\nالريادة والتخطيط للمشاريع",
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130316",
+      "courseNameAr": "بحوث العمليات",
+      "courseNameEn": "بحوث العمليات",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "تطبيقات رياضية محوسبة",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130307",
+      "courseNameAr": "الانسان والحاسوب",
+      "courseNameEn": "الانسان والحاسوب",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "تطبيقات الانترنت 1",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130338",
+      "courseNameAr": "معالجة الصور والوسائط الرقمية",
+      "courseNameEn": "معالجة الصور والوسائط الرقمية",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "برمجة مرئية",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130308",
+      "courseNameAr": "النظم الذكية",
+      "courseNameEn": "النظم الذكية",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "موضوعات حديثة في\nتكنولوجيا المعلومات",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130317",
+      "courseNameAr": "تراسل البيانات وامنها",
+      "courseNameEn": "تراسل البيانات وامنها",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "شبكات الحاسوب",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130418",
+      "courseNameAr": "الانظمة الضمنية",
+      "courseNameEn": "الانظمة الضمنية",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "نظم التشغيل",
+      "studyYear": 4,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130409",
+      "courseNameAr": "ادارة نظم الادارة والاعمال",
+      "courseNameEn": "ادارة نظم الادارة والاعمال",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "قواعد البيانات 2",
+      "studyYear": 4,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130439",
+      "courseNameAr": "لغة برمجة خاصة",
+      "courseNameEn": "لغة برمجة خاصة",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "برمجة مرئية",
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0130495",
+      "courseNameAr": "موضوعات متقدمة في علم الحاسوب",
+      "courseNameEn": "موضوعات متقدمة في علم الحاسوب",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "موافقة القسم",
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0101112",
+      "courseNameAr": "اسس الرياضيات",
+      "courseNameEn": "اسس الرياضيات",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "مهارات الحاسوب الاستدراكية (متزامن)",
+      "studyYear": 1,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص المساندة",
+      "subCategory": "متطلبات التخصص المساندة",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "0101274",
+      "courseNameAr": "تطبيقات رياضية محوسبة",
+      "courseNameEn": "تطبيقات رياضية محوسبة",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "اسس الرياضيات",
+      "studyYear": 2,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص المساندة",
+      "subCategory": "متطلبات التخصص المساندة",
+      "offeredInDepartments": [
+        "Computer Science"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "135102",
+      "courseNameAr": "أساسيات علم البيانات",
+      "courseNameEn": "أساسيات علم البيانات",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "أسس الرياضيات",
+      "studyYear": 1,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تهدف مادة أساسيات علم البيانات إلى تعريف الطلاب بالمفاهيم الأساسية لتحليل البيانات، مثل جمع البيانات، وتنظيفها، وتحليلها باستخدام أدوات وتقنيات مختلفة. تركز المادة على إكساب الطلاب مهارات التعامل مع البيانات الضخمة وتفسير النتائج."
+    },
+    {
+      "courseId": "135232",
+      "courseNameAr": "برمجة علوم البيانات والذكاء الاصطناعي (1)",
+      "courseNameEn": "برمجة علوم البيانات والذكاء الاصطناعي (1)",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "البرمجة الحاسوبية",
+      "studyYear": 2,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تركز هذه المادة على المبادئ الأساسية لبرمجة علوم البيانات وتطبيقات الذكاء الاصطناعي. يتعلم الطلاب كيفية استخدام لغات البرمجة الشائعة مثل بايثون في تحليل البيانات وتطبيق الخوارزميات الذكية. تشمل المواضيع الرئيسية معالجة البيانات، استكشاف البيانات وتنقيتها، إنشاء النماذج التنبؤية باستخدام تقنيات التعلم الآلي، بالإضافة إلى تطبيقات الذكاء الاصطناعي في مجالات مثل التصنيف والتجميع. بنهاية المادة، سيكون الطلاب قادرين على تطوير برامج فعالة تستخدم علوم البيانات والذكاء الاصطناعي لحل مشكلات واقعية."
+    },
+    {
+      "courseId": "135203",
+      "courseNameAr": "الذكاء الاصطناعي ونظم الحوسبة",
+      "courseNameEn": "الذكاء الاصطناعي ونظم الحوسبة",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "موضوعات حديثة في\nتكنولوجيا المعلومات",
+      "studyYear": 2,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تهدف مادة الذكاء الاصطناعي ونظم الحوسبة إلى تعريف الطلاب بمفاهيم الذكاء الاصطناعي وتطبيقاته المختلفة في نظم الحوسبة الحديثة. تتناول المادة تقنيات التعلم الآلي ومعالجة اللغة الطبيعية والرؤية الحاسوبية، بالإضافة إلى الأساليب المستخدمة في تطوير الخوارزميات الذكية. كما تسلط الضوء على كيفية دمج هذه التقنيات في الأنظمة الحاسوبية لتحسين الأداء والكفاءة في مجموعة متنوعة من المجالات."
+    },
+    {
+      "courseId": "135211",
+      "courseNameAr": "تراكيب البيانات",
+      "courseNameEn": "Data Structures",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "برمجة تطبيقية",
+      "studyYear": 2,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تركز مادة تراكيب البيانات على دراسة الهياكل الأساسية لتنظيم وتخزين البيانات بكفاءة، مثل القوائم، المكدسات، الطوابير، الأشجار، والرسوم البيانية. تهدف المادة إلى تعليم الطلاب كيفية استخدام هذه التراكيب لتحسين أداء الخوارزميات وحل المشكلات البرمجية."
+    },
+    {
+      "courseId": "135240",
+      "courseNameAr": "التعلم الالي",
+      "courseNameEn": "التعلم الالي",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "برمجة علوم البيانات والذكاء الاصطناعي (1)+الذكاء\nالاصطناعي ونظم الحوسبة",
+      "studyYear": 2,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تهدف مادة التعلم الآلي إلى تعريف الطلاب بالمفاهيم والتقنيات الأساسية لبناء نماذج قادرة على التعلم من البيانات واتخاذ قرارات بناءً على الأنماط المكتشفة. تتناول المادة خوارزميات مثل الانحدار الخطي، شجرة القرار، والشبكات العصبية، وتطبيقاتها في مجالات متنوعة مثل التصنيف والتنبؤ."
+    },
+    {
+      "courseId": "135220",
+      "courseNameAr": "قواعد البيانات",
+      "courseNameEn": "Database Systems",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "أساسيات تكنولوجيا المعلومات",
+      "studyYear": 2,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تركز مادة قواعد البيانات على المفاهيم الأساسية لتصميم، إنشاء، وإدارة قواعد البيانات. يتعلم الطلاب كيفية تنظيم البيانات باستخدام نماذج العلاقات، كتابة استعلامات SQL، وضمان سلامة البيانات وأمنها. كما تغطي المادة تقنيات تحسين الأداء والتعامل مع قواعد البيانات الكبيرة."
+    },
+    {
+      "courseId": "135233",
+      "courseNameAr": "برمجة علوم البيانات والذكاء الاصطناعي (2)",
+      "courseNameEn": "برمجة علوم البيانات والذكاء الاصطناعي (2)",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "برمجة علوم البيانات والذكاء\nالاصطناعي (1)",
+      "studyYear": 2,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تستكمل مادة برمجة علوم البيانات والذكاء الاصطناعي (2) المهارات المكتسبة في الجزء الأول، مع التركيز على تقنيات متقدمة مثل الشبكات العصبية العميقة، تعزيز التعلم، وتحليل البيانات غير المهيكلة. يركز المقرر على تطوير حلول ذكاء اصطناعي مبتكرة باستخدام أدوات برمجية متقدمة وتطبيقها في سيناريوهات معقدة"
+    },
+    {
+      "courseId": "135312",
+      "courseNameAr": "الخوارزميات",
+      "courseNameEn": "الخوارزميات",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "تراكيب البيانات",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تهدف مادة الخوارزميات إلى تعريف الطلاب بالأساليب الفعّالة لحل المشكلات البرمجية من خلال تصميم وتحليل الخوارزميات. تتناول المادة مواضيع مثل الفرز، البحث، خوارزميات التخصيص الديناميكي، وتقنيات تحسين الأداء. كما تركز على قياس كفاءة الخوارزميات من حيث الزمن والمساحة"
+    },
+    {
+      "courseId": "135321",
+      "courseNameAr": "البيانات الضخمة",
+      "courseNameEn": "البيانات الضخمة",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "قواعد البيانات",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات عائلة التخصص",
+      "subCategory": "متطلبات عائلة التخصص",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تركز مادة البيانات الضخمة على مفهوم البيانات الكبيرة وأهميتها في العصر الرقمي. يتعلم الطلاب كيفية جمع، تخزين، وتحليل كميات هائلة من البيانات باستخدام تقنيات وأدوات متقدمة مثل Hadoop وSpark. كما تغطي المادة استراتيجيات استخراج المعلومات القيمة من البيانات الضخمة وتطبيقاتها في مجالات متعددة مثل الأعمال، الرعاية الصحية، والعلوم الاجتماعية"
+    },
+    {
+      "courseId": "135222",
+      "courseNameAr": "مبادئ استرجاع المعلومات",
+      "courseNameEn": "مبادئ استرجاع المعلومات",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "أساسيات علم البيانات",
+      "studyYear": 2,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تهدف مادة مبادئ استرجاع المعلومات إلى تعريف الطلاب بالمفاهيم الأساسية لاسترجاع المعلومات وتطبيقاتها في نظم المعلومات. تتناول المادة تقنيات البحث في قواعد البيانات، خوارزميات تصنيف الوثائق، وتحليل استعلامات البحث. كما تركز على كيفية تحسين نتائج البحث وضمان دقة المعلومات المسترجعة"
+    },
+    {
+      "courseId": "135213",
+      "courseNameAr": "النماذج التحسينية",
+      "courseNameEn": "النماذج التحسينية",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "تطبيقات رياضية محوسبة",
+      "studyYear": 2,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تتناول مادة النماذج التحسينية دراسة الأساليب والتقنيات المستخدمة لتحسين الأداء والكفاءة في مختلف النظم. يركز المقرر على نماذج التحسين الرياضي، البرمجة الخطية، وخوارزميات البحث المختلفة مثل الخوارزميات الجينية. يتعلم الطلاب كيفية تطبيق هذه النماذج في حل المشكلات المعقدة في مجالات مثل إدارة الأعمال والهندسة والعلوم"
+    },
+    {
+      "courseId": "135214",
+      "courseNameAr": "الاحصاء والاحتمالات في الذكاء الاصطناعي",
+      "courseNameEn": "الاحصاء والاحتمالات في الذكاء الاصطناعي",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "تطبيقات رياضية محوسبة",
+      "studyYear": 2,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تهدف مادة الإحصاء والاحتمالات في الذكاء الاصطناعي إلى تزويد الطلاب بالمفاهيم الأساسية للإحصاء ونظرية الاحتمالات وكيفية تطبيقها في مجالات الذكاء الاصطناعي. تتناول المادة تقنيات تحليل البيانات، نماذج التوزيع الاحتمالي، واستخدام الإحصاءات الوصفية والاستدلالية. كما تركز على كيفية استخدام هذه المفاهيم لتحسين أداء الخوارزميات وتفسير النتائج في تطبيقات الذكاء الاصطناعي"
+    },
+    {
+      "courseId": "135323",
+      "courseNameAr": "تنقيب البيانات",
+      "courseNameEn": "تنقيب البيانات",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "التعلم الالي",
+      "studyYear": 3,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تهدف مادة تنقيب البيانات إلى تعريف الطلاب بالأساليب والتقنيات المستخدمة لاستخراج الأنماط والمعلومات القيمة من مجموعات البيانات الكبيرة. تتناول المادة خوارزميات التعلم الآلي، تحليل البيانات، وتقنيات التمثيل البصري للمعلومات. كما تركز على تطبيقات تنقيب البيانات في مجالات متنوعة مثل الأعمال، الرعاية الصحية، والعلوم الاجتماعية"
+    },
+    {
+      "courseId": "135341",
+      "courseNameAr": "الشبكات العصبونية و التعلم العميق",
+      "courseNameEn": "الشبكات العصبونية و التعلم العميق",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "التعلم الالي",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تهدف مادة الشبكات العصبونية والتعلم العميق إلى تعريف الطلاب بالمفاهيم الأساسية للشبكات العصبية الاصطناعية وكيفية استخدامها في مجالات الذكاء الاصطناعي. تتناول المادة بنية الشبكات العصبية، تقنيات التدريب، وأنواع الشبكات المختلفة مثل الشبكات التلافيفية والشبكات المتكررة. كما تركز على التطبيقات العملية للتعلم العميق في مجالات مثل معالجة الصور، ومعالجة اللغة الطبيعية"
+    },
+    {
+      "courseId": "135342",
+      "courseNameAr": "معالجة اللغات الطبيعية",
+      "courseNameEn": "معالجة اللغات الطبيعية",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "تنقيب البيانات",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تهدف مادة معالجة اللغات الطبيعية إلى تعريف الطلاب بالمفاهيم الأساسية والأساليب المستخدمة في تمكين الحواسيب من فهم ومعالجة اللغة البشرية. تتناول المادة تقنيات مثل تحليل النصوص، نمذجة اللغة، والتعرف على الكيانات، بالإضافة إلى استخدام أدوات التعلم الآلي لتحسين الأداء. كما تركز على التطبيقات العملية في مجالات مثل الترجمة الآلية، أنظمة الدردشة، وتحليل المشاعر"
+    },
+    {
+      "courseId": "135343",
+      "courseNameAr": "الروبوتات المتنقلة الذكية",
+      "courseNameEn": "الروبوتات المتنقلة الذكية",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "البيانات الضخمة",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تهدف مادة الروبوتات المتنقلة الذكية إلى تعريف الطلاب بمفاهيم تصميم وتطوير الروبوتات القادرة على الحركة والتفاعل مع البيئة المحيطة. تتناول المادة تقنيات مثل استشعار البيئة، التحكم الحركي، والتخطيط للمسار، بالإضافة إلى خوارزميات التعلم الآلي التي تساعد الروبوتات في اتخاذ القرارات. كما تركز على التطبيقات العملية في مجالات مثل الصناعة، الرعاية الصحية، والاستكشاف"
+    },
+    {
+      "courseId": "135324",
+      "courseNameAr": "البيانات المرئية",
+      "courseNameEn": "البيانات المرئية",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "أساسيات علم البيانات",
+      "studyYear": 3,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تركز مادة البيانات المرئية على تقنيات وأساليب تحويل البيانات إلى تمثيلات بصرية لفهم المعلومات بشكل أفضل. تتناول المادة أدوات الرسوم البيانية، الرسوم التوضيحية، والتصورات التفاعلية، وتعلم كيفية تصميم وتطوير المرئيات التي تسهل استكشاف البيانات وتفسير النتائج. كما تركز على تطبيقات البيانات المرئية في مجالات مثل الأعمال، العلوم، والصحافة"
+    },
+    {
+      "courseId": "135425",
+      "courseNameAr": "هندسة البيانات وتحليلاتها",
+      "courseNameEn": "هندسة البيانات وتحليلاتها",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "البيانات المرئية",
+      "studyYear": 4,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تهدف مادة هندسة البيانات وتحليلاتها إلى تعريف الطلاب بالمفاهيم الأساسية لهندسة البيانات وطرق تحليلها. تتناول المادة كيفية تصميم وبناء نظم تخزين البيانات، بالإضافة إلى تقنيات تحليل البيانات الضخمة واستخراج الرؤى منها. كما تركز على استخدام أدوات مثل SQL وPython وSpark لتحسين جودة البيانات وتحليلها، وتطبيقاتها في مجالات مثل الأعمال والتسويق والبحث العلمي"
+    },
+    {
+      "courseId": "135444",
+      "courseNameAr": "نماذج اللغات الضخمة وهندسة الاستعلام",
+      "courseNameEn": "نماذج اللغات الضخمة وهندسة الاستعلام",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "التعلم الالي",
+      "studyYear": 4,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تهدف مادة نماذج اللغات الضخمة وهندسة الاستعلام إلى تعريف الطلاب بالمفاهيم الأساسية لنماذج اللغة الطبيعية الكبيرة وكيفية هندسة استعلامات البيانات. تتناول المادة تقنيات مثل النماذج القائمة على الشبكات العصبية والتعلم العميق، بالإضافة إلى كيفية تصميم استعلامات فعالة للتفاعل مع قواعد البيانات الكبيرة. كما تركز على التطبيقات العملية لهذه النماذج في مجالات مثل معالجة اللغة الطبيعية، الترجمة الآلية، واسترجاع المعلومات"
+    },
+    {
+      "courseId": "135445",
+      "courseNameAr": "تطبيقات التعلم الالي والعميق (1)",
+      "courseNameEn": "تطبيقات التعلم الالي والعميق (1)",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "التعلم الالي",
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تهدف مادة تطبيقات التعلم الآلي والعميق (1) إلى تعريف الطلاب بكيفية استخدام تقنيات التعلم الآلي والتعلم العميق في حل المشكلات العملية. تتناول المادة تطبيقات مثل التصنيف، التنبؤ، وتحليل الصور، مع التركيز على تنفيذ نماذج التعلم العميق باستخدام أدوات مثل TensorFlow وKeras. كما تركز على دراسة حالات حقيقية من مجالات مختلفة، مثل الرعاية الصحية، التجارة، والسيارات ذاتية القيادة"
+    },
+    {
+      "courseId": "135491",
+      "courseNameAr": "التدريب الميداني",
+      "courseNameEn": "Field Training",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "استكمال 90 ساعة",
+      "studyYear": 4,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "135492",
+      "courseNameAr": "مشروع تخرج 1",
+      "courseNameEn": "مشروع تخرج 1",
+      "creditHours": 2,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "موافقة القسم",
+      "studyYear": 4,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "135493",
+      "courseNameAr": "مشروع تخرج 2",
+      "courseNameEn": "مشروع تخرج 2",
+      "creditHours": 2,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "مشروع تخرج 1",
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "Official curriculum course at ZUJ Faculty of Science & IT."
+    },
+    {
+      "courseId": "135494",
+      "courseNameAr": "مخيم الممارسات المهنية",
+      "courseNameEn": "مخيم الممارسات المهنية",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "موافقة القسم (90)\n+\nالريادة والتخطيط للمشاريع",
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاجبارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تهدف مادة مخيم الممارسات المهنية في مجال الذكاء الاصطناعي إلى تزويد الطلاب بتجربة عملية مكثفة في بيئات العمل الحقيقية المتعلقة بالذكاء الاصطناعي. يتضمن المخيم تطبيق المعارف والمهارات المكتسبة من خلال المشاركة في مشاريع حقيقية، والتفاعل مع محترفين في هذا المجال. يركز المخيم على تطوير المهارات التقنية والعملية، مثل تطوير خوارزميات التعلم الآلي، تحليل البيانات، وتصميم الأنظمة الذكية. كما يُشجع الطلاب على بناء شبكة علاقات مهنية تسهم في تعزيز فرصهم الوظيفية في المستقبل"
+    },
+    {
+      "courseId": "135304",
+      "courseNameAr": "أمن البيانات",
+      "courseNameEn": "أمن البيانات",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "اساسيات علم البيانات",
+      "studyYear": 3,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تقدم هذه المادة فهمًا عميقًا لمبادئ أمان البيانات، مع التركيز على حماية البيانات من الوصول غير المصرح به والانتهاكات والفساد. سيتعلم الطلاب تقنيات التشفير، وإخفاء البيانات، والتخزين الآمن، وطرق ضمان سرية البيانات وسلامتها وتوافرها. تشمل الموضوعات الرئيسية التحكم في الوصول، وتصنيف البيانات، والامتثال التنظيمي (مثل GDPR، HIPAA)، وإدارة المعلومات الحساسة. كما تغطي المادة استراتيجيات تقييم المخاطر والتخفيف منها لحماية البيانات عبر منصات وبيئات مختلفة. بنهاية المادة، سيكون لدى الطلاب المهارات اللازمة لتنفيذ تدابير أمان بيانات قوية في سياقات مؤسسية متنوعة"
+    },
+    {
+      "courseId": "135326",
+      "courseNameAr": "الرؤية الحاسوبية",
+      "courseNameEn": "الرؤية الحاسوبية",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "التعلم الالي",
+      "studyYear": 3,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تتناول هذه المادة المبادئ والتقنيات الأساسية للرؤية الحاسوبية، التي تهدف إلى تمكين الحواسيب من فهم وتحليل الصور والفيديوهات كما يفعل الإنسان. سيقوم الطلاب بدراسة خوارزميات معالجة الصور، واستخراج الملامح، والتعرف على الأشياء، واستخدام الشبكات العصبية العميقة في تطبيقات الرؤية الحاسوبية. تشمل الموضوعات أيضًا التعرف على الأنماط، وتطبيقات الرؤية الحاسوبية في مجالات مثل السيارات الذاتية القيادة، والروبوتات، والطب. بنهاية المادة، سيكون لدى الطلاب القدرة على تطوير حلول رؤية حاسوبية متقدمة وتحليل البيانات المرئية بشكل فعال"
+    },
+    {
+      "courseId": "135446",
+      "courseNameAr": "الروبوتات المتقدمة",
+      "courseNameEn": "الروبوتات المتقدمة",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "الروبوتات المتنقلة الذكية",
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تتناول هذه المادة المفاهيم والتقنيات المتقدمة في علم الروبوتات، حيث تغطي تصميم الروبوتات الذكية، والتحكم فيها، وبرمجتها. سيتعلم الطلاب كيفية دمج المستشعرات والمحركات ووحدات التحكم في الروبوتات، بالإضافة إلى موضوعات متقدمة مثل إدراك الروبوت، وتخطيط الحركة، واتخاذ القرارات بشكل مستقل. تشمل المادة أيضًا تطبيقات تعلم الآلة في الروبوتات، والتلاعب الروبوتي، والتطبيقات الواقعية في مجالات مثل التصنيع والرعاية الصحية والمركبات الذاتية القيادة. بنهاية المادة، سيكون لدى الطلاب القدرة على تصميم وبرمجة وتنفيذ أنظمة روبوتية متقدمة قادرة على أداء المهام المعقدة"
+    },
+    {
+      "courseId": "135315",
+      "courseNameAr": "نمذجة البيانات ومحاكاتها",
+      "courseNameEn": "نمذجة البيانات ومحاكاتها",
+      "creditHours": 3,
+      "lectureModality": "مدمج (وجاهي + إلكتروني)",
+      "modalityType": "blended",
+      "prerequisite": "تطبيقات رياضية محوسبة",
+      "studyYear": 3,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تتناول هذه المادة مبادئ وتقنيات نمذجة البيانات والمحاكاة، مع التركيز على إنشاء نماذج رياضية وحاسوبية لتمثيل الأنظمة المعقدة. سيتعلم الطلاب كيفية تصميم النماذج، ومحاكاة السيناريوهات الواقعية، وتحليل النتائج لدعم اتخاذ القرارات. تشمل الموضوعات الرئيسية المحاكاة بالأحداث المتقطعة، وأساليب مونت كارلو، وديناميكيات الأنظمة، والتحليل الإحصائي. كما تستكشف المادة استخدام أدوات وبرمجيات المحاكاة في مجالات متنوعة مثل الهندسة، والتمويل، والرعاية الصحية. بنهاية المادة، سيكون لدى الطلاب القدرة على تطوير وتطبيق نماذج لمحاكاة وتحليل المشكلات الواقعية بشكل فعال"
+    },
+    {
+      "courseId": "135327",
+      "courseNameAr": "تميز الانماط واستدلال المعرفة",
+      "courseNameEn": "تميز الانماط واستدلال المعرفة",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "أساسيات تكنولوجيا المعلومات",
+      "studyYear": 3,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تركز هذه المادة على المبادئ والأساليب المتعلقة بتمييز الأنماط واستدلال المعرفة، مما يمكّن الأنظمة من التعرف على الأنماط في البيانات واستنتاج المعلومات بذكاء. سيتعرف الطلاب على تقنيات التصنيف، والتجميع، واستخراج الميزات، وتقليل الأبعاد. كما تغطي المادة النماذج الإحصائية، وخوارزميات تعلم الآلة، والشبكات العصبية المستخدمة في تمييز الأنماط في البيانات المختلفة. تشمل التطبيقات مجالات مثل التعرف على الصور والكلام، ومعالجة اللغة الطبيعية، والتنقيب عن البيانات. بنهاية المادة، سيتمكن الطلاب من تصميم أنظمة لتمييز الأنماط واستنتاج المعرفة من مجموعات البيانات الكبيرة"
+    },
+    {
+      "courseId": "135495",
+      "courseNameAr": "مواضيع مختارة في الذكاء الاصطناعي (1)",
+      "courseNameEn": "مواضيع مختارة في الذكاء الاصطناعي (1)",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "موافقة القسم",
+      "studyYear": 4,
+      "studySemester": 1,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تغطي هذه المادة مواضيع متقدمة ومختارة في مجال الذكاء الاصطناعي، حيث يتم استكشاف أحدث التطورات والأبحاث في هذا المجال. يتم تحديد المواضيع حسب احتياجات السوق والتطورات التقنية الحديثة، وقد تشمل تعلم الآلة العميق، الذكاء الاصطناعي التوضيحي، الذكاء الاصطناعي في الروبوتات، ومعالجة اللغات الطبيعية. الهدف من المادة هو تزويد الطلاب بمهارات متقدمة لفهم وتطبيق أحدث التقنيات والأساليب في الذكاء الاصطناعي. بنهاية المادة، سيكون الطلاب قادرين على تطبيق المعرفة المكتسبة في حل مشكلات معقدة ومتقدمة في الذكاء الاصطناعي"
+    },
+    {
+      "courseId": "135496",
+      "courseNameAr": "مواضيع مختارة في الذكاء الاصطناعي (2)",
+      "courseNameEn": "مواضيع مختارة في الذكاء الاصطناعي (2)",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "موافقة القسم",
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تعد هذه المادة استكمالاً لموضوعات مختارة في الذكاء الاصطناعي (1)، حيث تركز على مواضيع أكثر تخصصًا وتعمقًا في تقنيات الذكاء الاصطناعي. يتم استعراض أحدث الأبحاث والمفاهيم المتعلقة بتطبيقات الذكاء الاصطناعي في مجالات متقدمة مثل الروبوتات التفاعلية، الذكاء الاصطناعي في الرعاية الصحية، النماذج اللغوية الضخمة، وأنظمة الذكاء الاصطناعي المعتمدة على السحابة. تهدف المادة إلى تعزيز قدرات الطلاب في حل المشكلات المعقدة وتطبيق الذكاء الاصطناعي في بيئات مختلفة. بنهاية المادة، سيكتسب الطلاب المعرفة المتقدمة لتنفيذ مشاريع مبتكرة في مجال الذكاء الاصطناعي"
+    },
+    {
+      "courseId": "135447",
+      "courseNameAr": "تطبيقات التعلم الالي والعميق (2)",
+      "courseNameEn": "تطبيقات التعلم الالي والعميق (2)",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "تطبيقات التعلم الالي والعميق\n(1)",
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تعد هذه المادة استكمالاً لدراسة تطبيقات التعلم الآلي والعميق، حيث تركز على تقنيات متقدمة في التعلم العميق والتعلم الآلي وتطبيقاتها العملية في مجالات مختلفة. تشمل المواضيع المتقدمة الشبكات العصبية التلافيفية (CNNs)، والشبكات العصبية المتكررة (RNNs)، والتعلم المعزز، بالإضافة إلى تطبيقات التعلم العميق في الرؤية الحاسوبية، معالجة اللغات الطبيعية، والروبوتات. تهدف المادة إلى تمكين الطلاب من استخدام خوارزميات وتقنيات التعلم العميق في حل مشكلات حقيقية ومعقدة. بنهاية المادة، سيكون لدى الطلاب القدرة على تنفيذ مشاريع عملية باستخدام نماذج تعلم الآلة والعميق المتقدمة"
+    },
+    {
+      "courseId": "135448",
+      "courseNameAr": "تطبيقات انترنت الاشياء",
+      "courseNameEn": "تطبيقات انترنت الاشياء",
+      "creditHours": 3,
+      "lectureModality": "وجاهي كامل",
+      "modalityType": "in_person",
+      "prerequisite": "الروبوتات المتنقلة الذكية",
+      "studyYear": 4,
+      "studySemester": 2,
+      "requirementCategory": "متطلبات التخصص",
+      "subCategory": "متطلبات التخصص الاختيارية",
+      "offeredInDepartments": [
+        "Artificial Intelligence"
+      ],
+      "description": "تركز هذه المادة على دراسة التطبيقات العملية لإنترنت الأشياء (IoT) وكيفية استخدامها لتحسين الكفاءة وجودة الحياة في مختلف المجالات. تشمل المواضيع تغطية مكونات نظام إنترنت الأشياء، بما في ذلك المستشعرات، والأجهزة، والاتصال، وتحليل البيانات. كما يتم استكشاف التطبيقات في مجالات مثل المدن الذكية، والزراعة الذكية، والرعاية الصحية، وإدارة الطاقة. تهدف المادة إلى تزويد الطلاب بالمعرفة اللازمة لتصميم وتطوير تطبيقات إنترنت الأشياء، مع التركيز على الأمان والخصوصية. بنهاية المادة، سيكون لدى الطلاب القدرة على تطوير مشاريع تتضمن تطبيقات إنترنت الأشياء وتحليل البيانات الناتجة منها"
+    }
+  ]
+}

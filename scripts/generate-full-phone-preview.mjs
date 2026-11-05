@@ -1,0 +1,1182 @@
+import fs from "fs";
+
+const targetPath = "C:/Users/abood/.gemini/antigravity/brain/8aa2adca-5a08-481d-adfc-6fc424d4db49/phone_preview.html";
+
+const content = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oliver - Authentic ZUJ Mobile Experience Simulator</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    .mobile-scroll::-webkit-scrollbar { width: 4px; }
+    .mobile-scroll::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.1); }
+    .mobile-scroll::-webkit-scrollbar-thumb { background: rgba(34, 197, 94, 0.35); border-radius: 4px; }
+    .mobile-scroll::-webkit-scrollbar-thumb:hover { background: rgba(34, 197, 94, 0.7); }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.03); }
+    }
+    .animate-glow { animation: pulseGlow 3.5s ease-in-out infinite; }
+    .zuj-card-shadow { box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4), 0 2px 6px -1px rgba(0, 0, 0, 0.25); }
+    .screen-view { animation: fadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-2 md:p-6 antialiased flex flex-col items-center justify-center font-sans selection:bg-emerald-500/30">
+
+  <!-- Top Simulator Control Bar -->
+  <header class="w-full max-w-5xl mb-4 bg-slate-900/90 border border-emerald-500/25 backdrop-blur-xl rounded-2xl p-3.5 shadow-2xl flex flex-col gap-3">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 via-green-700 to-emerald-900 flex items-center justify-center shadow-lg shadow-emerald-950/60 border border-emerald-400/30">
+          <span class="text-white font-black text-base">O</span>
+        </div>
+        <div>
+          <h1 class="text-sm md:text-base font-bold text-white flex items-center gap-2">
+            <span>Oliver Mobile Experience Simulator</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono font-semibold">ZUJ Portal & Elearning 2026</span>
+          </h1>
+          <p class="text-[11px] text-slate-400 flex items-center gap-2">
+            <span>Authentic 133 Cr Study Plan • Modalities: وجاهي، مدمج، إلكتروني • Anti-Cheat QR Attendance</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Persona & Role Switchers -->
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-white/10 text-xs">
+          <button onclick="setStudent('hanan')" id="btn-user-hanan" class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold transition-all flex items-center gap-1.5 shadow">
+            <span class="w-2 h-2 rounded-full bg-emerald-300"></span>
+            <span>Hanan (240002)</span>
+          </button>
+          <button onclick="setStudent('abood')" id="btn-user-abood" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition-all flex items-center gap-1.5">
+            <span>Abood (202212359)</span>
+          </button>
+        </div>
+
+        <div class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-white/10 text-xs">
+          <button onclick="setRole('student')" id="btn-role-student" class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold transition-all flex items-center gap-1">
+            <span>Student View</span>
+          </button>
+          <button onclick="setRole('doctor')" id="btn-role-doctor" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition-all flex items-center gap-1">
+            <span>Doctor View (د. أحمد خليل)</span>
+          </button>
+        </div>
+
+        <div class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-white/10 text-xs font-medium">
+          <button onclick="setDevice('iphone')" id="dev-btn-iphone" class="px-2 py-1 rounded-lg bg-emerald-600 text-white font-semibold transition-all">iPhone 15 Pro</button>
+          <button onclick="setDevice('samsung')" id="dev-btn-samsung" class="px-2 py-1 rounded-lg text-slate-400 hover:text-white transition-all">Galaxy S24</button>
+        </div>
+
+        <button onclick="toggleLanguage()" id="lang-toggle-btn" class="min-h-[34px] flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-slate-800 text-slate-200 hover:bg-slate-700 border border-white/10 transition-colors active:scale-95">
+          <span id="lang-label">العربية (RTL)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Top Switcher Buttons matching hotkeys & core screens -->
+    <div class="flex items-center gap-1.5 bg-slate-950/90 p-1.5 rounded-xl border border-white/10 overflow-x-auto max-w-full">
+      <button onclick="switchScreen('dashboard')" id="btn-dashboard" class="screen-btn min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white shadow flex items-center gap-1.5 active:scale-95">
+        <span>Dashboard</span>
+      </button>
+      <button onclick="switchScreen('schedule')" id="btn-schedule" class="screen-btn min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:text-white hover:bg-white/5 flex items-center gap-1.5 active:scale-95">
+        <span>Schedule</span>
+      </button>
+      <button onclick="switchScreen('chat')" id="btn-chat" class="screen-btn min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:text-white hover:bg-white/5 flex items-center gap-1.5 active:scale-95">
+        <span class="text-emerald-400 font-bold">Oliver AI</span>
+      </button>
+      <button onclick="switchScreen('assignments')" id="btn-assignments" class="screen-btn min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:text-white hover:bg-white/5 flex items-center gap-1.5 active:scale-95">
+        <span>Assignments</span>
+        <span class="text-[10px] bg-rose-500/30 text-rose-300 px-1.5 rounded-full font-mono font-bold">4</span>
+      </button>
+      <button onclick="switchScreen('attendance')" id="btn-attendance" class="screen-btn min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:text-white hover:bg-white/5 flex items-center gap-1.5 active:scale-95">
+        <span class="text-blue-400 font-bold">Attendence (QR)</span>
+      </button>
+      <button onclick="switchScreen('zuj-portal')" id="btn-zuj-portal" class="screen-btn min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:text-white hover:bg-white/5 flex items-center gap-1.5 active:scale-95">
+        <span>ZUJ Portal</span>
+      </button>
+      <button onclick="switchScreen('curriculums')" id="btn-curriculums" class="screen-btn min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:text-white hover:bg-white/5 flex items-center gap-1.5 active:scale-95">
+        <span>Curriculums</span>
+      </button>
+      <button onclick="switchScreen('map')" id="btn-map" class="screen-btn min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:text-white hover:bg-white/5 flex items-center gap-1.5 active:scale-95">
+        <span>Campus Nav</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Phone Outer Chassis -->
+  <main id="phone-chassis" class="relative w-[392px] h-[835px] max-w-full rounded-[50px] p-3.5 bg-gradient-to-b from-[#242b25] via-[#161d18] to-[#0c120e] shadow-[0_25px_80px_rgba(0,0,0,0.9),0_0_50px_rgba(34,197,94,0.18)] border-4 border-[#3a493c] transition-all duration-300 flex flex-col overflow-hidden">
+    
+    <div id="phone-screen" dir="ltr" class="relative w-full h-full rounded-[42px] bg-[#05110a] overflow-hidden flex flex-col border border-white/10 shadow-inner">
+
+      <!-- Dynamic Top Bar -->
+      <div id="status-bar" class="relative z-50 h-11 w-full pt-3 px-6 flex items-center justify-between text-white text-xs select-none">
+        <span class="font-semibold text-[13px] tracking-tight">9:41</span>
+        <div id="dynamic-island" class="absolute left-1/2 -translate-x-1/2 top-2.5 h-6 w-32 bg-black rounded-full flex items-center justify-between px-3 border border-white/10 shadow-sm transition-all duration-300">
+          <div class="w-2.5 h-2.5 rounded-full bg-slate-900 border border-slate-800"></div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span id="island-badge" class="text-[9px] text-emerald-400 font-mono font-bold">Hanan • ZUJ</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-white/90">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 18.25A10.93 10.93 0 012 12C2 6.48 6.48 2 12 2s10 4.48 10 10c0 2.32-.78 4.46-2.1 6.18l-.62-.62A8.96 8.96 0 0021 12c0-4.97-4.03-9-9-9z"/></svg>
+          <div class="w-5 h-2.5 rounded-xs border border-white/70 p-0.5 flex items-center"><div class="h-full w-full bg-emerald-400 rounded-2xs"></div></div>
+        </div>
+      </div>
+
+      <!-- Scrollable Main Mobile Viewport -->
+      <div id="viewport-content" class="mobile-scroll flex-1 overflow-y-auto px-4 pb-20 pt-1 text-slate-100">
+
+        <!-- ============================================== -->
+        <!-- HOTKEY 1: DASHBOARD (NOT Student Dashboard)    -->
+        <!-- ============================================== -->
+        <section id="screen-dashboard" class="screen-view space-y-3.5">
+          <div class="flex items-center justify-between pt-1">
+            <div class="flex items-center gap-3">
+              <div class="relative">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 via-green-600 to-amber-500 p-0.5 shadow-md">
+                  <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center font-bold text-sm text-emerald-300">
+                    <span id="hub-avatar-initials">HA</span>
+                  </div>
+                </div>
+                <span class="absolute -bottom-0.5 -end-0.5 w-3 h-3 bg-emerald-500 border-2 border-[#05110a] rounded-full"></span>
+              </div>
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <h3 id="hub-student-name" class="text-sm font-extrabold text-white">Hanan (حنان)</h3>
+                  <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.2 rounded-full border border-emerald-500/30 font-bold">Dashboard</span>
+                </div>
+                <p class="text-[10px] text-slate-400 font-mono">
+                  <span>ID:</span> <span id="hub-student-id" class="text-emerald-400 font-bold">240002</span> • <span id="hub-student-dept">Software Eng</span>
+                </p>
+              </div>
+            </div>
+
+            <button onclick="switchScreen('attendance')" class="min-h-[34px] text-[10px] font-semibold px-2.5 py-1 rounded-xl bg-blue-600/20 border border-blue-500/40 text-blue-300 flex items-center gap-1 active:scale-95">
+              <span>QR Attend</span>
+            </button>
+          </div>
+
+          <!-- Academic & Advisor Banner -->
+          <div class="p-3 rounded-2xl bg-gradient-to-br from-emerald-950/70 via-slate-900/90 to-slate-900/90 border border-emerald-500/30 zuj-card-shadow flex items-center justify-between">
+            <div class="space-y-0.5">
+              <span class="text-[10px] text-emerald-300 font-medium">Academic Advisor (المرشد الأكاديمي)</span>
+              <h4 class="text-xs font-extrabold text-white">Dr. Ahmad Khalil (د. أحمد خليل)</h4>
+              <p class="text-[10px] text-slate-400">Software Engineering Department</p>
+            </div>
+            <button onclick="switchScreen('chat')" class="px-2.5 py-1 rounded-xl bg-emerald-600 text-white text-[10px] font-bold active:scale-95">
+              Contact
+            </button>
+          </div>
+
+          <!-- Stat Cards -->
+          <div class="grid grid-cols-2 gap-2.5">
+            <div class="p-3 rounded-2xl bg-slate-900/90 border border-emerald-500/25 zuj-card-shadow">
+              <span class="text-[10px] text-emerald-300 font-medium">Cumulative GPA</span>
+              <p class="text-lg font-black text-emerald-400 font-mono mt-0.5">89.2%</p>
+              <p class="text-[9px] text-slate-300">3.78 / 4.00 • Excellent (ممتاز)</p>
+            </div>
+            <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/10 zuj-card-shadow">
+              <span class="text-[10px] text-slate-400 font-medium">Class Attendance</span>
+              <p class="text-lg font-black text-white font-mono mt-0.5">92.5%</p>
+              <p class="text-[9px] text-emerald-400">Article 14 Safe (0/4 Absences)</p>
+            </div>
+          </div>
+
+          <!-- Next Lecture with Modality Badge -->
+          <div onclick="switchScreen('attendance')" class="p-3.5 rounded-2xl bg-slate-900/90 border border-emerald-500/25 zuj-card-shadow space-y-2 cursor-pointer hover:border-emerald-500/50">
+            <div class="flex items-center justify-between border-b border-white/5 pb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wide">Next Class • Tuesday 11:30</span>
+              </div>
+              <span class="text-[9px] font-mono bg-emerald-500/15 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30 font-semibold">
+                CS201 • Room 41
+              </span>
+            </div>
+            <div>
+              <h4 class="text-xs font-extrabold text-white">CS201 Data Structures (تراكيب البيانات)</h4>
+              <p class="text-[11px] text-slate-300 mt-0.5">Dr. Ahmad Khalil • Hall 41</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 text-[10px]">
+              <span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">
+                🏛️ وجاهي كامل (In-Person)
+              </span>
+              <span class="px-2 py-0.5 rounded-md bg-white/5 text-slate-300 font-mono">
+                3 Credit Hours
+              </span>
+              <span class="px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-300 font-mono">
+                QR Ready
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- HOTKEY 2: SCHEDULE (4-DAY TIMETABLE)           -->
+        <!-- ============================================== -->
+        <section id="screen-schedule" class="screen-view hidden space-y-3.5">
+          <div class="flex items-center justify-between pb-2 border-b border-white/10">
+            <div>
+              <h4 class="text-xs font-bold text-white">Student Timetable (الجدول الدراسي)</h4>
+              <p class="text-[10px] text-emerald-400 font-semibold">Hanan (240002) • 4-Day Academic Week</p>
+            </div>
+            <div class="text-[10px] font-mono bg-emerald-500/15 text-emerald-300 px-2 py-0.5 rounded-lg border border-emerald-500/30">
+              2026/2027-1
+            </div>
+          </div>
+
+          <!-- Modality Legend Strip -->
+          <div class="grid grid-cols-3 gap-1.5 text-[9px] text-center font-medium">
+            <span class="py-1 px-1 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-bold">
+              🌿 مدمج (Blended)
+            </span>
+            <span class="py-1 px-1 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold">
+              🏛️ وجاهي (In-Person)
+            </span>
+            <span class="py-1 px-1 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 font-bold">
+              💻 إلكتروني (Online)
+            </span>
+          </div>
+
+          <!-- Sunday -->
+          <div class="space-y-1.5">
+            <span class="text-xs font-bold text-white flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+              <span>Sunday (الأحد)</span>
+            </span>
+            <div class="p-3 rounded-xl bg-slate-900/80 border-s-4 border-s-amber-500 border border-white/5 space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white font-mono bg-amber-500/20 text-amber-300 px-1.5 py-0.2 rounded">ENG102</span>
+                <span class="text-[9px] font-bold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full">🌿 مدمج (Blended) • 3 Cr</span>
+              </div>
+              <h5 class="text-xs font-bold text-white">ENG102 Technical Writing (الكتابة الفنية)</h5>
+              <p class="text-[10px] text-slate-300 font-mono">[ 11:30_12:20 ] Sunday • Hall 39 • Dr. Sara Mahmoud</p>
+            </div>
+          </div>
+
+          <!-- Tuesday -->
+          <div class="space-y-1.5">
+            <span class="text-xs font-bold text-white flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+              <span>Tuesday (الثلاثاء)</span>
+            </span>
+            <div class="p-3 rounded-xl bg-slate-900/80 border-s-4 border-s-emerald-500 border border-white/5 space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white font-mono bg-emerald-500/20 text-emerald-300 px-1.5 py-0.2 rounded">CS201</span>
+                <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded-full">🏛️ وجاهي كامل • 3 Cr</span>
+              </div>
+              <h5 class="text-xs font-bold text-white">CS201 Data Structures (تراكيب البيانات)</h5>
+              <p class="text-[10px] text-slate-300 font-mono">[ 11:30_12:20 ] Tuesday • Hall 41 • Dr. Ahmad Khalil</p>
+            </div>
+          </div>
+
+          <!-- Wednesday -->
+          <div class="space-y-1.5">
+            <span class="text-xs font-bold text-white flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
+              <span>Wednesday (الأربعاء)</span>
+            </span>
+            <div class="p-3 rounded-xl bg-slate-900/80 border-s-4 border-s-blue-500 border border-white/5 space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white font-mono bg-blue-500/20 text-blue-300 px-1.5 py-0.2 rounded">CS202</span>
+                <span class="text-[9px] font-bold text-blue-300 bg-blue-500/15 px-2 py-0.5 rounded-full">🏛️ وجاهي كامل • 3 Cr</span>
+              </div>
+              <h5 class="text-xs font-bold text-white">CS202 OOP (البرمجة كائنية التوجه)</h5>
+              <p class="text-[10px] text-slate-300 font-mono">[ 08:30_09:45 ] Wednesday • Hall 42 • Dr. Ahmad Khalil</p>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900/80 border-s-4 border-s-rose-500 border border-white/5 space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white font-mono bg-rose-500/20 text-rose-300 px-1.5 py-0.2 rounded">PHYS102</span>
+                <span class="text-[9px] font-bold text-rose-300 bg-rose-500/15 px-2 py-0.5 rounded-full">🏛️ وجاهي كامل • 3 Cr</span>
+              </div>
+              <h5 class="text-xs font-bold text-white">PHYS102 General Physics II (الفيزياء العامة 2)</h5>
+              <p class="text-[10px] text-slate-300 font-mono">[ 13:00_14:15 ] Wednesday • Hall 40 • Dr. Omar Hassan</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- HOTKEY 3: OLIVER AI COPILOT                    -->
+        <!-- ============================================== -->
+        <section id="screen-chat" class="screen-view hidden flex flex-col h-full space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-white/10">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-300 font-bold text-xs">
+                AI
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-white">Oliver AI Academic Copilot</h4>
+                <p class="text-[10px] text-slate-400">125 ZUJ Courses & Bylaws Knowledge Base</p>
+              </div>
+            </div>
+            <span class="text-[9px] font-mono text-emerald-400 bg-white/5 px-2 py-0.5 rounded">133 Cr Synced</span>
+          </div>
+
+          <div id="chat-messages-container" class="space-y-3 py-1 text-xs max-h-[440px] overflow-y-auto mobile-scroll">
+            <div class="flex justify-end">
+              <div class="max-w-[85%] rounded-2xl rounded-tr-xs bg-emerald-600 text-white px-3.5 py-2.5 shadow-md">
+                How does classroom attendance and Article 14 absence limit work?
+              </div>
+            </div>
+            <div class="flex justify-start">
+              <div class="max-w-[88%] rounded-2xl rounded-tl-xs bg-slate-900/90 border border-emerald-500/25 px-3.5 py-2.5 text-slate-100 shadow-md space-y-1.5">
+                <p class="leading-relaxed">
+                  Hi Hanan! Under <strong>ZUJ Article 14</strong>, the maximum absence allowed in any 3-credit course is <strong>15% (4 lectures)</strong>.
+                </p>
+                <div class="p-2 rounded-lg bg-blue-950/40 border border-blue-500/30 text-[11px] space-y-1 text-blue-200">
+                  <p class="font-bold">📱 Anti-Cheat QR Check-In:</p>
+                  <p>In class, your doctor displays a dynamic QR code that refreshes every 8 seconds. When you scan it in the <strong>Attendence</strong> tab, Oliver verifies your classroom location and logs your attendance instantly!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            <button onclick="handlePromptChip('What is the difference between In-Person, Blended, and Online?')" class="min-h-[30px] px-2.5 py-1 rounded-full bg-white/5 text-slate-300 text-[10px] border border-white/10 active:scale-95">
+              🌿 Modalities Explained (وجاهي، مدمج)
+            </button>
+            <button onclick="handlePromptChip('How does the dynamic rolling QR stop photo forwarding?')" class="min-h-[30px] px-2.5 py-1 rounded-full bg-white/5 text-slate-300 text-[10px] border border-white/10 active:scale-95">
+              🛡️ Anti-Cheat 8s TOTP
+            </button>
+          </div>
+
+          <div class="mt-auto pt-2">
+            <form onsubmit="handleChatSubmit(event)" class="relative flex items-center">
+              <input id="chat-input" type="text" placeholder="Ask Oliver about courses, attendance, or bylaws..." class="w-full bg-slate-900/90 border border-slate-700/80 rounded-2xl py-2.5 ps-3.5 pe-11 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 shadow-inner">
+              <button type="submit" class="min-h-[36px] min-w-[36px] absolute end-1.5 w-8 h-8 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs hover:bg-emerald-400 active:scale-95">
+                ➔
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- HOTKEY 4: ASSIGNMENTS (4 TASKS & LATE SYSTEM)  -->
+        <!-- ============================================== -->
+        <section id="screen-assignments" class="screen-view hidden space-y-3.5">
+          <div class="flex items-center justify-between pb-1 border-b border-white/10">
+            <div>
+              <div class="flex items-center gap-1.5">
+                <h3 class="text-sm font-extrabold text-white">Course Assignments</h3>
+                <span id="role-tag-badge" class="text-[9px] px-2 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold font-mono">Student: Hanan</span>
+              </div>
+              <p class="text-[10px] text-slate-400">Doctor assignments with late submission enabled</p>
+            </div>
+            <button onclick="switchScreen('schedule')" class="text-[10px] font-semibold px-2 py-1 rounded-xl bg-white/5 border border-white/10 text-slate-300">
+              Schedule
+            </button>
+          </div>
+
+          <!-- Filter Tabs -->
+          <div class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-white/10 overflow-x-auto text-[11px] font-semibold">
+            <button onclick="filterAssignments('all')" id="tab-asgn-all" class="asgn-tab-btn flex-1 py-1 rounded-lg bg-emerald-600 text-white text-center shadow">All (4)</button>
+            <button onclick="filterAssignments('pending')" id="tab-asgn-pending" class="asgn-tab-btn flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center">Pending</button>
+            <button onclick="filterAssignments('submitted')" id="tab-asgn-submitted" class="asgn-tab-btn flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center">Submitted</button>
+            <button onclick="filterAssignments('graded')" id="tab-asgn-graded" class="asgn-tab-btn flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center">Graded</button>
+            <button onclick="filterAssignments('overdue')" id="tab-asgn-overdue" class="asgn-tab-btn flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center text-rose-400 font-bold">Overdue</button>
+          </div>
+
+          <div id="assignments-cards-container" class="space-y-3">
+            <!-- Rendered by renderAssignments() -->
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- HOTKEY 5: ATTENDENCE (PER-COURSE & ANTI-CHEAT) -->
+        <!-- ============================================== -->
+        <section id="screen-attendance" class="screen-view hidden space-y-3.5">
+          <div class="flex items-center justify-between pb-1 border-b border-white/10">
+            <div>
+              <div class="flex items-center gap-1.5">
+                <h3 class="text-sm font-extrabold text-white">Classroom Attendance</h3>
+                <span class="text-[9px] px-2 py-0.2 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 font-bold font-mono">Anti-Cheat QR</span>
+              </div>
+              <p class="text-[10px] text-slate-400">Attendance per course & Article 14 tracker</p>
+            </div>
+            
+            <button onclick="openPhoneScanner()" class="min-h-[32px] px-2.5 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold shadow flex items-center gap-1 active:scale-95">
+              <span>Scan QR</span>
+            </button>
+          </div>
+
+          <!-- Doctor Mode Banner in Attendance -->
+          <div id="att-doctor-banner" class="hidden p-3 rounded-2xl bg-blue-950/70 border border-blue-500/40 text-xs text-blue-200 flex items-center justify-between">
+            <div>
+              <p class="font-bold text-white">Doctor Mode: Classroom Screen</p>
+              <p class="text-[10px] text-slate-300">Generate dynamic 8s rolling QR for students</p>
+            </div>
+            <button onclick="openDoctorQrProjector()" class="px-2.5 py-1 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold shadow">
+              Open QR
+            </button>
+          </div>
+
+          <!-- Attendance Rate Summary -->
+          <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-emerald-500/25 zuj-card-shadow flex items-center justify-between">
+            <div>
+              <span class="text-[10px] text-slate-400">Total Semester Attendance</span>
+              <p class="text-xl font-black text-emerald-400 font-mono mt-0.5">92.5%</p>
+              <p class="text-[10px] text-slate-300">74 of 80 Lectures Attended</p>
+            </div>
+            <div class="text-end">
+              <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 font-bold">
+                Article 14: Safe
+              </span>
+              <p class="text-[9px] text-slate-400 mt-1">Absence Limit: 4 Max</p>
+            </div>
+          </div>
+
+          <!-- Per-Course Attendance Cards (4 Registered Courses) -->
+          <div class="space-y-2.5">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Per-Course Attendance (4)</p>
+
+            <!-- Course 1: CS201 -->
+            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-emerald-500/30 zuj-card-shadow space-y-2">
+              <div class="flex items-start justify-between">
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded font-bold">CS201</span>
+                    <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-bold">🏛️ وجاهي كامل</span>
+                    <span class="text-[9px] bg-slate-800 text-slate-300 px-1.5 rounded">3 Cr • Hall 41</span>
+                  </div>
+                  <h4 class="text-xs font-bold text-white mt-1">CS201 Data Structures (تراكيب البيانات)</h4>
+                  <p class="text-[10px] text-slate-400">Dr. Ahmad Khalil • Tuesday 11:30</p>
+                </div>
+                <span class="text-base font-black text-emerald-400 font-mono">95%</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                <div class="h-full bg-emerald-500 rounded-full w-[95%]"></div>
+              </div>
+              <div class="flex justify-between text-[10px] text-slate-300 pt-0.5">
+                <span>✓ 19 Present • 0 Absent • 1 Late</span>
+                <span class="text-emerald-400 font-bold">Safe (0/4 Absences)</span>
+              </div>
+            </div>
+
+            <!-- Course 2: CS202 -->
+            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-white/10 zuj-card-shadow space-y-2">
+              <div class="flex items-start justify-between">
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-mono text-blue-400 bg-blue-500/10 px-1.5 py-0.2 rounded font-bold">CS202</span>
+                    <span class="text-[9px] px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-300 font-bold">🏛️ وجاهي كامل</span>
+                    <span class="text-[9px] bg-slate-800 text-slate-300 px-1.5 rounded">3 Cr • Hall 42</span>
+                  </div>
+                  <h4 class="text-xs font-bold text-white mt-1">CS202 OOP (البرمجة كائنية التوجه)</h4>
+                  <p class="text-[10px] text-slate-400">Dr. Ahmad Khalil • Wednesday 08:30</p>
+                </div>
+                <span class="text-base font-black text-emerald-400 font-mono">100%</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                <div class="h-full bg-emerald-500 rounded-full w-full"></div>
+              </div>
+              <div class="flex justify-between text-[10px] text-slate-300 pt-0.5">
+                <span>✓ 20 Present • 0 Absent • 0 Late</span>
+                <span class="text-emerald-400 font-bold">Safe (0/4 Absences)</span>
+              </div>
+            </div>
+
+            <!-- Course 3: ENG102 -->
+            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-white/10 zuj-card-shadow space-y-2">
+              <div class="flex items-start justify-between">
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-mono text-amber-400 bg-amber-500/10 px-1.5 py-0.2 rounded font-bold">ENG102</span>
+                    <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-bold">🌿 مدمج (Blended)</span>
+                    <span class="text-[9px] bg-slate-800 text-slate-300 px-1.5 rounded">3 Cr • Hall 39</span>
+                  </div>
+                  <h4 class="text-xs font-bold text-white mt-1">ENG102 Technical Writing (الكتابة الفنية)</h4>
+                  <p class="text-[10px] text-slate-400">Dr. Sara Mahmoud • Sunday 11:30</p>
+                </div>
+                <span class="text-base font-black text-amber-400 font-mono">90%</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                <div class="h-full bg-amber-500 rounded-full w-[90%]"></div>
+              </div>
+              <div class="flex justify-between text-[10px] text-slate-300 pt-0.5">
+                <span>✓ 18 Present • 0 Absent • 2 Late</span>
+                <span class="text-emerald-400 font-bold">Safe (0/4 Absences)</span>
+              </div>
+            </div>
+
+            <!-- Course 4: PHYS102 -->
+            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-rose-500/30 zuj-card-shadow space-y-2">
+              <div class="flex items-start justify-between">
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-mono text-rose-400 bg-rose-500/10 px-1.5 py-0.2 rounded font-bold">PHYS102</span>
+                    <span class="text-[9px] px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 font-bold">🏛️ وجاهي كامل</span>
+                    <span class="text-[9px] bg-slate-800 text-slate-300 px-1.5 rounded">3 Cr • Hall 40</span>
+                  </div>
+                  <h4 class="text-xs font-bold text-white mt-1">PHYS102 General Physics II (الفيزياء العامة 2)</h4>
+                  <p class="text-[10px] text-slate-400">Dr. Omar Hassan • Wednesday 13:00</p>
+                </div>
+                <span class="text-base font-black text-rose-400 font-mono">85%</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                <div class="h-full bg-rose-500 rounded-full w-[85%]"></div>
+              </div>
+              <div class="flex justify-between text-[10px] text-slate-300 pt-0.5">
+                <span>✓ 17 Present • 3 Absent</span>
+                <span class="text-rose-400 font-bold animate-pulse">⚠️ Warning (3/4 Absences)</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- OTHER SCREENS: PORTAL, CURRICULUMS, MAP        -->
+        <!-- ============================================== -->
+        <section id="screen-zuj-portal" class="screen-view hidden space-y-3.5">
+          <div class="flex items-center justify-between pb-2 border-b border-white/10">
+            <h4 class="text-xs font-bold text-white">ZUJ Student Portal App</h4>
+            <span class="text-[10px] font-mono text-emerald-400">2026/2027-1</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="p-3 rounded-xl bg-slate-900 border border-emerald-500/30">
+              <p class="text-[9px] text-emerald-400">Cumulative GPA</p>
+              <p class="text-sm font-black text-emerald-400 font-mono">89.2%</p>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900 border border-white/10">
+              <p class="text-[9px] text-slate-400">Registered Credits</p>
+              <p class="text-sm font-bold text-white font-mono">12 Cr (4 Courses)</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="screen-curriculums" class="screen-view hidden space-y-3.5">
+          <div class="flex items-center justify-between pb-2 border-b border-white/10">
+            <h4 class="text-xs font-bold text-white">Study Plan (الخطة الدراسية)</h4>
+            <span class="text-[10px] font-mono text-emerald-400">48 / 133 Cr</span>
+          </div>
+          <div class="p-3 rounded-2xl bg-slate-900/90 border border-emerald-500/20">
+            <div class="flex justify-between text-xs mb-1.5">
+              <span class="text-slate-300 font-medium">Overall Plan Completion</span>
+              <span class="text-emerald-400 font-bold font-mono">36.1%</span>
+            </div>
+            <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-emerald-500 to-amber-400 rounded-full w-[36.1%]"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="screen-map" class="screen-view hidden space-y-3.5">
+          <div class="flex items-center justify-between pb-2 border-b border-white/10">
+            <h4 class="text-xs font-bold text-white">Campus Wayfinding</h4>
+            <span class="text-[10px] font-mono text-emerald-400">Hall 41</span>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-950/70 to-slate-900/90 border border-emerald-500/30">
+            <span class="text-[10px] font-bold text-emerald-400">Live Route to CS201</span>
+            <h5 class="text-xs font-bold text-white mt-0.5">Main Gate ➔ IT Faculty (Hall 41)</h5>
+            <p class="text-[11px] text-slate-300 mt-0.5">3 min walk • 1st Floor</p>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ============================================== -->
+      <!-- BOTTOM HOTKEYS (EXACT 5 REQUIRED BUTTONS)      -->
+      <!-- 'Dashboard', 'Schedule', 'Oliver AI',          -->
+      <!-- 'Assignments', 'Attendence'                    -->
+      <!-- ============================================== -->
+      <nav class="absolute bottom-0 inset-x-0 h-16 bg-slate-950/95 border-t border-emerald-500/15 backdrop-blur-xl px-2 flex items-center justify-around text-[10px] text-slate-400 z-40 select-none">
+        
+        <!-- 1. Dashboard (NOT Student Dashboard) -->
+        <button onclick="switchScreen('dashboard')" id="nav-btn-dashboard" class="min-h-[48px] min-w-[48px] flex flex-col items-center justify-center gap-1 text-emerald-400 transition-transform active:scale-90">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          <span class="font-bold text-[9px]">Dashboard</span>
+        </button>
+
+        <!-- 2. Schedule -->
+        <button onclick="switchScreen('schedule')" id="nav-btn-schedule" class="min-h-[48px] min-w-[48px] flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-white transition-transform active:scale-90">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          <span class="font-medium text-[9px]">Schedule</span>
+        </button>
+
+        <!-- 3. Oliver AI (Center Prominent) -->
+        <button onclick="switchScreen('chat')" id="nav-btn-chat" class="min-h-[48px] min-w-[48px] flex flex-col items-center justify-center -mt-5 transition-transform active:scale-90">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 via-green-600 to-emerald-400 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-emerald-500/40 border-2 border-slate-950">
+            <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+          </div>
+          <span class="text-[9px] font-bold text-emerald-400 mt-0.5">Oliver AI</span>
+        </button>
+
+        <!-- 4. Assignments -->
+        <button onclick="switchScreen('assignments')" id="nav-btn-assignments" class="min-h-[48px] min-w-[48px] flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-white transition-transform active:scale-90">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+          <span class="font-medium text-[9px]">Assignments</span>
+        </button>
+
+        <!-- 5. Attendence -->
+        <button onclick="switchScreen('attendance')" id="nav-btn-attendance" class="min-h-[48px] min-w-[48px] flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-white transition-transform active:scale-90">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><rect x="7" y="7" width="10" height="10" rx="1"></rect></svg>
+          <span class="font-medium text-[9px]">Attendence</span>
+        </button>
+      </nav>
+
+      <!-- MODALS: Scanner Drawer, Doctor Projector Drawer, Assignment Submit, Grade -->
+      <!-- 1. Mobile QR Scanner Drawer -->
+      <div id="phone-scanner-modal" class="hidden absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col justify-end p-2">
+        <div class="bg-slate-900 border border-emerald-500/40 rounded-3xl p-4 space-y-3">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+              <span>Scan Classroom QR</span>
+            </h4>
+            <button onclick="closePhoneScanner()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-300">✕</button>
+          </div>
+          <div class="relative h-44 rounded-2xl bg-black border border-emerald-500/50 flex flex-col items-center justify-center overflow-hidden">
+            <div id="phone-scanner-content" class="text-center p-3 space-y-1">
+              <div class="w-10 h-10 mx-auto rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg">📷</div>
+              <p class="text-[11px] text-white font-bold">Scanning Classroom Projector</p>
+              <p class="text-[9px] text-slate-400">Checking 8-second dynamic token...</p>
+            </div>
+          </div>
+          <div class="p-2 rounded-xl bg-slate-950 border border-white/5 text-[10px] space-y-0.5 text-slate-300">
+            <p>📍 Location: <strong>Hall 41 (Verified inside room)</strong></p>
+            <p>📱 Security: <strong>Single Device Lock Active</strong></p>
+          </div>
+          <button onclick="confirmMobileAttendance()" class="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs active:scale-95 shadow">
+            Confirm & Log Attendance
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. Doctor Projector QR Modal -->
+      <div id="phone-doctor-qr-modal" class="hidden absolute inset-0 z-50 bg-black/85 backdrop-blur-sm flex flex-col justify-end p-2">
+        <div class="bg-slate-900 border border-blue-500/40 rounded-3xl p-4 space-y-3 max-h-[90%] overflow-y-auto">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <div>
+              <span class="text-[9px] font-mono text-blue-400 font-bold">CS201 • Hall 41</span>
+              <h4 class="text-xs font-bold text-white">Classroom Dynamic QR Code</h4>
+            </div>
+            <button onclick="closeDoctorQrProjector()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-300">✕</button>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-950 border border-blue-500/30 flex flex-col items-center space-y-2">
+            <div class="flex items-center gap-2">
+              <span id="phone-countdown-badge" class="font-mono text-xs font-bold text-blue-400 bg-blue-950 px-2 py-0.5 rounded">Expires in 8s</span>
+              <span class="text-[9px] text-emerald-400">🛡️ Anti-Forward Active</span>
+            </div>
+            <!-- Simulated QR SVG -->
+            <div class="p-3 bg-white rounded-xl">
+              <svg class="w-36 h-36" viewBox="0 0 100 100" fill="none">
+                <rect width="100" height="100" fill="white" />
+                <rect x="5" y="5" width="24" height="24" fill="black" /><rect x="8" y="8" width="18" height="18" fill="white" /><rect x="11" y="11" width="12" height="12" fill="#0f172a" />
+                <rect x="71" y="5" width="24" height="24" fill="black" /><rect x="74" y="8" width="18" height="18" fill="white" /><rect x="77" y="11" width="12" height="12" fill="#0f172a" />
+                <rect x="5" y="71" width="24" height="24" fill="black" /><rect x="8" y="74" width="18" height="18" fill="white" /><rect x="11" y="77" width="12" height="12" fill="#0f172a" />
+                <rect x="36" y="14" width="12" height="12" fill="#10b981" /><rect x="52" y="36" width="16" height="16" fill="#0f172a" /><rect x="36" y="54" width="12" height="12" fill="#10b981" />
+                <rect x="42" y="42" width="16" height="16" rx="3" fill="#0f172a" /><text x="50" y="52" fill="#10b981" fontSize="6" fontWeight="bold" textAnchor="middle">ZUJ</text>
+              </svg>
+            </div>
+            <span id="phone-totp-display" class="font-mono text-[10px] text-slate-300">TOTP: 9B7F2A1C</span>
+          </div>
+          <!-- Attendee stream -->
+          <div class="p-2.5 rounded-xl bg-black/40 border border-white/5 space-y-1 text-[10px]">
+            <div class="flex justify-between font-bold text-emerald-400">
+              <span>Live Attendees:</span>
+              <span>24 / 28 Present</span>
+            </div>
+            <p class="text-slate-300">• Hanan (240002) - 11:32:05 AM [Verified]</p>
+            <p class="text-slate-400">• Ahmad Zaid (240019) - 11:31:58 AM [Verified]</p>
+          </div>
+          <button onclick="closeDoctorQrProjector()" class="w-full py-2 rounded-xl bg-slate-800 text-slate-200 text-xs font-bold">
+            Done
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. Assignment Submit Drawer -->
+      <div id="submit-modal" class="hidden absolute inset-0 z-50 bg-black/75 backdrop-blur-sm flex flex-col justify-end p-2">
+        <div class="bg-slate-900 border border-emerald-500/40 rounded-3xl p-4 space-y-3 max-h-[85%] overflow-y-auto">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <div>
+              <span id="sub-modal-course-badge" class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded font-bold">CS201</span>
+              <h4 id="sub-modal-title" class="text-xs font-bold text-white mt-1">AVL Tree Rotation Complexity</h4>
+            </div>
+            <button onclick="closeSubmitModal()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-300">✕</button>
+          </div>
+          <div id="sub-modal-late-warning" class="hidden p-2.5 rounded-xl bg-rose-950/70 border border-rose-500/40 text-xs text-rose-200">
+            ⚠️ <strong>Late Submission Notice:</strong> Submitting past deadline will be permanently documented for doctor.
+          </div>
+          <p id="sub-modal-desc" class="text-[11px] text-slate-300 p-2 rounded-xl bg-black/30 border border-white/5">Prompt</p>
+          <div class="flex rounded-xl bg-slate-950 p-1 border border-white/10 text-xs font-semibold">
+            <button onclick="setSubMethod('text')" id="sub-tab-text" class="flex-1 py-1 rounded-lg bg-emerald-600 text-white text-center">Type Solution</button>
+            <button onclick="setSubMethod('image')" id="sub-tab-image" class="flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center">Attach Diagram</button>
+            <button onclick="setSubMethod('choice')" id="sub-tab-choice" class="flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center">Option</button>
+          </div>
+          <div id="sub-view-text">
+            <textarea id="sub-input-text" rows="3" placeholder="// Type solution..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-xs text-white font-mono"></textarea>
+          </div>
+          <div id="sub-view-image" class="hidden space-y-1.5">
+            <div class="h-24 rounded-xl bg-slate-950 overflow-hidden border border-white/10">
+              <img id="sub-img-preview" src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&auto=format&fit=crop&q=60" class="w-full h-full object-cover">
+            </div>
+          </div>
+          <div id="sub-view-choice" class="hidden space-y-1 text-xs">
+            <div id="sub-choice-list" class="space-y-1"></div>
+          </div>
+          <button onclick="submitAssignmentFromModal()" id="sub-modal-submit-btn" class="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs active:scale-95 shadow">
+            Submit Solution
+          </button>
+        </div>
+      </div>
+
+      <!-- 4. Doctor Grade Drawer -->
+      <div id="grade-modal" class="hidden absolute inset-0 z-50 bg-black/75 backdrop-blur-sm flex flex-col justify-end p-2">
+        <div class="bg-slate-900 border border-blue-500/40 rounded-3xl p-4 space-y-3 max-h-[85%] overflow-y-auto">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <h4 id="grade-modal-title" class="text-xs font-bold text-white">Reviewing Solution</h4>
+            <button onclick="closeGradeModal()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-300">✕</button>
+          </div>
+          <div id="grade-modal-late-alert" class="p-2 rounded-xl bg-rose-950/70 border border-rose-500/40 text-xs text-rose-200">
+            ⚠️ Attention: Late student submission past deadline.
+          </div>
+          <div class="p-2 rounded-xl bg-black/40 font-mono text-emerald-300 text-[11px] max-h-20 overflow-y-auto whitespace-pre-wrap" id="grade-modal-solution-text">Solution</div>
+          <div>
+            <label class="text-[10px] text-slate-400 font-bold block mb-1">Score (0-100):</label>
+            <input id="grade-modal-score" type="number" value="95" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-xs text-white font-mono font-bold">
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-400 font-bold block mb-1">Feedback:</label>
+            <textarea id="grade-modal-feedback" rows="2" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-xs text-white"></textarea>
+          </div>
+          <button onclick="saveGradeFromModal()" class="w-full py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs active:scale-95 shadow">
+            Save Grade
+          </button>
+        </div>
+      </div>
+
+      <!-- iOS Home Indicator -->
+      <div class="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-32 h-1 bg-white/30 rounded-full z-50 pointer-events-none"></div>
+
+    </div>
+  </main>
+
+  <script>
+    let currentLang = 'en';
+    let currentDevice = 'iphone';
+    let currentStudent = 'hanan';
+    let currentRole = 'student';
+    let currentAsgnFilter = 'all';
+    let activeSubmittingId = null;
+    let activeGradingId = null;
+    let currentSubMethod = 'text';
+
+    // Doctor TOTP timer
+    let phoneCountdown = 8;
+    let phoneTotpInterval = null;
+
+    const ASSIGNMENTS_DB = [
+      {
+        id: 31001,
+        title: "AVL Tree Rotation & Height Balancing",
+        titleAr: "توازن شجرة AVL وحساب تعقيد الدوران",
+        courseCode: "CS201",
+        courseName: "Data Structures",
+        doctorName: "Dr. Ahmad Khalil",
+        dueDate: "Nov 11, 2026, 23:59",
+        status: "pending",
+        description: "Determine the worst-case time complexity of rebalancing an AVL tree after a single insertion and identify balance factors.",
+        options: ["O(1) - Constant single/double rotation", "O(log n) - Tree traversal height", "O(n) - Linear scan", "O(n log n) - Recursive scan"],
+        selectedOption: null,
+        solutionText: null,
+        isLateSubmission: false
+      },
+      {
+        id: 31002,
+        title: "Vehicle Hierarchy & Polymorphism Implementation",
+        titleAr: "تطبيق الوراثة وتعدد الأشكال لكلاسات المركبات",
+        courseCode: "CS202",
+        courseName: "Object Oriented Programming",
+        doctorName: "Dr. Ahmad Khalil",
+        dueDate: "Nov 8, 2026, 23:59",
+        status: "submitted",
+        description: "Implement abstract Vehicle class with ElectricCar subclass. Provide Java code and class diagram.",
+        options: null,
+        solutionText: "public abstract class Vehicle {\\n    protected String vin;\\n    public abstract double calculateRange();\\n}\\npublic class ElectricCar extends Vehicle {\\n    public double calculateRange() { return 450.0; }\\n}",
+        isLateSubmission: false
+      },
+      {
+        id: 31003,
+        title: "Doubly Linked List Node Deletion Lab",
+        titleAr: "حذف عقدة من القائمة المتصلة المزدوجة",
+        courseCode: "CS201",
+        courseName: "Data Structures",
+        doctorName: "Dr. Ahmad Khalil",
+        dueDate: "Nov 1, 2026, 23:59",
+        status: "graded",
+        score: 96,
+        feedback: "ممتاز يا حنان! معالجة دقيقة لحالات الأطراف (Head and Tail) وإدارة ممتازة للذاكرة.",
+        isLateSubmission: false
+      },
+      {
+        id: 31004,
+        title: "Gauss's Law Spherical Shell Flux Calculation",
+        titleAr: "حساب التدفق الكهربائي لسطح غاوس وقشرة كروية",
+        courseCode: "PHYS102",
+        courseName: "General Physics II",
+        doctorName: "Dr. Omar Hassan",
+        dueDate: "Oct 21, 2026, 23:59",
+        status: "overdue",
+        description: "Calculate total electric flux through Gaussian spherical surface enclosing charged conducting shell.",
+        options: ["Φ = Q_enclosed / ε0", "Φ = 0 (Inside conductor)", "Φ = E · 4πr²", "All of the above"],
+        selectedOption: null,
+        solutionText: null,
+        isLateSubmission: false
+      }
+    ];
+
+    function renderAssignments() {
+      const container = document.getElementById('assignments-cards-container');
+      if (!container) return;
+
+      const filtered = ASSIGNMENTS_DB.filter(a => currentAsgnFilter === 'all' || a.status === currentAsgnFilter);
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="p-4 text-center text-slate-400 text-xs">No assignments in this tab</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(a => {
+        const isAr = currentLang === 'ar';
+        const title = isAr ? a.titleAr : a.title;
+        let badge = '';
+        if (a.status === 'pending') badge = '<span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[9px] font-bold">Pending</span>';
+        else if (a.status === 'submitted') badge = '<span class="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[9px] font-bold">Submitted</span>';
+        else if (a.status === 'graded') badge = \`<span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[9px] font-bold">Graded • \${a.score}/100</span>\`;
+        else if (a.status === 'overdue') badge = '<span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[9px] font-bold">Overdue (Late Allowed)</span>';
+
+        let lateBadge = a.isLateSubmission ? '<span class="px-2 py-0.5 rounded-full bg-rose-950 text-rose-300 border border-rose-500/50 text-[9px] font-bold animate-pulse">⚠️ Late Submission</span>' : '';
+
+        let actionBtn = '';
+        if (currentRole === 'doctor') {
+          if (a.status === 'submitted' || (a.status === 'overdue' && a.solutionText)) {
+            actionBtn = \`<button onclick="openGradeModalFor(\${a.id})" class="w-full py-1.5 rounded-xl bg-blue-600 text-white text-[11px] font-bold active:scale-95">Review & Grade</button>\`;
+          } else if (a.status === 'graded') {
+            actionBtn = \`<button onclick="openGradeModalFor(\${a.id})" class="w-full py-1.5 rounded-xl bg-slate-800 text-slate-200 text-[11px] font-bold active:scale-95">Edit Grade (\${a.score}/100)</button>\`;
+          } else {
+            actionBtn = '<div class="text-center py-1 text-[10px] text-slate-500">Awaiting submission</div>';
+          }
+        } else {
+          if (a.status === 'pending') {
+            actionBtn = \`<button onclick="openSubmitModalFor(\${a.id})" class="w-full py-2 rounded-xl bg-emerald-600 text-white text-[11px] font-bold active:scale-95">Submit Solution</button>\`;
+          } else if (a.status === 'overdue') {
+            actionBtn = \`<button onclick="openSubmitModalFor(\${a.id})" class="w-full py-2 rounded-xl bg-rose-600 text-white text-[11px] font-bold border border-rose-400 active:scale-95">Submit Late Solution (Allowed)</button>\`;
+          } else if (a.status === 'submitted') {
+            actionBtn = \`<button onclick="openSubmitModalFor(\${a.id})" class="w-full py-1.5 rounded-xl bg-slate-800 text-slate-300 text-[11px] font-semibold active:scale-95">Edit Submission</button>\`;
+          } else if (a.status === 'graded') {
+            actionBtn = \`<div class="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-start text-[11px] text-slate-200 italic">"\${a.feedback || 'Great job!'}"</div>\`;
+          }
+        }
+
+        return \`
+          <div class="p-3.5 rounded-2xl bg-slate-900/90 border \${a.status === 'overdue' ? 'border-rose-500/40' : 'border-emerald-500/25'} zuj-card-shadow space-y-2">
+            <div class="flex items-start justify-between border-b border-white/5 pb-2">
+              <div>
+                <span class="text-[10px] font-mono text-emerald-400 font-bold">\${a.courseCode}</span>
+                <h4 class="text-xs font-bold text-white leading-snug">\${title}</h4>
+              </div>
+              <div class="flex flex-col items-end gap-1">
+                \${badge}
+                \${lateBadge}
+              </div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-300">
+              <span>Doctor: \${a.doctorName}</span>
+              <span class="font-mono \${a.status === 'overdue' ? 'text-rose-400 font-bold' : 'text-slate-400'}">\${a.dueDate}</span>
+            </div>
+            <p class="text-[11px] text-slate-300 bg-black/20 p-2 rounded-xl">\${a.description}</p>
+            \${actionBtn}
+          </div>\`;
+      }).join('');
+    }
+
+    function filterAssignments(tab) {
+      currentAsgnFilter = tab;
+      document.querySelectorAll('.asgn-tab-btn').forEach(b => {
+        b.classList.remove('bg-emerald-600', 'text-white', 'shadow');
+        b.classList.add('text-slate-400');
+      });
+      const active = document.getElementById('tab-asgn-' + tab);
+      if (active) {
+        active.classList.remove('text-slate-400');
+        active.classList.add('bg-emerald-600', 'text-white', 'shadow');
+      }
+      renderAssignments();
+    }
+
+    function openSubmitModalFor(id) {
+      activeSubmittingId = id;
+      const asgn = ASSIGNMENTS_DB.find(x => x.id === id);
+      if (!asgn) return;
+      document.getElementById('sub-modal-course-badge').textContent = asgn.courseCode;
+      document.getElementById('sub-modal-title').textContent = asgn.title;
+      document.getElementById('sub-modal-desc').textContent = asgn.description;
+      const lateWarn = document.getElementById('sub-modal-late-warning');
+      if (asgn.status === 'overdue') lateWarn.classList.remove('hidden');
+      else lateWarn.classList.add('hidden');
+
+      const choiceList = document.getElementById('sub-choice-list');
+      if (asgn.options && asgn.options.length > 0) {
+        choiceList.innerHTML = asgn.options.map(opt => \`
+          <label class="flex items-center gap-2 p-1.5 rounded-lg bg-slate-900 border border-white/5 cursor-pointer">
+            <input type="radio" name="opt" value="\${opt}">
+            <span class="text-[11px] text-white">\${opt}</span>
+          </label>
+        \`).join('');
+      } else {
+        choiceList.innerHTML = '<span class="text-[10px] text-slate-500">No options</span>';
+      }
+      setSubMethod(asgn.options ? 'choice' : 'text');
+      document.getElementById('submit-modal').classList.remove('hidden');
+    }
+
+    function closeSubmitModal() { document.getElementById('submit-modal').classList.add('hidden'); }
+
+    function setSubMethod(m) {
+      currentSubMethod = m;
+      ['text', 'image', 'choice'].forEach(method => {
+        const btn = document.getElementById('sub-tab-' + method);
+        const view = document.getElementById('sub-view-' + method);
+        if (method === m) {
+          btn.classList.add('bg-emerald-600', 'text-white');
+          btn.classList.remove('text-slate-400');
+          view.classList.remove('hidden');
+        } else {
+          btn.classList.remove('bg-emerald-600', 'text-white');
+          btn.classList.add('text-slate-400');
+          view.classList.add('hidden');
+        }
+      });
+    }
+
+    function submitAssignmentFromModal() {
+      if (!activeSubmittingId) return;
+      const asgn = ASSIGNMENTS_DB.find(x => x.id === activeSubmittingId);
+      if (!asgn) return;
+      const wasOverdue = (asgn.status === 'overdue');
+      asgn.status = 'submitted';
+      asgn.isLateSubmission = wasOverdue;
+      asgn.solutionText = document.getElementById('sub-input-text').value || "Solution submitted by student";
+      closeSubmitModal();
+      renderAssignments();
+      showToast(wasOverdue ? "⚠️ Late Submission recorded & flagged for doctor!" : "✓ Submitted successfully!");
+    }
+
+    function openGradeModalFor(id) {
+      activeGradingId = id;
+      const asgn = ASSIGNMENTS_DB.find(x => x.id === id);
+      if (!asgn) return;
+      document.getElementById('grade-modal-title').textContent = "Grading: " + asgn.title;
+      const lateAlert = document.getElementById('grade-modal-late-alert');
+      if (asgn.isLateSubmission || asgn.status === 'overdue') lateAlert.classList.remove('hidden');
+      else lateAlert.classList.add('hidden');
+      document.getElementById('grade-modal-solution-text').textContent = asgn.solutionText || "Code / Text Answer";
+      document.getElementById('grade-modal-score').value = asgn.score || 95;
+      document.getElementById('grade-modal-feedback').value = asgn.feedback || "Well done!";
+      document.getElementById('grade-modal').classList.remove('hidden');
+    }
+
+    function closeGradeModal() { document.getElementById('grade-modal').classList.add('hidden'); }
+
+    function saveGradeFromModal() {
+      if (!activeGradingId) return;
+      const asgn = ASSIGNMENTS_DB.find(x => x.id === activeGradingId);
+      if (!asgn) return;
+      asgn.score = parseInt(document.getElementById('grade-modal-score').value, 10) || 95;
+      asgn.feedback = document.getElementById('grade-modal-feedback').value;
+      asgn.status = 'graded';
+      closeGradeModal();
+      renderAssignments();
+      showToast("✓ Official grade (" + asgn.score + "/100) recorded!");
+    }
+
+    // Attendance QR Modals
+    function openPhoneScanner() {
+      document.getElementById('phone-scanner-modal').classList.remove('hidden');
+    }
+    function closePhoneScanner() {
+      document.getElementById('phone-scanner-modal').classList.add('hidden');
+    }
+    function confirmMobileAttendance() {
+      closePhoneScanner();
+      showToast("✓ Attendance logged in Hall 41 for CS201!");
+    }
+
+    function openDoctorQrProjector() {
+      document.getElementById('phone-doctor-qr-modal').classList.remove('hidden');
+      phoneCountdown = 8;
+      if (phoneTotpInterval) clearInterval(phoneTotpInterval);
+      phoneTotpInterval = setInterval(() => {
+        phoneCountdown--;
+        if (phoneCountdown <= 0) {
+          phoneCountdown = 8;
+          const hex = Math.random().toString(16).slice(2, 10).toUpperCase();
+          document.getElementById('phone-totp-display').textContent = "TOTP: " + hex;
+        }
+        document.getElementById('phone-countdown-badge').textContent = "Expires in " + phoneCountdown + "s";
+      }, 1000);
+    }
+
+    function closeDoctorQrProjector() {
+      document.getElementById('phone-doctor-qr-modal').classList.add('hidden');
+      if (phoneTotpInterval) clearInterval(phoneTotpInterval);
+    }
+
+    function switchScreen(screenId) {
+      document.querySelectorAll('.screen-view').forEach(el => el.classList.add('hidden'));
+      const target = document.getElementById('screen-' + screenId);
+      if (target) target.classList.remove('hidden');
+
+      // Top bar buttons
+      document.querySelectorAll('.screen-btn').forEach(btn => {
+        btn.classList.remove('bg-emerald-600', 'text-white', 'shadow');
+        btn.classList.add('text-slate-400');
+      });
+      const topBtn = document.getElementById('btn-' + screenId);
+      if (topBtn) {
+        topBtn.classList.remove('text-slate-400');
+        topBtn.classList.add('bg-emerald-600', 'text-white', 'shadow');
+      }
+
+      // Bottom Hotkeys: Dashboard, Schedule, Oliver AI, Assignments, Attendence
+      const hotkeys = ['dashboard', 'schedule', 'chat', 'assignments', 'attendance'];
+      hotkeys.forEach(k => {
+        const btn = document.getElementById('nav-btn-' + k);
+        if (btn) {
+          if (k === screenId) {
+            btn.classList.add('text-emerald-400');
+            btn.classList.remove('text-slate-400');
+          } else if (k !== 'chat') {
+            btn.classList.remove('text-emerald-400');
+            btn.classList.add('text-slate-400');
+          }
+        }
+      });
+
+      document.getElementById('viewport-content').scrollTop = 0;
+      if (screenId === 'assignments') renderAssignments();
+    }
+
+    function setRole(role) {
+      currentRole = role;
+      const btnStudent = document.getElementById('btn-role-student');
+      const btnDoctor = document.getElementById('btn-role-doctor');
+      const attDoctorBanner = document.getElementById('att-doctor-banner');
+      const island = document.getElementById('island-badge');
+
+      if (role === 'doctor') {
+        btnDoctor.classList.add('bg-blue-600', 'text-white');
+        btnDoctor.classList.remove('text-slate-400');
+        btnStudent.classList.remove('bg-emerald-600', 'text-white');
+        btnStudent.classList.add('text-slate-400');
+        if (attDoctorBanner) attDoctorBanner.classList.remove('hidden');
+        if (island) island.textContent = "Dr. Ahmad Khalil";
+      } else {
+        btnStudent.classList.add('bg-emerald-600', 'text-white');
+        btnStudent.classList.remove('text-slate-400');
+        btnDoctor.classList.remove('bg-blue-600', 'text-white');
+        btnDoctor.classList.add('text-slate-400');
+        if (attDoctorBanner) attDoctorBanner.classList.add('hidden');
+        if (island) island.textContent = "Hanan • ZUJ";
+      }
+      renderAssignments();
+    }
+
+    function setStudent(s) {
+      currentStudent = s;
+      const bH = document.getElementById('btn-user-hanan');
+      const bA = document.getElementById('btn-user-abood');
+      if (s === 'hanan') {
+        bH.classList.add('bg-emerald-600', 'text-white');
+        bH.classList.remove('text-slate-400');
+        bA.classList.remove('bg-emerald-600', 'text-white');
+        bA.classList.add('text-slate-400');
+        document.getElementById('hub-student-name').textContent = "Hanan (حنان)";
+        document.getElementById('hub-student-id').textContent = "240002";
+        document.getElementById('hub-avatar-initials').textContent = "HA";
+      } else {
+        bA.classList.add('bg-emerald-600', 'text-white');
+        bA.classList.remove('text-slate-400');
+        bH.classList.remove('bg-emerald-600', 'text-white');
+        bH.classList.add('text-slate-400');
+        document.getElementById('hub-student-name').textContent = "Abdualrhman (Abood)";
+        document.getElementById('hub-student-id').textContent = "202212359";
+        document.getElementById('hub-avatar-initials').textContent = "AB";
+      }
+    }
+
+    function setDevice(d) {
+      currentDevice = d;
+      const c = document.getElementById('phone-chassis');
+      const s = document.getElementById('phone-screen');
+      const isl = document.getElementById('dynamic-island');
+      if (d === 'iphone') {
+        c.style.width = '392px';
+        c.style.height = '835px';
+        isl.style.display = 'flex';
+        document.getElementById('dev-btn-iphone').classList.add('bg-emerald-600', 'text-white');
+        document.getElementById('dev-btn-samsung').classList.remove('bg-emerald-600', 'text-white');
+      } else {
+        c.style.width = '412px';
+        c.style.height = '840px';
+        isl.style.display = 'none';
+        document.getElementById('dev-btn-samsung').classList.add('bg-emerald-600', 'text-white');
+        document.getElementById('dev-btn-iphone').classList.remove('bg-emerald-600', 'text-white');
+      }
+    }
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'en' ? 'ar' : 'en';
+      document.getElementById('phone-screen').setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+      document.getElementById('lang-label').textContent = currentLang === 'ar' ? 'English (LTR)' : 'العربية (RTL)';
+      renderAssignments();
+    }
+
+    function showToast(msg) {
+      const toast = document.createElement('div');
+      toast.className = 'fixed top-12 left-1/2 -translate-x-1/2 bg-slate-900 border border-emerald-500/50 text-white text-xs px-4 py-2 rounded-xl shadow-2xl z-50 animate-bounce';
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2500);
+    }
+
+    function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const q = input.value.trim();
+      if (!q) return;
+      input.value = '';
+      sendInquiry(q);
+    }
+
+    function handlePromptChip(t) { sendInquiry(t); }
+
+    function sendInquiry(q) {
+      const container = document.getElementById('chat-messages-container');
+      const userB = document.createElement('div');
+      userB.className = 'flex justify-end';
+      userB.innerHTML = \`<div class="max-w-[85%] rounded-2xl rounded-tr-xs bg-emerald-600 text-white px-3.5 py-2.5 shadow-md">\${q}</div>\`;
+      container.appendChild(userB);
+      container.scrollTop = container.scrollHeight;
+
+      setTimeout(() => {
+        let reply = "Verified against <strong>ZUJ Bylaws 2026</strong>: 125 curriculum courses loaded. Attendance is tracked per course with 15% Article 14 limit.";
+        const botB = document.createElement('div');
+        botB.className = 'flex justify-start';
+        botB.innerHTML = \`<div class="max-w-[88%] rounded-2xl rounded-tl-xs bg-slate-900/90 border border-emerald-500/25 px-3.5 py-2.5 text-slate-100 shadow-md text-[11px] leading-relaxed">\${reply}</div>\`;
+        container.appendChild(botB);
+        container.scrollTop = container.scrollHeight;
+      }, 350);
+    }
+
+    // Initialize
+    renderAssignments();
+  </script>
+</body>
+</html>
+`;
+
+fs.writeFileSync(targetPath, content, "utf8");
+console.log("Successfully generated phone_preview.html at", targetPath);

@@ -84,6 +84,8 @@ export const courses = mysqlTable(
     description: text("description"),
     descriptionAr: text("descriptionAr"),
     credits: int("credits").notNull(),
+    modality: varchar("modality", { length: 50 }).default("in_person"),
+    modalityAr: varchar("modalityAr", { length: 50 }).default("وجاهي"),
     departmentId: int("departmentId").notNull(),
     minGPA: decimal("minGPA", { precision: 3, scale: 2 }).default("0.00"),
     instructorId: int("instructorId"), // lecturer / instructor user id
@@ -566,6 +568,10 @@ export const attendance = mysqlTable(
     status: mysqlEnum("status", ["present", "absent", "excused", "late"])
       .default("present")
       .notNull(),
+    verificationMethod: varchar("verificationMethod", { length: 50 }).default("qr_scan"),
+    checkInCode: varchar("checkInCode", { length: 100 }),
+    hallName: varchar("hallName", { length: 100 }),
+    deviceFingerprint: varchar("deviceFingerprint", { length: 255 }),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
     updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   },

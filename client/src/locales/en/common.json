@@ -156,7 +156,7 @@
     }
   },
   "student": {
-    "dashboard": "Student Dashboard",
+    "dashboard": "Dashboard",
     "gpa": "GPA",
     "completedHours": "Completed Hours",
     "totalHours": "Total Hours",

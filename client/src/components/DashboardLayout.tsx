@@ -45,18 +45,18 @@ type MenuItem = {
 const menuItemsByRole: Record<string, MenuItem[]> = {
   student: [
     { icon: LayoutDashboard, labelKey: "student.dashboard", path: "/dashboard" },
-    { icon: BookOpen, labelKey: "student.myCourses", path: "/courses" },
     { icon: CalendarDays, labelKey: "student.schedule", path: "/schedule" },
+    { icon: Sparkles, labelKey: "chat.title", path: "/chat" },
     { icon: FileText, labelKey: "student.assignments", path: "/assignments" },
-    { icon: Award, labelKey: "student.grades", path: "/grades" },
     { icon: CheckCircle2, labelKey: "student.attendance", path: "/attendance" },
+    { icon: BookOpen, labelKey: "student.myCourses", path: "/courses" },
+    { icon: Award, labelKey: "student.grades", path: "/grades" },
     { icon: Megaphone, labelKey: "student.announcements", path: "/announcements" },
     { icon: BarChart3, labelKey: "student.achievements", path: "/achievements" },
     { icon: Target, labelKey: "student.progress", path: "/progress" },
     { icon: BrainCircuit, labelKey: "analytics.title", path: "/analytics" },
     { icon: Clock, labelKey: "student.studyPlan", path: "/study-plan" },
     { icon: MapPin, labelKey: "map.title", path: "/campus" },
-    { icon: Sparkles, labelKey: "chat.title", path: "/chat" },
   ],
   advisor: [
     { icon: LayoutDashboard, labelKey: "advisor.dashboard", path: "/advisor" },
@@ -206,11 +206,11 @@ function DashboardLayoutContent({
       ];
     }
     return [
-      { icon: LayoutDashboard, label: t("student.dashboard") || "الرئيسية", path: "/dashboard", tab: undefined, highlight: false },
-      { icon: CalendarDays, label: t("student.schedule") || "الجدول", path: "/schedule", tab: undefined, highlight: false },
+      { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard", tab: undefined, highlight: false },
+      { icon: CalendarDays, label: "Schedule", path: "/schedule", tab: undefined, highlight: false },
       { icon: Sparkles, label: "Oliver AI", path: "/chat", tab: undefined, highlight: true },
-      { icon: Award, label: t("student.grades") || "العلامات", path: "/grades", tab: undefined, highlight: false },
-      { icon: MapPin, label: t("map.title") || "الخريطة", path: "/campus", tab: undefined, highlight: false },
+      { icon: FileText, label: "Assignments", path: "/assignments", tab: undefined, highlight: false },
+      { icon: CheckCircle2, label: "Attendence", path: "/attendance", tab: undefined, highlight: false },
     ];
   }, [user?.role, t]);
 
