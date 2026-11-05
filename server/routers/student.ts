@@ -1285,11 +1285,23 @@ export const studentRouter = router({
           id: studentAssignments.id,
           status: studentAssignments.status,
           score: studentAssignments.score,
+          solutionText: studentAssignments.solutionText,
+          solutionImageUrl: studentAssignments.solutionImageUrl,
+          selectedOption: studentAssignments.selectedOption,
+          feedback: studentAssignments.feedback,
+          gradedBy: studentAssignments.gradedBy,
+          gradedAt: studentAssignments.gradedAt,
           submittedAt: studentAssignments.submittedAt,
           assignmentId: studentAssignments.assignmentId,
+          advisorId: assignments.advisorId,
+          doctorName: users.name,
+          doctorEmail: users.email,
           title: assignments.title,
           titleAr: assignments.titleAr,
           description: assignments.description,
+          descriptionAr: assignments.descriptionAr,
+          submissionType: assignments.submissionType,
+          options: assignments.options,
           dueDate: assignments.dueDate,
           totalPoints: assignments.totalPoints,
           courseName: courses.name,
@@ -1299,6 +1311,7 @@ export const studentRouter = router({
         .from(studentAssignments)
         .leftJoin(assignments, eq(studentAssignments.assignmentId, assignments.id))
         .leftJoin(courses, eq(assignments.courseId, courses.id))
+        .leftJoin(users, eq(assignments.advisorId, users.id))
         .where(and(...conditions))
         .orderBy(assignments.dueDate);
       return items;
@@ -1539,15 +1552,19 @@ export const studentRouter = router({
     .input(
       z.object({
         courseId: z.number(),
+        advisorId: z.number().optional(),
         title: z.string().min(1),
         titleAr: z.string().optional(),
         description: z.string().optional(),
         descriptionAr: z.string().optional(),
+        submissionType: z.string().default("all"),
+        options: z.array(z.string()).optional(),
         dueDate: z.string(),
         totalPoints: z.number().default(100),
+        studentId: z.number().optional(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
 
@@ -1556,17 +1573,31 @@ export const studentRouter = router({
         throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid due date format" });
       }
 
+      const advisorId = input.advisorId || (ctx.user.role === "advisor" ? ctx.user.id : 210024);
+
       const [inserted] = await db.insert(assignments).values({
         courseId: input.courseId,
+        advisorId,
         title: input.title,
         titleAr: input.titleAr || input.title,
         description: input.description || null,
         descriptionAr: input.descriptionAr || null,
+        submissionType: input.submissionType || "all",
+        options: input.options ? JSON.stringify(input.options) : null,
         dueDate: parsedDueDate,
         totalPoints: input.totalPoints,
       });
 
       const newAssignmentId = Number(inserted.insertId);
+
+      if (input.studentId) {
+        await db.insert(studentAssignments).values({
+          studentId: input.studentId,
+          assignmentId: newAssignmentId,
+          status: "pending",
+        });
+        return { success: true, assignmentId: newAssignmentId, enrolledCount: 1 };
+      }
 
       const enrolledStudents = await db
         .select({ studentId: studentCourses.studentId })
@@ -1590,6 +1621,93 @@ export const studentRouter = router({
         success: true,
         assignmentId: newAssignmentId,
         enrolledCount: enrolledStudents.length,
+      };
+    }),
+
+  submitAssignment: protectedProcedure
+    .input(
+      z.object({
+        assignmentId: z.number(),
+        solutionText: z.string().optional(),
+        solutionImageUrl: z.string().optional(),
+        selectedOption: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      const [record] = await db
+        .select()
+        .from(studentAssignments)
+        .where(
+          and(
+            eq(studentAssignments.studentId, ctx.user.id),
+            sql`(${studentAssignments.id} = ${input.assignmentId} OR ${studentAssignments.assignmentId} = ${input.assignmentId})`
+          )
+        )
+        .limit(1);
+
+      const targetId = record ? record.id : input.assignmentId;
+
+      await db
+        .update(studentAssignments)
+        .set({
+          status: "submitted",
+          solutionText: input.solutionText || null,
+          solutionImageUrl: input.solutionImageUrl || null,
+          selectedOption: input.selectedOption || null,
+          submittedAt: new Date(),
+        })
+        .where(eq(studentAssignments.id, targetId));
+
+      return {
+        success: true,
+        id: targetId,
+        status: "submitted",
+        message: "Assignment submitted successfully to doctor for review",
+      };
+    }),
+
+  gradeAssignment: protectedProcedure
+    .input(
+      z.object({
+        studentAssignmentId: z.number(),
+        score: z.number().min(0),
+        feedback: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      const [record] = await db
+        .select()
+        .from(studentAssignments)
+        .where(eq(studentAssignments.id, input.studentAssignmentId))
+        .limit(1);
+
+      if (!record) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Assignment submission not found" });
+      }
+
+      await db
+        .update(studentAssignments)
+        .set({
+          status: "graded",
+          score: input.score,
+          feedback: input.feedback || null,
+          gradedBy: ctx.user.id,
+          gradedAt: new Date(),
+        })
+        .where(eq(studentAssignments.id, input.studentAssignmentId));
+
+      return {
+        success: true,
+        id: input.studentAssignmentId,
+        status: "graded",
+        score: input.score,
+        feedback: input.feedback,
       };
     }),
 });

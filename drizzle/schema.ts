@@ -63,8 +63,6 @@ export const departments = mysqlTable("departments", {
   code: varchar("code", { length: 50 }).notNull().unique(),
   description: text("description"),
   descriptionAr: text("descriptionAr"),
-    submissionType: varchar("submissionType", { length: 50 }).default("all"),
-    options: text("options"),
   headId: int("headId"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -85,8 +83,6 @@ export const courses = mysqlTable(
     nameAr: varchar("nameAr", { length: 255 }).notNull(),
     description: text("description"),
     descriptionAr: text("descriptionAr"),
-    submissionType: varchar("submissionType", { length: 50 }).default("all"),
-    options: text("options"),
     credits: int("credits").notNull(),
     departmentId: int("departmentId").notNull(),
     minGPA: decimal("minGPA", { precision: 3, scale: 2 }).default("0.00"),
@@ -111,7 +107,6 @@ export type InsertCourse = typeof courses.$inferInsert;
 export const coursePrerequisites = mysqlTable("coursePrerequisites", {
   id: int("id").autoincrement().primaryKey(),
   courseId: int("courseId").notNull(),
-    advisorId: int("advisorId"),
   prerequisiteId: int("prerequisiteId").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
@@ -294,8 +289,6 @@ export const buildings = mysqlTable("buildings", {
   longitude: decimal("longitude", { precision: 11, scale: 8 }).notNull(),
   description: text("description"),
   descriptionAr: text("descriptionAr"),
-    submissionType: varchar("submissionType", { length: 50 }).default("all"),
-    options: text("options"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -594,6 +587,7 @@ export const assignments = mysqlTable(
   {
     id: int("id").autoincrement().primaryKey(),
     courseId: int("courseId").notNull(),
+    advisorId: int("advisorId"),
     title: varchar("title", { length: 255 }).notNull(),
     titleAr: varchar("titleAr", { length: 255 }).notNull(),
     description: text("description"),
