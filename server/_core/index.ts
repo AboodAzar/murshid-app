@@ -2,6 +2,8 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import net from "net";
+import path from "path";
+import fs from "fs";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerStorageProxy } from "./storageProxy";
@@ -29,10 +31,10 @@ async function startServer() {
     res.setHeader(
       "Content-Security-Policy",
       "default-src 'self'; " +
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-        "style-src 'self' 'unsafe-inline'; " +
-        "img-src 'self' data: https:; " +
-        "font-src 'self' data:; " +
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://cdn.tailwindcss.com https://cdn.jsdelivr.net; " +
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; " +
+        "img-src 'self' data: https: blob:; " +
+        "font-src 'self' data: https://fonts.gstatic.com; " +
         "connect-src 'self' https:; " +
         "frame-ancestors 'none';"
     );
@@ -80,6 +82,22 @@ async function startServer() {
 
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+
+  // Dedicated route to serve the phone preview simulator
+  app.get(["/phone", "/preview", "/mobile", "/phone-preview"], (_req, res) => {
+    const candidatePaths = [
+      path.resolve(process.cwd(), "client", "public", "phone.html"),
+      path.resolve(process.cwd(), "dist", "public", "phone.html"),
+      path.resolve("C:\\Users\\abood\\.gemini\\antigravity\\brain\\8aa2adca-5a08-481d-adfc-6fc424d4db49", "phone_preview.html")
+    ];
+    for (const p of candidatePaths) {
+      if (fs.existsSync(p)) {
+        return res.sendFile(p);
+      }
+    }
+    res.status(404).send("Phone preview not found");
+  });
+
   // tRPC API
   app.use(
     "/api/trpc",
