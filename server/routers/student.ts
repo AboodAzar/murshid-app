@@ -32,7 +32,13 @@ async function resolveTargetStudent(
     return { targetStudentId: user.id, authorized: true };
   }
   if (user.role === "admin") {
-    return { targetStudentId: inputStudentId ?? 0, authorized: true };
+    if (inputStudentId) return { targetStudentId: inputStudentId, authorized: true };
+    const [firstStudent] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.role, "student"))
+      .limit(1);
+    return { targetStudentId: firstStudent?.id ?? 0, authorized: true };
   }
   if (user.role === "advisor") {
     if (!inputStudentId) {
@@ -1527,5 +1533,63 @@ export const studentRouter = router({
       }
 
       return { success: true };
+    }),
+
+  createAssignment: protectedProcedure
+    .input(
+      z.object({
+        courseId: z.number(),
+        title: z.string().min(1),
+        titleAr: z.string().optional(),
+        description: z.string().optional(),
+        descriptionAr: z.string().optional(),
+        dueDate: z.string(),
+        totalPoints: z.number().default(100),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      const parsedDueDate = new Date(input.dueDate);
+      if (isNaN(parsedDueDate.getTime())) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid due date format" });
+      }
+
+      const [inserted] = await db.insert(assignments).values({
+        courseId: input.courseId,
+        title: input.title,
+        titleAr: input.titleAr || input.title,
+        description: input.description || null,
+        descriptionAr: input.descriptionAr || null,
+        dueDate: parsedDueDate,
+        totalPoints: input.totalPoints,
+      });
+
+      const newAssignmentId = Number(inserted.insertId);
+
+      const enrolledStudents = await db
+        .select({ studentId: studentCourses.studentId })
+        .from(studentCourses)
+        .where(
+          and(
+            eq(studentCourses.courseId, input.courseId),
+            eq(studentCourses.status, "in_progress")
+          )
+        );
+
+      for (const enrollment of enrolledStudents) {
+        await db.insert(studentAssignments).values({
+          studentId: enrollment.studentId,
+          assignmentId: newAssignmentId,
+          status: "pending",
+        });
+      }
+
+      return {
+        success: true,
+        assignmentId: newAssignmentId,
+        enrolledCount: enrolledStudents.length,
+      };
     }),
 });
