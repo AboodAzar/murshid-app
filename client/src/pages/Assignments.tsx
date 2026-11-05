@@ -55,6 +55,8 @@ type AssignmentItem = {
   options?: string | null;
   dueDate: Date | string | null;
   totalPoints?: number | null;
+  isLateSubmission?: boolean;
+  isOverdueUnsubmitted?: boolean;
   courseName?: string | null;
   courseCode?: string | null;
   courseId?: number | null;
@@ -501,7 +503,13 @@ export default function Assignments() {
                       {a.status === "overdue" && (
                         <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 text-xs font-semibold">
                           <AlertCircle className="w-3.5 h-3.5" />
-                          {language === "ar" ? "متأخر" : "Overdue"}
+                          {language === "ar" ? "متأخر (متاح التسليم)" : "Overdue (Late Allowed)"}
+                        </span>
+                      )}
+                      {(a.isLateSubmission || (a.submittedAt && a.dueDate && new Date(a.submittedAt) > new Date(a.dueDate))) && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-500/25 border border-red-500/40 text-red-300 text-xs font-bold animate-pulse">
+                          <AlertCircle className="w-3.5 h-3.5 text-red-400" />
+                          {language === "ar" ? "⚠️ تسليم متأخر" : "⚠️ Late Submission"}
                         </span>
                       )}
                     </div>
@@ -621,13 +629,23 @@ export default function Assignments() {
 
                     <div className="flex items-center gap-2">
                       {/* Submit / Edit Solution Button for Students */}
-                      {(a.status === "pending" || a.status === "submitted") && (
+                      {(a.status === "pending" || a.status === "submitted" || a.status === "overdue") && (
                         <button
                           onClick={() => openSubmitModal(a)}
-                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md transition-all hover:scale-[1.02]"
+                          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold shadow-md transition-all hover:scale-[1.02] ${
+                            a.status === "overdue"
+                              ? "bg-red-600 hover:bg-red-500 text-white border border-red-400/30"
+                              : a.status === "submitted"
+                              ? "bg-slate-700 hover:bg-slate-600 text-white"
+                              : "bg-emerald-600 hover:bg-emerald-500 text-white"
+                          }`}
                         >
                           <Send className="w-3.5 h-3.5" />
-                          {a.status === "submitted"
+                          {a.status === "overdue"
+                            ? language === "ar"
+                              ? "تسليم متأخر للدكتور"
+                              : "Submit Late Solution"
+                            : a.status === "submitted"
                             ? language === "ar"
                               ? "تعديل الحل المسلّم"
                               : "Edit Submission"
@@ -638,7 +656,7 @@ export default function Assignments() {
                       )}
 
                       {/* Doctor Grade Button */}
-                      {isPrivileged && a.status === "submitted" && (
+                      {isPrivileged && (a.status === "submitted" || (a.status === "overdue" && a.solutionText)) && (
                         <button
                           onClick={() => openGradeModal(a)}
                           className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-md transition-all hover:scale-[1.02]"
@@ -684,6 +702,21 @@ export default function Assignments() {
                 </div>
 
                 <form onSubmit={handleSubmitSolution} className="space-y-4 text-start">
+                  {(submittingAssignment.status === "overdue" || (submittingAssignment.dueDate && new Date() > new Date(submittingAssignment.dueDate))) && (
+                    <div className="p-3.5 rounded-xl bg-red-950/40 border border-red-500/40 text-xs text-red-200 flex items-start gap-2.5">
+                      <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-bold text-red-300">
+                          {language === "ar" ? "تنبيه: تسليم متأخر بعد انقضاء الموعد النهائي" : "Notice: Submitting After Deadline (Late Submission)"}
+                        </p>
+                        <p className="text-slate-300 mt-0.5 leading-relaxed">
+                          {language === "ar"
+                            ? "انتهى الموعد الرسمي للتسليم. يمكنك تسليم الحل، ولكن سيتم توثيقه وإبرازه كـ (تسليم متأخر) لدى الدكتور المشرف."
+                            : "The official deadline has passed. You may still submit your work, but it will be flagged as Late for the faculty doctor."}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   {/* Doctor details */}
                   <div className="p-3 rounded-xl bg-slate-800/50 border border-white/5 flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -862,6 +895,21 @@ export default function Assignments() {
                 </div>
 
                 <form onSubmit={handleGradeSubmission} className="space-y-4 text-start">
+                  {(gradingAssignment.isLateSubmission || (gradingAssignment.submittedAt && gradingAssignment.dueDate && new Date(gradingAssignment.submittedAt) > new Date(gradingAssignment.dueDate))) && (
+                    <div className="p-3.5 rounded-xl bg-red-950/50 border border-red-500/40 text-xs text-red-200 flex items-start gap-2.5">
+                      <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-bold text-red-300">
+                          {language === "ar" ? "⚠️ تنبيه للدكتور: هذا الواجب تم تسليمه متأخراً" : "⚠️ Doctor Warning: Late Student Submission"}
+                        </p>
+                        <p className="text-slate-300 mt-0.5">
+                          {language === "ar"
+                            ? "قام الطالب بالتسليم بعد انقضاء الموعد النهائي المحدد. يرجى أخذ ذلك بعين الاعتبار عند رصد الدرجة النهائية."
+                            : "Student submitted after the deadline. Please factor any institutional late submission penalties into the score."}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   {/* Submission Details Preview */}
                   <div className="p-3 rounded-xl bg-slate-800/50 border border-white/5 space-y-2">
                     <p className="text-xs font-semibold text-slate-300">

@@ -1314,7 +1314,21 @@ export const studentRouter = router({
         .leftJoin(users, eq(assignments.advisorId, users.id))
         .where(and(...conditions))
         .orderBy(assignments.dueDate);
-      return items;
+      return items.map((item) => {
+        const isOverdueUnsubmitted = Boolean(
+          item.status === "pending" && item.dueDate && new Date() > new Date(item.dueDate)
+        );
+        const isLateSubmission = Boolean(
+          item.submittedAt && item.dueDate && new Date(item.submittedAt) > new Date(item.dueDate)
+        );
+        const effectiveStatus = (item.status === "pending" && isOverdueUnsubmitted) ? "overdue" : item.status;
+        return {
+          ...item,
+          status: effectiveStatus,
+          isLateSubmission,
+          isOverdueUnsubmitted,
+        };
+      });
     }),
 
   attendance: protectedProcedure
