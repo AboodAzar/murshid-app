@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Murshid",
+    "appName": "Oliver",
     "appDescription": "AI-Powered Academic Guidance Platform",
     "language": "Language",
     "english": "English",
@@ -101,7 +101,7 @@
     },
     "cta": {
       "title": "Ready to Transform Your Academic Journey?",
-      "description": "Join thousands of students using Murshid for academic success",
+      "description": "Join thousands of students using Oliver for academic success",
       "button": "Start Now"
     }
   },

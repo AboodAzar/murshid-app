@@ -32,7 +32,7 @@ const client = createTRPCClient({
 async function test(name, fn) {
   try {
     const result = await fn();
-    if (result && typeof result === 'object' && 'error' in result) {
+    if (result && typeof result === "object" && "error" in result && result.error) {
       console.log(`❌ ${name}:`, result.error?.message?.slice(0, 120));
       return false;
     }
@@ -45,34 +45,48 @@ async function test(name, fn) {
 }
 
 const r = { passed: 0, failed: 0 };
-async function run(name, fn) { if (await test(name, fn)) r.passed++; else r.failed++; }
+async function run(name, fn) {
+  if (await test(name, fn)) r.passed++;
+  else r.failed++;
+}
 
-console.log("=== Student Workflow Test ===");
-await run("student.login", () => client.auth.login.mutate({ email: "test1781037416495@std-zuj.edu.jo", password: "TestPass123!" }));
+async function main() {
+  console.log("=== Student Workflow Test ===");
+  await run("student.login", () => client.auth.login.mutate({ email: "khaled.haddad@zuj.edu.jo", password: "password123" }));
 
-await run("student.dashboard", () => client.student.dashboard.query());
-await run("student.myCourses", () => client.student.myCourses.query());
-await run("student.todaySchedule", () => client.student.todaySchedule.query());
-await run("student.academicAlerts", () => client.student.academicAlerts.query());
-await run("student.overview", () => client.student.overview.query());
-await run("student.fullSchedule", () => client.student.fullSchedule.query());
-await run("student.assignments", () => client.student.assignments.query());
-await run("student.attendance", () => client.student.attendance.query());
-await run("student.studentAnnouncements", () => client.student.studentAnnouncements.query());
+  await run("student.dashboard", () => client.student.dashboard.query());
+  await run("student.myCourses", () => client.student.myCourses.query());
+  await run("student.todaySchedule", () => client.student.todaySchedule.query());
+  await run("student.academicAlerts", () => client.student.academicAlerts.query());
+  await run("student.overview", () => client.student.overview.query());
+  await run("student.fullSchedule", () => client.student.fullSchedule.query());
+  await run("student.assignments", () => client.student.assignments.query());
+  await run("student.attendance", () => client.student.attendance.query());
+  await run("student.studentAnnouncements", () => client.student.studentAnnouncements.query());
 
-await run("courses.list", () => client.courses.list.query());
-await run("announcements.list", () => client.announcements.list.query());
-await run("navigation.campus", () => client.navigation.campus.query());
-await run("faqs.list", () => client.faqs.list.query());
-await run("documents.list", () => client.documents.list.query());
-await run("notifications.list", () => client.notifications.list.query());
+  await run("courses.list", () => client.courses.list.query());
+  await run("announcements.list", () => client.announcements.list.query());
+  await run("navigation.campus", () => client.navigation.campus.query());
+  await run("faqs.list", () => client.faqs.list.query());
+  await run("notifications.list", () => client.notifications.list.query({}));
 
-// Test AI Chat
-await run("aiChat.getConversations", () => client.aiChat.getConversations.query());
-await run("aiChat.createConversation", () => client.aiChat.createConversation.mutate());
+  // Test AI Chat
+  await run("aiChat.getConversations", () => client.aiChat.getConversations.query());
+  await run("aiChat.createConversation", () => client.aiChat.createConversation.mutate({}));
 
-// Test preferences
-await run("preferences.getNotificationPreferences", () => client.preferences.getNotificationPreferences.query());
-await run("preferences.setLanguage", () => client.preferences.setLanguage.mutate("ar"));
+  // Test preferences
+  await run("preferences.getNotificationPreferences", () => client.preferences.getNotificationPreferences.query());
+  await run("preferences.setLanguage", () => client.preferences.setLanguage.mutate("ar"));
 
-console.log(`\n=== Summary: ${r.passed} passed, ${r.failed} failed ===`);
+  try {
+    await client.auth.logout.mutate();
+  } catch {}
+
+  console.log(`\n=== Summary: ${r.passed} passed, ${r.failed} failed ===`);
+  process.exit(r.failed > 0 ? 1 : 0);
+}
+
+main().catch((err) => {
+  console.error("Fatal error in smoke-test-student:", err);
+  process.exit(1);
+});

@@ -20,7 +20,7 @@ import {
   BookOpen, GraduationCap, Calendar, Clock, Award, Briefcase,
   Lightbulb, ShieldAlert, ArrowRight, BarChart3, Compass, FlaskConical,
   Layers, Star, ClipboardList, PenLine, Bell, ChevronRight, Mic, Hash,
-  Download, Share2, RefreshCw, Info, Frown, Smile, Meh, ThumbsUp, ThumbsDown
+  Download, Share2, RefreshCw, Info, Frown, Smile, Meh, ThumbsUp, ThumbsDown, X
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -51,7 +51,7 @@ function ScoreRing({ score, size = 100 }: { score: number; size?: number }) {
   );
 }
 
-function MiniBar({ value, color = "#3b82f6" }: { value: number; color?: string }) {
+function MiniBar({ value, color = "#10b981" }: { value: number; color?: string }) {
   return (
     <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
       <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(100, Math.max(0, value))}%` }} transition={{ duration: 0.8, ease: "easeOut" }} className="h-full rounded-full" style={{ backgroundColor: color }} />
@@ -67,28 +67,97 @@ function StatusDot({ status }: { status: string }) {
 function ActivityIcon(props: any) { return <BarChart3 {...props} />; }
 
 const QUICK_ACTIONS = [
-  { id: "plan", label: "Study Plan", icon: ClipboardList, color: "bg-blue-500/15 text-primary", desc: "Weekly AI schedule" },
+  { id: "plan", label: "Study Plan", icon: ClipboardList, color: "bg-emerald-500/15 text-primary", desc: "Weekly AI schedule" },
   { id: "gpa", label: "Analyze GPA", icon: BarChart3, color: "bg-violet-500/15 text-violet-400", desc: "Performance deep-dive" },
   { id: "graduation", label: "Graduation", icon: GraduationCap, color: "bg-emerald-500/15 text-emerald-400", desc: "Graduation forecast" },
   { id: "courses", label: "Courses", icon: BookOpen, color: "bg-amber-500/15 text-amber-400", desc: "Next semester picks" },
-  { id: "schedule", label: "Schedule", icon: Calendar, color: "bg-cyan-500/15 text-cyan-400", desc: "Balance workload" },
+  { id: "schedule", label: "Schedule", icon: Calendar, color: "bg-emerald-500/15 text-emerald-400", desc: "Balance workload" },
   { id: "career", label: "Career", icon: Briefcase, color: "bg-rose-500/15 text-rose-400", desc: "Dream job path" },
   { id: "chat", label: "Ask AI", icon: Sparkles, color: "bg-fuchsia-500/15 text-fuchsia-400", desc: "Anything on your mind" },
 ];
 
-const SUGGESTED_PROMPTS = [
-  "How can I improve my GPA this semester?",
-  "What courses should I take next semester?",
-  "Am I on track to graduate on time?",
-  "Which careers match my courses and skills?",
-  "Create a study plan for my upcoming exams",
-  "Explain my academic health score",
+const SUGGESTED_PROMPTS_EN = [
+  "How is my cumulative GPA calculated on the 100% scale?",
+  "How do integrated (blended) courses work on our 4-day schedule?",
+  "Am I eligible for the 30% or 40% academic merit discount?",
+  "What are the requirements for Capstone Project 1 and Field Training?",
+  "What are the rules regarding the 15% absence deprivation limit?",
+  "Where are Hall 9303 and the IT computer labs located?",
 ];
 
-interface Message { id?: number; role: "user" | "assistant"; content: string; createdAt?: Date; feedback?: "up" | "down" | "none" | null; }
+const SUGGESTED_PROMPTS_AR = [
+  "كيف يُحتسب معدلي التراكمي على النظام المئوي (100%)؟",
+  "كيف يعمل نمط التعليم المدمج في نظام الدوام 4 أيام؟",
+  "هل أستحق خصم التفوق الأكاديمي (30% أو 40%) على الرسوم؟",
+  "ما هي شروط تسجيل مشروع التخرج (1) والتدريب الميداني؟",
+  "ما هي عقوبة تجاوز نسبة 15% من الغياب (المادة 11)؟",
+  "أين تقع قاعة 9303 ومختبرات الحاسوب في مبنى IT؟",
+];
+
+interface Message {
+  id?: number;
+  role: "user" | "assistant";
+  content: string;
+  createdAt?: Date;
+  feedback?: "up" | "down" | "none" | null;
+  isOfflineFallback?: boolean;
+  source?: "faq" | "academic_rules" | "local_advisor" | "external_llm";
+}
+
+function MessageSourceBadge({
+  source,
+  isOffline,
+  language,
+}: {
+  source?: "faq" | "academic_rules" | "local_advisor" | "external_llm" | string;
+  isOffline?: boolean;
+  language: "en" | "ar";
+}) {
+  if (source === "faq") {
+    return (
+      <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300">
+        <BookOpen className="w-2.5 h-2.5" />
+        {language === "ar" ? "لوائح وأسئلة الزيتونة" : "ZUJ Regulations FAQ"}
+      </span>
+    );
+  }
+  if (source === "academic_rules") {
+    return (
+      <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">
+        <GraduationCap className="w-2.5 h-2.5" />
+        {language === "ar" ? "الخطة الدراسية والقواعد" : "Academic Rules"}
+      </span>
+    );
+  }
+  if (source === "local_advisor") {
+    return (
+      <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300">
+        <Sparkles className="w-2.5 h-2.5" />
+        {language === "ar" ? "إرشادات المرشد المحلي" : "Advisor Guidance"}
+      </span>
+    );
+  }
+  if (source === "external_llm") {
+    return (
+      <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">
+        <Zap className="w-2.5 h-2.5" />
+        {language === "ar" ? "نموذج سحابي حي" : "Live Model"}
+      </span>
+    );
+  }
+  if (isOffline) {
+    return (
+      <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-slate-500/20 border border-slate-500/30 text-slate-300">
+        <BrainCircuit className="w-2.5 h-2.5" />
+        {language === "ar" ? "استجابة محلية" : "Local Fallback"}
+      </span>
+    );
+  }
+  return null;
+}
 
 export default function AIChatPage() {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -109,6 +178,7 @@ export default function AIChatPage() {
   const gpa = parseFloat(dashboard?.stats?.gpa ?? "0");
   const healthScore = health?.overallScore ?? 0;
   const gradProgress = dashboard?.stats?.progress ?? 0;
+  const suggestedPrompts = language === "ar" ? SUGGESTED_PROMPTS_AR : SUGGESTED_PROMPTS_EN;
   const currentSem = dashboard?.stats?.currentSemester ?? 1;
   const semestersLeft = dashboard?.stats?.semestersLeft ?? 0;
 
@@ -118,7 +188,13 @@ export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showFallbackBanner, setShowFallbackBanner] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const { data: aiStatus, isLoading: statusLoading } = trpc.aiChat.getStatus.useQuery(undefined, {
+    refetchInterval: 30000,
+  });
+  const isLocalFallbackMode = !aiStatus?.isOnline || aiStatus?.mode === "local_mock_fallback";
 
   const { data: conversationsData } = trpc.aiChat.getConversations.useQuery();
   const { data: messagesData } = trpc.aiChat.getMessages.useQuery(selectedConversation || 0, { enabled: !!selectedConversation });
@@ -154,15 +230,44 @@ export default function AIChatPage() {
 
   const handleSendMessage = async () => {
     if (!input.trim() || !selectedConversation || isLoading) return;
-    const userMsg: Message = { role: "user", content: input };
-    setMessages(prev => [...prev, userMsg]); setInput(""); setIsLoading(true);
+    const userText = input.trim();
+    const userMsg: Message = { role: "user", content: userText, createdAt: new Date() };
+    setMessages(prev => [...prev, userMsg]);
+    setInput("");
+    setIsLoading(true);
     try {
-      const res = await sendMsg.mutateAsync({ conversationId: selectedConversation, message: input });
-      if (res.response) setMessages(prev => [...prev, { role: "assistant", content: res.response }]);
+      const res = await sendMsg.mutateAsync({ conversationId: selectedConversation, message: userText });
+      if (res?.response) {
+        setMessages(prev => [
+          ...prev,
+          {
+            role: "assistant",
+            content: res.response,
+            isOfflineFallback: res.isOfflineFallback ?? true,
+            source: res.source ?? "local_advisor",
+            createdAt: new Date(),
+          },
+        ]);
+      }
       utils.aiChat.getMessages.invalidate(selectedConversation);
     } catch (e) {
-      setMessages(prev => [...prev, { role: "assistant", content: t("chat.sendError") }]);
-    } finally { setIsLoading(false); }
+      console.error("[AIChatPage] Message delivery error:", e);
+      setMessages(prev => [
+        ...prev,
+        {
+          role: "assistant",
+          content: language === "ar"
+            ? "تعذر إرسال الرسالة إلى الخادم حالياً. يرجى مراجعة المرشد الأكاديمي أو المحاولة مجدداً."
+            : t("chat.sendError") || "Sorry, I encountered an error. Please try again.",
+          isOfflineFallback: true,
+          source: "local_advisor",
+          createdAt: new Date(),
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+      setTimeout(scrollToBottom, 50);
+    }
   };
 
   const handleDeleteConversation = async (id: number) => {
@@ -191,19 +296,48 @@ export default function AIChatPage() {
     <DashboardLayout>
       <div className="p-3 sm:p-4 md:p-6 max-w-none md:max-w-7xl md:mx-auto space-y-6">
         {/* ─── Hero ─── */}
-        <motion.div {...fadeInUp} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-900/40 via-slate-900/60 to-slate-900/80 border border-blue-500/20 backdrop-blur-2xl p-4 sm:p-6 md:p-8">
-          <div className="absolute top-0 end-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <motion.div {...fadeInUp} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-950/40 via-slate-900/60 to-slate-900/80 border border-emerald-500/20 backdrop-blur-2xl p-4 sm:p-6 md:p-8">
+          <div className="absolute top-0 end-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <Logo size={40} className="rounded-xl shadow-[0_0_30px_rgba(59,130,246,.35)]" />
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-xs font-medium text-emerald-400 uppercase tracking-wider">AI Online</span>
+                  {statusLoading ? (
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800/60 border border-slate-700/50 text-slate-400">
+                      <div className="w-2 h-2 rounded-full bg-slate-400 animate-pulse" />
+                      <span className="text-[11px] font-medium uppercase tracking-wider">
+                        {t("chat.statusChecking")}
+                      </span>
+                    </div>
+                  ) : isLocalFallbackMode ? (
+                    <div
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 shadow-sm"
+                      title={aiStatus?.model ? `Active: ${aiStatus.model}` : "Local ZUJ FAQ & Rules Fallback"}
+                    >
+                      <div className="w-2 h-2 rounded-full bg-amber-400" />
+                      <span className="text-[11px] font-semibold uppercase tracking-wider">
+                        {t("chat.statusLocal")}
+                      </span>
+                      <Badge variant="outline" className="text-[9px] px-1 py-0 border-amber-400/40 text-amber-300 hidden sm:inline-flex">
+                        {t("chat.statusOffline")}
+                      </Badge>
+                    </div>
+                  ) : (
+                    <div
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 shadow-sm"
+                      title={aiStatus?.model ? `Model: ${aiStatus.model}` : "Live External Model"}
+                    >
+                      <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="text-[11px] font-semibold uppercase tracking-wider">
+                        {t("chat.statusOnline")}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-white">Welcome back, {studentName}.</h1>
-              <p className="text-muted-foreground max-w-md">I'm <span className="text-primary font-semibold">Murshid AI</span>, your academic advisor and study companion.</p>
+              <p className="text-muted-foreground max-w-md">I'm <span className="text-primary font-semibold">Oliver AI</span>, your academic advisor and study companion.</p>
             </div>
             {allLoaded ? (
               <div className="flex flex-wrap items-center gap-3">
@@ -240,7 +374,7 @@ export default function AIChatPage() {
         {/* ─── Main Tabs ─── */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-card border border-border backdrop-blur-2xl p-1 flex flex-nowrap md:flex-wrap h-auto gap-1 overflow-x-auto md:overflow-x-visible scrollbar-hide">
-            <TabsTrigger value="dashboard" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-muted-foreground shrink-0"><BrainCircuit className="w-3.5 h-3.5 me-1.5" />Dashboard</TabsTrigger>
+            <TabsTrigger value="dashboard" className="data-[state=active]:bg-emerald-700 data-[state=active]:text-white text-muted-foreground shrink-0"><BrainCircuit className="w-3.5 h-3.5 me-1.5" />Dashboard</TabsTrigger>
             <TabsTrigger value="insights" className="data-[state=active]:bg-violet-600 data-[state=active]:text-white text-muted-foreground shrink-0"><Zap className="w-3.5 h-3.5 me-1.5" />Insights</TabsTrigger>
             <TabsTrigger value="planner" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-muted-foreground shrink-0"><ClipboardList className="w-3.5 h-3.5 me-1.5" />Planner</TabsTrigger>
             <TabsTrigger value="career" className="data-[state=active]:bg-rose-600 data-[state=active]:text-white text-muted-foreground shrink-0"><Briefcase className="w-3.5 h-3.5 me-1.5" />Career</TabsTrigger>
@@ -349,17 +483,17 @@ export default function AIChatPage() {
 
             {/* Suggested Prompts */}
             <motion.div {...fadeInUp}>
-              <Card className="bg-gradient-to-r from-blue-900/20 to-slate-900/20 border-blue-500/20 backdrop-blur-2xl">
-                <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><MessageCircle className="w-4 h-4 text-primary" />Ask Murshid AI</CardTitle></CardHeader>
+              <Card className="bg-gradient-to-r from-emerald-950/20 to-slate-900/20 border-emerald-500/20 backdrop-blur-2xl">
+                <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><MessageCircle className="w-4 h-4 text-primary" />Ask Oliver AI</CardTitle></CardHeader>
                 <CardContent className="p-5">
                   <div className="flex flex-wrap gap-2">
-                    {SUGGESTED_PROMPTS.map((prompt, i) => (
+                    {suggestedPrompts.map((prompt, i) => (
                       <button key={i} onClick={() => openChatWithPrompt(prompt)} className="px-4 py-2 rounded-lg bg-white/[0.05] border border-border text-xs text-secondary-foreground hover:bg-white/[0.08] hover:text-white hover:border-white/20 transition-all">
                         {prompt}
                       </button>
                     ))}
                   </div>
-                  <Button className="mt-4 bg-blue-600 hover:bg-blue-500 text-white" onClick={() => setActiveTab("chat")}><Sparkles className="w-4 h-4 me-2" />Start a Conversation</Button>
+                  <Button className="mt-4 bg-emerald-700 hover:bg-emerald-600 text-white" onClick={() => setActiveTab("chat")}><Sparkles className="w-4 h-4 me-2" />Start a Conversation</Button>
                 </CardContent>
               </Card>
             </motion.div>
@@ -376,7 +510,7 @@ export default function AIChatPage() {
                       <>
                         {forecast && (
                           <div className="flex items-start gap-3 p-3 rounded-lg bg-card border border-border">
-                            <div className="w-8 h-8 rounded-lg bg-blue-500/15 flex items-center justify-center shrink-0"><TrendingUp className="w-4 h-4 text-primary" /></div>
+                            <div className="w-8 h-8 rounded-lg bg-emerald-500/15 flex items-center justify-center shrink-0"><TrendingUp className="w-4 h-4 text-primary" /></div>
                             <div><p className="text-sm text-white">Predicted GPA: <span className="font-bold text-primary">{forecast?.overallProjection?.currentGPA?.toFixed(2) ?? "—"}</span></p><p className="text-xs text-muted-foreground">Based on current trajectory</p></div>
                           </div>
                         )}
@@ -405,7 +539,7 @@ export default function AIChatPage() {
               </motion.div>
               <motion.div {...fadeInUp}>
                 <Card className="bg-card border-border backdrop-blur-2xl">
-                  <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><BarChart3 className="w-4 h-4 text-cyan-400" />AI Analytics</CardTitle></CardHeader>
+                  <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><BarChart3 className="w-4 h-4 text-emerald-400" />AI Analytics</CardTitle></CardHeader>
                   <CardContent className="p-5 space-y-4">
                     {allLoaded ? (
                       <>
@@ -424,11 +558,11 @@ export default function AIChatPage() {
             </div>
             <motion.div {...fadeInUp}>
               <Card className="bg-card border-border backdrop-blur-2xl">
-                <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><ClipboardList className="w-4 h-4 text-cyan-400" />Study Planner Snapshot</CardTitle></CardHeader>
+                <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><ClipboardList className="w-4 h-4 text-emerald-400" />Study Planner Snapshot</CardTitle></CardHeader>
                 <CardContent className="p-5">
                   {allLoaded ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                      <div className="p-4 rounded-xl bg-card border border-border text-center"><Calendar className="w-5 h-5 text-cyan-400 mx-auto mb-2" /><p className="text-xs text-muted-foreground">Weekly Schedule</p><p className="text-sm font-bold text-white mt-1">{dashboard?.courses?.length ?? 0} courses</p></div>
+                      <div className="p-4 rounded-xl bg-card border border-border text-center"><Calendar className="w-5 h-5 text-emerald-400 mx-auto mb-2" /><p className="text-xs text-muted-foreground">Weekly Schedule</p><p className="text-sm font-bold text-white mt-1">{dashboard?.courses?.length ?? 0} courses</p></div>
                       <div className="p-4 rounded-xl bg-card border border-border text-center"><PenLine className="w-5 h-5 text-amber-400 mx-auto mb-2" /><p className="text-xs text-muted-foreground">Assignments</p><p className="text-sm font-bold text-white mt-1">{overview?.upcomingAssignments?.length ?? 0} pending</p></div>
                       <div className="p-4 rounded-xl bg-card border border-border text-center"><Clock className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-xs text-muted-foreground">Study Hours</p><p className="text-sm font-bold text-white mt-1">{Math.round((dashboard?.courses?.length ?? 0) * 4.5)}h/week</p></div>
                       <div className="p-4 rounded-xl bg-card border border-border text-center"><Target className="w-5 h-5 text-emerald-400 mx-auto mb-2" /><p className="text-xs text-muted-foreground">Focus Areas</p><p className="text-sm font-bold text-white mt-1">{warnings?.warnings?.filter((w: any) => w.type === 'at_risk').length ?? 0} at risk</p></div>
@@ -459,12 +593,12 @@ export default function AIChatPage() {
               </motion.div>
               <motion.div {...fadeInUp}>
                 <Card className="bg-card border-border backdrop-blur-2xl">
-                  <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><ClipboardList className="w-4 h-4 text-cyan-400" />Degree Roadmap</CardTitle></CardHeader>
+                  <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><ClipboardList className="w-4 h-4 text-emerald-400" />Degree Roadmap</CardTitle></CardHeader>
                   <CardContent className="p-5 space-y-3">
                     {rmLoading ? <div className="space-y-3">{[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-12" />)}</div> :
                       roadmap?.roadmap && roadmap.roadmap.length > 0 ? roadmap.roadmap.slice(0, 6).map((item: any, i: number) => (
                         <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-card border border-border">
-                          <div className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-blue-500/15 flex items-center justify-center text-xs font-bold text-primary">{item.semester}</div><span className="text-sm text-white">{item.credits} credits</span></div>
+                          <div className="flex items-center gap-3"><div className="w-6 h-6 rounded-full bg-emerald-500/15 flex items-center justify-center text-xs font-bold text-primary">{item.semester}</div><span className="text-sm text-white">{item.credits} credits</span></div>
                           <span className="text-xs text-muted-foreground">{item.status}</span>
                         </div>
                       )) : <div className="text-center py-8 text-muted-foreground"><Compass className="w-8 h-8 mx-auto mb-2 opacity-30" /><p className="text-sm">Roadmap data not available</p></div>}
@@ -482,7 +616,7 @@ export default function AIChatPage() {
                   <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
                     <Card className="bg-card border-border backdrop-blur-2xl h-full hover:bg-white/[0.06] transition-colors">
                       <CardContent className="p-5 space-y-3">
-                        <div className="flex items-start justify-between"><div className={`w-10 h-10 rounded-lg ${i % 2 === 0 ? "bg-rose-500/15 text-rose-400" : "bg-blue-500/15 text-primary"} flex items-center justify-center`}><Briefcase className="w-5 h-5" /></div><Badge variant="outline" className="border-border text-muted-foreground text-[10px]">{c.matchPercentage ?? 0}% match</Badge></div>
+                        <div className="flex items-start justify-between"><div className={`w-10 h-10 rounded-lg ${i % 2 === 0 ? "bg-rose-500/15 text-rose-400" : "bg-emerald-500/15 text-primary"} flex items-center justify-center`}><Briefcase className="w-5 h-5" /></div><Badge variant="outline" className="border-border text-muted-foreground text-[10px]">{c.matchPercentage ?? 0}% match</Badge></div>
                         <h4 className="text-sm font-bold text-white">{c.title}</h4>
                         <p className="text-xs text-muted-foreground">{c.description}</p>
                         <div className="space-y-1"><p className="text-[10px] text-muted-foreground uppercase">Skills</p><div className="flex flex-wrap gap-1">{(c.requiredSkills ?? []).slice(0, 4).map((s: string, j: number) => <Badge key={j} variant="outline" className="border-border text-muted-foreground text-[10px]">{s}</Badge>)}</div></div>
@@ -505,11 +639,11 @@ export default function AIChatPage() {
               {/* Sidebar — desktop only, conditionally rendered */}
               {!isMobile && (
                 <div className="w-60 lg:w-64 bg-card border border-border rounded-xl p-3 flex-col backdrop-blur-2xl shrink-0 flex">
-                  <Button onClick={handleCreateConversation} className="w-full mb-3 bg-blue-600 hover:bg-blue-500 text-sm" disabled={createConv.isPending}><Plus className="w-4 h-4 me-2" />New Chat</Button>
+                  <Button onClick={handleCreateConversation} className="w-full mb-3 bg-emerald-700 hover:bg-emerald-600 text-sm" disabled={createConv.isPending}><Plus className="w-4 h-4 me-2" />New Chat</Button>
                   <div className="flex-1 overflow-y-auto space-y-1.5 min-h-0">
                     {!conversationsData ? <div className="space-y-2">{[1, 2, 3].map(i => <Skeleton key={i} className="h-10" />)}</div> :
                       conversations.length > 0 ? conversations.map(conv => (
-                        <div key={conv.id} className={`p-2 rounded-lg cursor-pointer transition-colors group flex justify-between items-center ${selectedConversation === conv.id ? "bg-blue-600/20 border border-blue-500/40" : "bg-card hover:bg-white/[0.06] border border-border"}`} onClick={() => setSelectedConversation(conv.id)}>
+                        <div key={conv.id} className={`p-2 rounded-lg cursor-pointer transition-colors group flex justify-between items-center ${selectedConversation === conv.id ? "bg-emerald-700/20 border border-emerald-500/40" : "bg-card hover:bg-white/[0.06] border border-border"}`} onClick={() => setSelectedConversation(conv.id)}>
                           <div className="flex-1 min-w-0"><p className="text-sm font-medium truncate text-secondary-foreground">{conv.title}</p></div>
                           <button onClick={e => { e.stopPropagation(); handleDeleteConversation(conv.id); }} className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"><Trash2 className="w-4 h-4 text-red-400 hover:text-red-300" /></button>
                         </div>
@@ -525,12 +659,43 @@ export default function AIChatPage() {
                     {/* Mobile conversation strip — conditionally rendered */}
                     {isMobile && (
                       <div className="flex items-center gap-2 px-3 py-2 border-b border-border bg-card/95 backdrop-blur overflow-x-auto shrink-0">
-                        <Button onClick={handleCreateConversation} size="sm" className="shrink-0 h-9 w-9 p-0 bg-blue-600 hover:bg-blue-500" disabled={createConv.isPending}><Plus className="w-4 h-4" /></Button>
+                        <Button onClick={handleCreateConversation} size="sm" className="shrink-0 h-9 w-9 p-0 bg-emerald-700 hover:bg-emerald-600" disabled={createConv.isPending}><Plus className="w-4 h-4" /></Button>
                         {conversations.map(conv => (
-                          <button key={conv.id} onClick={() => setSelectedConversation(conv.id)} className={`shrink-0 px-2.5 py-1 rounded-md text-[11px] border truncate max-w-[120px] ${selectedConversation === conv.id ? "bg-blue-600/20 border-blue-500/40 text-white" : "bg-card border-border text-muted-foreground"}`}>
+                          <button key={conv.id} onClick={() => setSelectedConversation(conv.id)} className={`shrink-0 px-2.5 py-1 rounded-md text-[11px] border truncate max-w-[120px] ${selectedConversation === conv.id ? "bg-emerald-700/20 border-emerald-500/40 text-white" : "bg-card border-border text-muted-foreground"}`}>
                             {conv.title}
                           </button>
                         ))}
+                      </div>
+                    )}
+
+                    {/* ─── Local Fallback Mode Banner ─── */}
+                    {isLocalFallbackMode && showFallbackBanner && (
+                      <div className="mx-3 sm:mx-4 mt-3 p-3 sm:p-3.5 rounded-xl bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-transparent border border-amber-500/30 text-amber-200 backdrop-blur-md flex items-start justify-between gap-3 shrink-0">
+                        <div className="flex items-start gap-2.5 min-w-0">
+                          <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center shrink-0 mt-0.5">
+                            <Info className="w-4 h-4" />
+                          </div>
+                          <div className="space-y-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h4 className="text-xs sm:text-sm font-semibold text-amber-300 leading-tight">
+                                {t("chat.bannerTitle")}
+                              </h4>
+                              <Badge variant="outline" className="text-[10px] bg-amber-500/20 border-amber-500/40 text-amber-300 px-1.5 py-0">
+                                {language === "ar" ? "لوائح جامعة الزيتونة" : "ZUJ FAQs & Regulations"}
+                              </Badge>
+                            </div>
+                            <p className="text-[11px] sm:text-xs text-amber-200/90 leading-relaxed">
+                              {t("chat.bannerDescription")}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setShowFallbackBanner(false)}
+                          className="p-1 rounded-md text-amber-400 hover:text-amber-100 hover:bg-amber-500/20 transition-colors shrink-0"
+                          aria-label={language === "ar" ? "إغلاق الإشعار" : "Dismiss notice"}
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
                       </div>
                     )}
 
@@ -539,11 +704,11 @@ export default function AIChatPage() {
                       {messages.length === 0 ? (
                         <div className="h-full flex items-center justify-center">
                           <div className="text-center space-y-4 px-2">
-                            <div className="w-14 h-14 rounded-2xl bg-blue-500/15 flex items-center justify-center mx-auto"><Sparkles className="w-7 h-7 text-primary" /></div>
+                            <div className="w-14 h-14 rounded-2xl bg-emerald-500/15 flex items-center justify-center mx-auto"><Sparkles className="w-7 h-7 text-primary" /></div>
                             <p className="text-muted-foreground text-lg font-medium">Start a new conversation</p>
-                            <p className="text-sm text-muted-foreground max-w-sm mx-auto">Ask Murshid AI anything about your academics, courses, career, or study plans.</p>
+                            <p className="text-sm text-muted-foreground max-w-sm mx-auto">Ask Oliver AI anything about your academics, courses, career, or study plans.</p>
                             <div className="flex flex-wrap gap-2 justify-center pt-2 max-w-xs mx-auto">
-                              {SUGGESTED_PROMPTS.slice(0, 3).map((p, i) => (
+                              {suggestedPrompts.slice(0, 3).map((p, i) => (
                                 <button key={i} onClick={() => { setInput(p); }} className="px-3 py-1.5 rounded-lg bg-white/[0.05] border border-border text-xs text-muted-foreground hover:bg-white/[0.08] hover:text-white transition-all">{p}</button>
                               ))}
                             </div>
@@ -553,10 +718,13 @@ export default function AIChatPage() {
                         <AnimatePresence>
                           {messages.map((msg, index) => (
                             <motion.div key={index} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                              <div className={`${msg.role === "user" ? "max-w-[85%]" : "max-w-[90%]"} sm:max-w-[80%] md:max-w-md lg:max-w-lg px-3 py-2.5 md:px-4 md:py-3 rounded-2xl break-words ${msg.role === "user" ? "bg-blue-600 text-white rounded-br-sm" : "bg-white/[0.06] border border-border text-slate-100 rounded-bl-sm"}`}>
-                                <div className="flex items-center gap-2 mb-1">
+                              <div className={`${msg.role === "user" ? "max-w-[85%]" : "max-w-[90%]"} sm:max-w-[80%] md:max-w-md lg:max-w-lg px-3 py-2.5 md:px-4 md:py-3 rounded-2xl break-words ${msg.role === "user" ? "bg-emerald-700 text-white rounded-ee-sm" : "bg-white/[0.06] border border-border text-slate-100 rounded-es-sm"}`}>
+                                <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                                   {msg.role === "assistant" ? <Bot className="w-3.5 h-3.5 text-primary" /> : <User className="w-3.5 h-3.5" />}
-                                  <span className="text-[10px] opacity-70">{msg.role === "assistant" ? "Murshid AI" : "You"}</span>
+                                  <span className="text-[10px] opacity-70">{msg.role === "assistant" ? "Oliver AI" : "You"}</span>
+                                  {msg.role === "assistant" && (
+                                    <MessageSourceBadge source={msg.source} isOffline={msg.isOfflineFallback} language={language} />
+                                  )}
                                 </div>
                                 {msg.role === "assistant" ? <Streamdown className="break-words">{msg.content}</Streamdown> : <p className="text-sm break-words">{msg.content}</p>}
                                 {msg.role === "assistant" && msg.id && (
@@ -576,7 +744,7 @@ export default function AIChatPage() {
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
                               <div className="bg-white/[0.06] border border-border px-3 py-2.5 rounded-2xl flex items-center gap-2">
                                 <Bot className="w-4 h-4 text-primary" />
-                                <span className="text-sm text-secondary-foreground">Murshid AI is thinking</span>
+                                <span className="text-sm text-secondary-foreground">Oliver AI is thinking</span>
                                 <div className="flex gap-1"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} /><div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} /><div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} /></div>
                               </div>
                             </motion.div>
@@ -590,16 +758,16 @@ export default function AIChatPage() {
                     <div className="border-t border-border p-2.5 sm:p-3 md:p-4 bg-card/95 backdrop-blur shrink-0">
                       <div className="flex gap-2 md:gap-3 w-full md:max-w-4xl md:mx-auto">
                         <Input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSendMessage()} placeholder={t("chat.placeholder")} className="bg-white/[0.05] border-border text-white placeholder-slate-500 h-11 text-sm flex-1" disabled={isLoading} />
-                        <Button onClick={handleSendMessage} disabled={!input.trim() || isLoading} className="bg-blue-600 hover:bg-blue-500 h-11 w-11 p-0 shrink-0"><Send className="w-4 h-4" /></Button>
+                        <Button onClick={handleSendMessage} disabled={!input.trim() || isLoading} className="bg-emerald-700 hover:bg-emerald-600 h-11 w-11 p-0 shrink-0"><Send className="w-4 h-4" /></Button>
                       </div>
                     </div>
                   </>
                 ) : (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center space-y-4 px-4">
-                      <div className="w-16 h-16 rounded-2xl bg-blue-500/15 flex items-center justify-center mx-auto"><MessageCircle className="w-8 h-8 text-primary" /></div>
+                      <div className="w-16 h-16 rounded-2xl bg-emerald-500/15 flex items-center justify-center mx-auto"><MessageCircle className="w-8 h-8 text-primary" /></div>
                       <p className="text-muted-foreground text-lg">{t("chat.startNewChat")}</p>
-                      <Button onClick={handleCreateConversation} className="bg-blue-600 hover:bg-blue-500"><Plus className="w-4 h-4 me-2" />New Conversation</Button>
+                      <Button onClick={handleCreateConversation} className="bg-emerald-700 hover:bg-emerald-600"><Plus className="w-4 h-4 me-2" />New Conversation</Button>
                     </div>
                   </div>
                 )}

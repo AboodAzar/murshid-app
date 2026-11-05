@@ -47,10 +47,10 @@ const priorityConfig: Record<string, {
   },
   low: {
     icon: CheckCircle2,
-    color: "text-blue-400",
-    bg: "bg-blue-500/10",
-    border: "border-blue-500/20",
-    badge: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/10",
+    border: "border-emerald-500/20",
+    badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
     label: "General",
   },
 };
@@ -129,7 +129,7 @@ export default function Announcements() {
     : "—";
 
   const stats = [
-    { label: "Total", value: total, icon: Megaphone, accent: "border-s-2 border-s-blue-500/50" },
+    { label: "Total", value: total, icon: Megaphone, accent: "border-s-2 border-s-emerald-500/50" },
     { label: "Important", value: highCount, icon: AlertTriangle, accent: "border-s-2 border-s-red-500/50" },
     { label: "This Month", value: thisMonthCount, icon: Calendar, accent: "border-s-2 border-s-emerald-500/50" },
     { label: "Latest", value: latestDate, icon: Clock, accent: "border-s-2 border-s-violet-500/50" },
@@ -142,7 +142,7 @@ export default function Announcements() {
         <motion.div {...fadeInUp} className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-[11px] font-semibold text-blue-300 uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-semibold text-emerald-300 uppercase tracking-wider">
                 <Sparkles className="w-3 h-3" />
                 Latest Updates
               </span>
@@ -176,7 +176,7 @@ export default function Announcements() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={dir === "rtl" ? "البحث في الإعلانات..." : "Search announcements..."}
-              className="ps-10 pe-10 bg-white/[0.03] border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-blue-500/30 rounded-xl h-10"
+              className="ps-10 pe-10 bg-white/[0.03] border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-emerald-500/30 rounded-xl h-10"
             />
             {search && (
               <button
@@ -236,7 +236,7 @@ export default function Announcements() {
             {(search || priorityFilter) && (
               <button
                 onClick={() => { setSearch(""); setPriorityFilter(null); }}
-                className="mt-4 text-sm text-blue-400 hover:text-blue-300 px-4 py-2 rounded-lg hover:bg-blue-500/10 transition-colors"
+                className="mt-4 text-sm text-emerald-400 hover:text-emerald-300 px-4 py-2 rounded-lg hover:bg-emerald-500/10 transition-colors"
               >
                 Clear filters
               </button>

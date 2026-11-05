@@ -25,7 +25,7 @@ export default function AdvisorAIReview() {
       <div className="p-6 max-w-6xl mx-auto space-y-6">
         <motion.div {...fadeInUp}>
           <h1 className="text-3xl font-bold text-white flex items-center gap-2">
-            <MessageSquare className="w-7 h-7 text-blue-400" />
+            <MessageSquare className="w-7 h-7 text-emerald-400" />
             {t("advisor.aiConversationReview")}
           </h1>
           <p className="text-slate-400 mt-1">{t("advisor.aiReviewDesc")}</p>
@@ -38,7 +38,7 @@ export default function AdvisorAIReview() {
             <div className="space-y-2 max-h-[500px] overflow-y-auto">
               {students.map((s: any) => (
                 <button key={s.id} onClick={() => { setSelectedStudentId(s.id); setSelectedConversation(null); }}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl text-start transition-colors ${selectedStudentId === s.id ? "bg-blue-600/20 border border-blue-500/30" : "bg-white/[0.04] hover:bg-white/[0.07]"}`}>
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl text-start transition-colors ${selectedStudentId === s.id ? "bg-emerald-600/20 border border-emerald-500/30" : "bg-white/[0.04] hover:bg-white/[0.07]"}`}>
                   <div className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center"><User className="w-4 h-4 text-slate-300" /></div>
                   <span className="text-sm font-medium text-white">{s.name || s.email}</span>
                   <ChevronRight className="w-4 h-4 text-slate-500 ms-auto rtl:rotate-180" />
@@ -77,13 +77,13 @@ export default function AdvisorAIReview() {
               </div>
             ) : (
               <div className="space-y-4">
-                <button onClick={() => setSelectedConversation(null)} className="text-sm text-blue-400 hover:text-blue-300">← {t("common.back")}</button>
+                <button onClick={() => setSelectedConversation(null)} className="text-sm text-emerald-400 hover:text-emerald-300">← {t("common.back")}</button>
                 <h3 className="text-lg font-semibold text-white">{selectedConversation.title || t("advisor.untitledConversation")}</h3>
                 <div className="space-y-3 max-h-[500px] overflow-y-auto pe-2">
                   {selectedConversation.messages?.map((msg: any, idx: number) => (
                     <div key={idx} className={`flex gap-3 ${msg.role === "user" ? "" : ""}`}>
-                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${msg.role === "user" ? "bg-blue-500/15" : "bg-emerald-500/15"}`}>
-                        {msg.role === "user" ? <User className="w-3.5 h-3.5 text-blue-400" /> : <Bot className="w-3.5 h-3.5 text-emerald-400" />}
+                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${msg.role === "user" ? "bg-emerald-500/15" : "bg-emerald-500/15"}`}>
+                        {msg.role === "user" ? <User className="w-3.5 h-3.5 text-emerald-400" /> : <Bot className="w-3.5 h-3.5 text-emerald-400" />}
                       </div>
                       <div className={`p-3 rounded-xl text-sm ${msg.role === "user" ? "bg-white/[0.04] text-white" : "bg-emerald-500/5 text-slate-200 border border-emerald-500/10"}`}>
                         {msg.content}

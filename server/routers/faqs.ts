@@ -132,18 +132,19 @@ export const faqsRouter = router({
         // Sync with Runpod only for published FAQs
         if (input.isActive) {
           const runpodUrl = process.env.RUNPOD_API_URL;
-          if (runpodUrl) {
+          if (runpodUrl && process.env.AI_FORCE_LOCAL_FALLBACK !== "true") {
             try {
               await fetch(`${runpodUrl.replace(/\/$/, '')}/add_faq`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                   question: input.question,
-                  answer: input.answer
+                  answer: input.answer,
                 }),
+                signal: AbortSignal.timeout(1500),
               });
-            } catch (e) {
-              console.error("[FAQs] Runpod sync failed:", e);
+            } catch (e: any) {
+              console.warn("[FAQs] Runpod sync skipped/timed out:", e?.message);
             }
           }
         }

@@ -32,58 +32,67 @@ const client = createTRPCClient({
 async function test(name, fn) {
   try {
     const result = await fn();
-    if (result && typeof result === 'object' && 'error' in result) {
+    if (result && typeof result === "object" && "error" in result && result.error) {
       console.log(`❌ ${name}:`, result.error?.message?.slice(0, 120));
       return false;
     }
     console.log(`✅ ${name}`);
     return true;
   } catch (err) {
-    console.log(`❌ ${name}:`, err.message?.slice(0, 120));
+    console.log(`❌ ${name}:`, err.message?.slice(0, 120) || String(err));
     return false;
   }
 }
 
 const r = { passed: 0, failed: 0 };
-async function run(name, fn) { if (await test(name, fn)) r.passed++; else r.failed++; }
+async function run(name, fn) {
+  if (await test(name, fn)) r.passed++;
+  else r.failed++;
+}
 
-// Login as admin, change a test user to advisor
-console.log("=== Setup: Create Advisor ===");
-await run("admin.login", () => client.auth.login.mutate({ email: "abood@gmail.com", password: "Abood#2004" }));
-await run("admin.updateUser (make advisor)", () => client.admin.updateUser.mutate({ id: 180002, role: "advisor" }));
+async function main() {
+  // ========== ADVISOR WORKFLOW ==========
+  console.log("=== Advisor Workflow Test ===");
+  await run("advisor.login", () => client.auth.login.mutate({ email: "a.khalil@zuj.edu.jo", password: "password123" }));
+  await run("advisor.me", () => client.auth.me.query());
+  await run("advisor.getInsights", () => client.advisor.getInsights.query());
+  const assigned = await client.advisor.getAssignedStudents.query();
+  await run("advisor.getAssignedStudents", async () => assigned);
+  const assignedStudentId = assigned[0]?.id;
 
-// Now test as advisor
-console.log("\n=== Advisor Workflow Test ===");
-await run("auth.logout", () => client.auth.logout.mutate());
-cookieJar = "";
-await run("advisor.login", () => client.auth.login.mutate({ email: "test1781037416495@std-zuj.edu.jo", password: "TestPass123!" }));
+  await run("advisor.getAppointments", () => client.advisor.getAppointments.query());
+  await run("advisor.getAlerts", () => client.advisor.getAlerts.query({}));
+  await run("advisor.getNotes", () => client.advisor.getNotes.query({}));
 
-await run("advisor.getInsights", () => client.advisor.getInsights.query());
-await run("advisor.getAssignedStudents", () => client.advisor.getAssignedStudents.query());
-await run("advisor.getAppointments", () => client.advisor.getAppointments.query());
-await run("advisor.getAlerts", () => client.advisor.getAlerts.query({}));
-await run("advisor.getNotes", () => client.advisor.getNotes.query({}));
-
-// Advisor should NOT be able to access students not assigned to them
-await run("advisor.student.dashboard (unassigned)", async () => {
-  try {
-    await client.student.dashboard.query({ studentId: 1 });
-    return { error: { message: "Should have failed" } };
-  } catch (err) {
-    if (err.message?.includes("Not authorized")) {
-      console.log("✅ advisor.student.dashboard (unassigned): Correctly rejected");
-      r.passed++;
-      return null;
-    }
-    throw err;
+  if (assignedStudentId) {
+    await run("advisor.student.dashboard (assigned)", () => client.student.dashboard.query({ studentId: assignedStudentId }));
+    await run("advisor.student.myCourses (assigned)", () => client.student.myCourses.query({ studentId: assignedStudentId }));
   }
+
+  // Advisor should NOT be able to access students not assigned to them
+  // Test with an ID not in advisor's assigned roster (e.g. 999999 or admin id 1)
+  await run("advisor.student.dashboard (unassigned boundary check)", async () => {
+    try {
+      await client.student.dashboard.query({ studentId: 1 });
+      return { error: { message: "Should have failed authorization" } };
+    } catch (err) {
+      if (err.message?.includes("Not authorized") || err.message?.includes("FORBIDDEN")) {
+        return { success: true };
+      }
+      throw err;
+    }
+  });
+
+  // Cleanup
+  try {
+    await client.auth.logout.mutate();
+  } catch {}
+
+  console.log(`\n=== Summary: ${r.passed} passed, ${r.failed} failed ===`);
+  process.exit(r.failed > 0 ? 1 : 0);
+}
+
+main().catch((err) => {
+  console.error("Fatal error in test-advisor-workflow:", err);
+  process.exit(1);
 });
-
-// Restore user to student
-console.log("\n=== Cleanup ===");
-await run("auth.logout", () => client.auth.logout.mutate());
-cookieJar = "";
-await run("admin.login", () => client.auth.login.mutate({ email: "abood@gmail.com", password: "Abood#2004" }));
-await run("admin.updateUser (restore student)", () => client.admin.updateUser.mutate({ id: 180002, role: "student" }));
-
-console.log(`\n=== Summary: ${r.passed} passed, ${r.failed} failed ===`);

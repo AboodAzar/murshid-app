@@ -52,8 +52,8 @@ const fadeInUp = {
 const fileIconColors: Record<string, string> = {
   pdf: "text-red-400 bg-red-500/15",
   csv: "text-emerald-400 bg-emerald-500/15",
-  doc: "text-blue-400 bg-blue-500/15",
-  docx: "text-blue-400 bg-blue-500/15",
+  doc: "text-emerald-400 bg-emerald-500/15",
+  docx: "text-emerald-400 bg-emerald-500/15",
   link: "text-violet-400 bg-violet-500/15",
   default: "text-slate-400 bg-slate-500/15",
 };
@@ -210,7 +210,7 @@ export default function AdvisorDocuments() {
   };
 
   const statCards = [
-    { label: t("advisor.totalDocuments"), value: stats?.total ?? 0, icon: FileText, color: "text-blue-400", bg: "bg-blue-500/15" },
+    { label: t("advisor.totalDocuments"), value: stats?.total ?? 0, icon: FileText, color: "text-emerald-400", bg: "bg-emerald-500/15" },
     { label: t("advisor.indexedDocuments"), value: stats?.indexed ?? 0, icon: CheckCircle2, color: "text-emerald-400", bg: "bg-emerald-500/15" },
     { label: t("advisor.processingDocuments"), value: stats?.processing ?? 0, icon: Loader2, color: "text-amber-400", bg: "bg-amber-500/15" },
     { label: t("advisor.failedDocuments"), value: stats?.failed ?? 0, icon: AlertTriangle, color: "text-red-400", bg: "bg-red-500/15" },
@@ -299,7 +299,7 @@ export default function AdvisorDocuments() {
         {/* Section A: My Documents */}
         <motion.div {...fadeInUp} className="mb-8">
           <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-            <FileText className="w-5 h-5 text-blue-400" />
+            <FileText className="w-5 h-5 text-emerald-400" />
             {t("advisor.myDocuments") || "My Documents"}
           </h2>
           {isLoading ? (
@@ -359,7 +359,7 @@ export default function AdvisorDocuments() {
                             href={doc.fileUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium bg-white/[0.06] text-blue-300 hover:bg-white/[0.1] border border-white/10 transition-colors shrink-0"
+                            className="flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium bg-white/[0.06] text-emerald-300 hover:bg-white/[0.1] border border-white/10 transition-colors shrink-0"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
                             <span className="hidden sm:inline">{t("advisor.openDocument")}</span>
@@ -443,7 +443,7 @@ export default function AdvisorDocuments() {
                         href={res.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full sm:flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs font-medium bg-white/[0.06] text-blue-300 hover:bg-white/[0.1] border border-white/10 transition-colors"
+                        className="w-full sm:flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs font-medium bg-white/[0.06] text-emerald-300 hover:bg-white/[0.1] border border-white/10 transition-colors"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         {t("advisor.openLink") || "Open Link"}

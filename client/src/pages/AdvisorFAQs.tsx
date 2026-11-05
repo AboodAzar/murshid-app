@@ -151,7 +151,7 @@ export default function AdvisorFAQs() {
   };
 
   const statCards = [
-    { label: t("advisor.totalFAQs"), value: stats?.total ?? 0, icon: FileText, color: "text-blue-400", bg: "bg-blue-500/15" },
+    { label: t("advisor.totalFAQs"), value: stats?.total ?? 0, icon: FileText, color: "text-emerald-400", bg: "bg-emerald-500/15" },
     { label: t("advisor.publishedFAQs"), value: stats?.published ?? 0, icon: BookOpen, color: "text-emerald-400", bg: "bg-emerald-500/15" },
     { label: t("advisor.draftFAQs"), value: stats?.draft ?? 0, icon: Eye, color: "text-amber-400", bg: "bg-amber-500/15" },
   ];
@@ -289,7 +289,7 @@ export default function AdvisorFAQs() {
                         <Button onClick={() => setViewFaq(faq)} size="icon" variant="ghost" className="w-8 h-8 text-slate-400 hover:text-white">
                           <Eye className="w-4 h-4" />
                         </Button>
-                        <Button onClick={() => openEdit(faq)} size="icon" variant="ghost" className="w-8 h-8 text-slate-400 hover:text-blue-400">
+                        <Button onClick={() => openEdit(faq)} size="icon" variant="ghost" className="w-8 h-8 text-slate-400 hover:text-emerald-400">
                           <Edit3 className="w-4 h-4" />
                         </Button>
                         <Button onClick={() => setDeleteTarget(faq)} size="icon" variant="ghost" className="w-8 h-8 text-slate-400 hover:text-red-400">

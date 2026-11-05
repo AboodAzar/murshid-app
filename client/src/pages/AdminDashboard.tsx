@@ -859,7 +859,7 @@ export default function AdminDashboard() {
                           labelStyle={{ color: "#e2e8f0" }}
                         />
                         <Legend />
-                        <Line type="monotone" dataKey="avgResponseTime" stroke="#3b82f6" strokeWidth={2} dot={{ fill: "#3b82f6" }} name="Avg Response Time (s)" />
+                        <Line type="monotone" dataKey="avgResponseTime" stroke="#f59e0b" strokeWidth={2} dot={{ fill: "#f59e0b" }} name="Avg Response Time (s)" />
                         <Line type="monotone" dataKey="accuracy" stroke="#10b981" strokeWidth={2} dot={{ fill: "#10b981" }} name="Accuracy (%)" />
                       </LineChart>
                     </ResponsiveContainer>

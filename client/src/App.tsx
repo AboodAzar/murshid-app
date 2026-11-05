@@ -6,7 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { I18nProvider } from "./contexts/I18nContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import Home from "./pages/Home";
+import Unauthorized from "./pages/Unauthorized";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -213,7 +213,7 @@ function Router() {
       </Route>
 
       <Route path={"/404"} component={NotFound} />
-      <Route path={"/unauthorized"} component={NotFound} />
+      <Route path={"/unauthorized"} component={Unauthorized} />
 
       <Route path={"/auth-debug"}>
         {() => (

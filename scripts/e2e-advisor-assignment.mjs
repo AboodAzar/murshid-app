@@ -32,7 +32,7 @@ const client = createTRPCClient({
 async function test(name, fn) {
   try {
     const result = await fn();
-    if (result && typeof result === 'object' && 'error' in result) {
+    if (result && typeof result === "object" && "error" in result && result.error) {
       console.log(`❌ ${name}:`, result.error?.message?.slice(0, 120));
       return false;
     }
@@ -45,95 +45,133 @@ async function test(name, fn) {
 }
 
 const r = { passed: 0, failed: 0 };
-async function run(name, fn) { if (await test(name, fn)) r.passed++; else r.failed++; }
-
-// ========== ADMIN SETUP ==========
-console.log("=== Admin Setup ===");
-await run("admin.login", () => client.auth.login.mutate({ email: "abood@gmail.com", password: "Abood#2004" }));
-
-const advisors = await client.admin.getAdvisorsWithStudents.query();
-const unassigned = await client.admin.getUnassignedStudents.query();
-
-console.log(`Found ${advisors.length} advisors, ${unassigned.length} unassigned students`);
-
-if (advisors.length === 0 || unassigned.length === 0) {
-  console.log("❌ Cannot test: need at least 1 advisor and 1 unassigned student");
-  process.exit(1);
+async function run(name, fn) {
+  if (await test(name, fn)) r.passed++;
+  else r.failed++;
 }
 
-const testAdvisorId = advisors[0].id;
-const testStudentId = unassigned[0].id;
+async function main() {
+  // ========== ADMIN SETUP ==========
+  console.log("=== Admin Setup ===");
+  await run("admin.login", () => client.auth.login.mutate({ email: "abood@gmail.com", password: "Abood#2004" }));
 
-console.log(`Advisor: ${advisors[0].name ?? advisors[0].email} (id=${testAdvisorId})`);
-console.log(`Student: ${unassigned[0].name ?? unassigned[0].email} (id=${testStudentId})`);
+  const advisors = await client.admin.getAdvisorsWithStudents.query();
+  let unassigned = await client.admin.getUnassignedStudents.query();
 
-// ========== ASSIGNMENT ==========
-console.log("\n=== Assignment ===");
-await run("admin.assignAdvisor", () => client.admin.assignAdvisor.mutate({ studentId: testStudentId, advisorId: testAdvisorId }));
+  console.log(`Found ${advisors.length} advisors, ${unassigned.length} unassigned students`);
 
-await run("admin.verify.assigned", async () => {
-  const updated = await client.admin.getAdvisorsWithStudents.query();
-  const advisor = updated.find(a => a.id === testAdvisorId);
-  if (!advisor || !advisor.students.find(s => s.id === testStudentId)) {
-    throw new Error("Student not in advisor list");
+  if (advisors.length === 0) {
+    console.log("❌ Cannot test: need at least 1 advisor");
+    process.exit(1);
   }
-});
 
-await run("admin.verify.dashboard", async () => {
-  const dash = await client.admin.dashboard.query();
-  const student = dash.users.find(u => u.id === testStudentId);
-  if (!student || student.advisorId !== testAdvisorId) {
-    throw new Error("Dashboard missing advisorId");
+  let testStudentId = null;
+  let originalAdvisorId = null;
+  const testAdvisor = advisors[0];
+  const testAdvisorId = testAdvisor.id;
+
+  if (unassigned.length > 0) {
+    testStudentId = unassigned[0].id;
+    originalAdvisorId = null;
+  } else {
+    // All students currently assigned: dynamically unassign one student for this test
+    const advisorWithStudents = advisors.find((a) => a.students && a.students.length > 0) || advisors[0];
+    const candidateStudent = advisorWithStudents.students[0];
+    testStudentId = candidateStudent.id;
+    originalAdvisorId = advisorWithStudents.id;
+
+    console.log(`Temporarily unassigning student ${testStudentId} from advisor ${originalAdvisorId} for test...`);
+    await client.admin.assignAdvisor.mutate({ studentId: testStudentId, advisorId: null });
+    unassigned = await client.admin.getUnassignedStudents.query();
   }
-});
 
-// ========== ADVISOR WORKFLOW ==========
-console.log("\n=== Advisor Workflow ===");
-await run("auth.logout", () => client.auth.logout.mutate());
-cookieJar = "";
+  console.log(`Target Advisor: ${testAdvisor.name ?? testAdvisor.email} (id=${testAdvisorId})`);
+  console.log(`Target Student: id=${testStudentId}`);
 
-await run("advisor.login", () => client.auth.login.mutate({ email: "nesreen@gmail.com", password: "password123" }));
+  // ========== ASSIGNMENT ==========
+  console.log("\n=== Assignment ===");
+  await run("admin.assignAdvisor", () => client.admin.assignAdvisor.mutate({ studentId: testStudentId, advisorId: testAdvisorId }));
 
-await run("advisor.getAssignedStudents", async () => {
-  try {
+  await run("admin.verify.assigned", async () => {
+    const updated = await client.admin.getAdvisorsWithStudents.query();
+    const advisor = updated.find((a) => a.id === testAdvisorId);
+    if (!advisor || !advisor.students.find((s) => s.id === testStudentId)) {
+      throw new Error("Student not in advisor list");
+    }
+  });
+
+  await run("admin.verify.dashboard", async () => {
+    const dash = await client.admin.dashboard.query();
+    const student = dash.users.find((u) => u.id === testStudentId);
+    if (!student || student.advisorId !== testAdvisorId) {
+      throw new Error("Dashboard missing or wrong advisorId");
+    }
+  });
+
+  // ========== ADVISOR WORKFLOW ==========
+  console.log("\n=== Advisor Workflow ===");
+  await run("auth.logout", () => client.auth.logout.mutate());
+  cookieJar = "";
+
+  await run("advisor.login", () => client.auth.login.mutate({ email: testAdvisor.email, password: "password123" }));
+
+  await run("advisor.getAssignedStudents", async () => {
     const students = await client.advisor.getAssignedStudents.query();
-    if (!students.find(s => s.id === testStudentId)) {
+    if (!students.find((s) => s.id === testStudentId)) {
       throw new Error("Assigned student not visible to advisor");
     }
-  } catch (err) {
-    console.log("  [DEBUG] getAssignedStudents error:", err.message);
-    if (err.meta?.responseJSON) {
-      console.log("  [DEBUG] response:", JSON.stringify(err.meta.responseJSON, null, 2).slice(0, 500));
+  });
+
+  await run("advisor.getInsights", async () => {
+    const insights = await client.advisor.getInsights.query();
+    if (insights.totalStudents === 0) {
+      throw new Error("Insights show 0 students");
     }
-    throw err;
+  });
+
+  await run("advisor.getAlerts", () => client.advisor.getAlerts.query({}));
+  await run("advisor.getNotes", () => client.advisor.getNotes.query({}));
+  await run("advisor.student.dashboard", () => client.student.dashboard.query({ studentId: testStudentId }));
+  await run("advisor.student.myCourses", () => client.student.myCourses.query({ studentId: testStudentId }));
+
+  // ========== CLEANUP ==========
+  console.log("\n=== Cleanup ===");
+  await run("auth.logout", () => client.auth.logout.mutate());
+  cookieJar = "";
+
+  await run("admin.login", () => client.auth.login.mutate({ email: "abood@gmail.com", password: "Abood#2004" }));
+
+  if (originalAdvisorId) {
+    console.log(`Restoring student ${testStudentId} to original advisor ${originalAdvisorId}...`);
+    await run("admin.restoreOriginalAdvisor", () =>
+      client.admin.assignAdvisor.mutate({ studentId: testStudentId, advisorId: originalAdvisorId })
+    );
+    await run("admin.verify.restored", async () => {
+      const updated = await client.admin.getAdvisorsWithStudents.query();
+      const origAdvisor = updated.find((a) => a.id === originalAdvisorId);
+      if (!origAdvisor || !origAdvisor.students.find((s) => s.id === testStudentId)) {
+        throw new Error("Student not restored to original advisor list");
+      }
+    });
+  } else {
+    await run("admin.unassign", () => client.admin.assignAdvisor.mutate({ studentId: testStudentId, advisorId: null }));
+    await run("admin.verify.unassigned", async () => {
+      const updated = await client.admin.getUnassignedStudents.query();
+      if (!updated.find((s) => s.id === testStudentId)) {
+        throw new Error("Student not back in unassigned list");
+      }
+    });
   }
+
+  try {
+    await client.auth.logout.mutate();
+  } catch {}
+
+  console.log(`\n=== E2E Summary: ${r.passed} passed, ${r.failed} failed ===`);
+  process.exit(r.failed > 0 ? 1 : 0);
+}
+
+main().catch((err) => {
+  console.error("Fatal error in e2e-advisor-assignment:", err);
+  process.exit(1);
 });
-
-await run("advisor.getInsights", async () => {
-  const insights = await client.advisor.getInsights.query();
-  if (insights.totalStudents === 0) {
-    throw new Error("Insights show 0 students");
-  }
-});
-
-await run("advisor.getAlerts", () => client.advisor.getAlerts.query({}));
-await run("advisor.getNotes", () => client.advisor.getNotes.query({}));
-await run("advisor.student.dashboard", () => client.student.dashboard.query({ studentId: testStudentId }));
-await run("advisor.student.myCourses", () => client.student.myCourses.query({ studentId: testStudentId }));
-
-// ========== CLEANUP ==========
-console.log("\n=== Cleanup ===");
-await run("auth.logout", () => client.auth.logout.mutate());
-cookieJar = "";
-
-await run("admin.login", () => client.auth.login.mutate({ email: "abood@gmail.com", password: "Abood#2004" }));
-await run("admin.unassign", () => client.admin.assignAdvisor.mutate({ studentId: testStudentId, advisorId: null }));
-
-await run("admin.verify.unassigned", async () => {
-  const updated = await client.admin.getUnassignedStudents.query();
-  if (!updated.find(s => s.id === testStudentId)) {
-    throw new Error("Student not back in unassigned list");
-  }
-});
-
-console.log(`\n=== E2E Summary: ${r.passed} passed, ${r.failed} failed ===`);

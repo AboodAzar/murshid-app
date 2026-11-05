@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import Logo from "@/components/Logo";
-import { ArrowRight, Mail, Lock, User } from "lucide-react";
+import { ArrowRight, Mail, Lock, User, ShieldCheck } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
 const fadeInUp = {
@@ -78,7 +78,6 @@ export default function Register() {
             setPage(3);
             return;
           }
-          // Registration successful without verification — redirect to login
           console.log("[Register:Frontend] Registration success, redirecting to login");
           setLocation("/login");
         }
@@ -126,19 +125,19 @@ export default function Register() {
   return (
     <div
       dir={dir}
-      className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-4"
+      className="min-h-screen bg-gradient-to-br from-[#040e08] via-[#091f12] to-[#040e08] flex items-center justify-center px-4 py-8"
     >
       {/* Background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          animate={{ x: [0, 100, 0], y: [0, 50, 0] }}
+          animate={{ x: [0, 80, 0], y: [0, 40, 0] }}
           transition={{ duration: 20, repeat: Infinity }}
-          className="absolute top-20 end-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"
+          className="absolute top-20 end-10 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl"
         />
         <motion.div
-          animate={{ x: [0, -100, 0], y: [0, -50, 0] }}
+          animate={{ x: [0, -80, 0], y: [0, -40, 0] }}
           transition={{ duration: 25, repeat: Infinity }}
-          className="absolute bottom-20 start-10 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl"
+          className="absolute bottom-20 start-10 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl"
         />
       </div>
 
@@ -150,26 +149,31 @@ export default function Register() {
       >
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Logo size={80} className="rounded-2xl shadow-lg shadow-blue-500/25" />
-            <span className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-              {t("common.appName")}
-            </span>
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <Logo size={72} className="rounded-2xl shadow-xl shadow-emerald-500/20" />
+            <div className="text-start">
+              <span className="text-3xl font-extrabold bg-gradient-to-r from-emerald-400 via-green-300 to-amber-300 bg-clip-text text-transparent block">
+                Oliver
+              </span>
+              <span className="text-xs font-medium text-emerald-400/90 tracking-wide uppercase">
+                ZUJ Academic Guidance
+              </span>
+            </div>
           </div>
-          <p className="text-muted-foreground">{t("common.appDescription")}</p>
+          <p className="text-muted-foreground text-sm">{t("common.appDescription")}</p>
         </div>
 
         {/* Register Card */}
-        <Card className="bg-card backdrop-blur-xl border-border shadow-2xl">
-          <CardHeader className="space-y-2">
-            <CardTitle className="text-2xl">
+        <Card className="bg-card/90 backdrop-blur-2xl border-emerald-500/20 shadow-2xl shadow-emerald-950/50">
+          <CardHeader className="space-y-1.5 pb-4">
+            <CardTitle className="text-2xl font-bold tracking-tight text-white">
               {t("auth.createAccount")}
             </CardTitle>
-            <CardDescription>{t("auth.createAccountDesc")}</CardDescription>
+            <CardDescription className="text-slate-400">{t("auth.createAccountDesc")}</CardDescription>
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {page === 1 ? (
                 <>
                   {/* Name Input */}
@@ -178,14 +182,14 @@ export default function Register() {
                       {t("auth.fullName")}
                     </label>
                     <div className="relative">
-                      <User className="absolute start-3 top-3 w-5 h-5 text-muted-foreground" />
+                      <User className="absolute start-3 top-3.5 w-5 h-5 text-slate-400" />
                       <Input
                         type="text"
                         name="name"
-                        placeholder={t("auth.namePlaceholder")}
+                        placeholder={t("auth.fullNamePlaceholder")}
                         value={formData.name}
                         onChange={handleInputChange}
-                        className="ps-10 bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
+                        className="ps-10 bg-slate-900/60 border-slate-700/80 text-white placeholder-slate-400 focus:border-emerald-500 focus:ring-emerald-500/30 h-11"
                         required
                         disabled={isLoading}
                       />
@@ -198,14 +202,14 @@ export default function Register() {
                       {t("auth.email")}
                     </label>
                     <div className="relative">
-                      <Mail className="absolute start-3 top-3 w-5 h-5 text-muted-foreground" />
+                      <Mail className="absolute start-3 top-3.5 w-5 h-5 text-slate-400" />
                       <Input
                         type="email"
                         name="email"
                         placeholder={t("auth.emailPlaceholder")}
                         value={formData.email}
                         onChange={handleInputChange}
-                        className="ps-10 bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
+                        className="ps-10 bg-slate-900/60 border-slate-700/80 text-white placeholder-slate-400 focus:border-emerald-500 focus:ring-emerald-500/30 h-11"
                         required
                         disabled={isLoading}
                       />
@@ -220,14 +224,14 @@ export default function Register() {
                       {t("auth.password")}
                     </label>
                     <div className="relative">
-                      <Lock className="absolute start-3 top-3 w-5 h-5 text-muted-foreground" />
+                      <Lock className="absolute start-3 top-3.5 w-5 h-5 text-slate-400" />
                       <Input
                         type="password"
                         name="password"
                         placeholder="••••••••"
                         value={formData.password}
                         onChange={handleInputChange}
-                        className="ps-10 bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
+                        className="ps-10 bg-slate-900/60 border-slate-700/80 text-white placeholder-slate-400 focus:border-emerald-500 focus:ring-emerald-500/30 h-11"
                         required
                         disabled={isLoading}
                       />
@@ -240,14 +244,14 @@ export default function Register() {
                       {t("auth.confirmPassword")}
                     </label>
                     <div className="relative">
-                      <Lock className="absolute start-3 top-3 w-5 h-5 text-muted-foreground" />
+                      <Lock className="absolute start-3 top-3.5 w-5 h-5 text-slate-400" />
                       <Input
                         type="password"
                         name="confirmPassword"
                         placeholder="••••••••"
                         value={formData.confirmPassword}
                         onChange={handleInputChange}
-                        className="ps-10 bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
+                        className="ps-10 bg-slate-900/60 border-slate-700/80 text-white placeholder-slate-400 focus:border-emerald-500 focus:ring-emerald-500/30 h-11"
                         required
                         disabled={isLoading}
                       />
@@ -258,22 +262,22 @@ export default function Register() {
                 <>
                   {/* OTP Input */}
                   <div className="space-y-4 text-center">
-                    <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Mail className="w-8 h-8 text-primary" />
+                    <div className="w-16 h-16 bg-emerald-500/20 border border-emerald-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <Mail className="w-8 h-8 text-emerald-400" />
                     </div>
                     <h3 className="text-xl font-bold text-white">Check your email</h3>
                     <p className="text-muted-foreground text-sm">
                       We've sent a 6-digit verification code to<br/>
-                      <span className="text-primary font-semibold">{formData.email}</span>
+                      <span className="text-emerald-400 font-semibold">{formData.email}</span>
                     </p>
                     
-                    <div className="pt-4">
+                    <div className="pt-2">
                       <Input
                         type="text"
                         placeholder="000000"
                         value={otp}
                         onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                        className="text-center text-2xl tracking-widest bg-slate-700/50 border-slate-600 text-white placeholder-slate-500 focus:border-blue-500 h-14"
+                        className="text-center text-2xl tracking-widest bg-slate-900/60 border-slate-700/80 text-white placeholder-slate-500 focus:border-emerald-500 h-14 font-mono"
                         required
                         disabled={isLoading}
                       />
@@ -284,8 +288,9 @@ export default function Register() {
 
               {/* Error Message */}
               {error && (
-                <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-sm">
-                  {error}
+                <div className="p-3 bg-red-500/15 border border-red-500/40 rounded-xl text-red-300 text-sm flex items-start gap-2">
+                  <span className="text-base">⚠️</span>
+                  <span>{error}</span>
                 </div>
               )}
 
@@ -296,7 +301,7 @@ export default function Register() {
                     type="button"
                     onClick={() => setPage(1)}
                     variant="outline"
-                    className="flex-1"
+                    className="flex-1 h-12"
                     disabled={isLoading}
                   >
                     {t("common.previous")}
@@ -305,7 +310,7 @@ export default function Register() {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className={`flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white py-6 text-base font-semibold ${page === 1 ? "w-full" : ""}`}
+                  className={`flex-1 bg-emerald-600 hover:bg-emerald-500 text-white h-12 text-base font-semibold shadow-lg shadow-emerald-700/30 ${page === 1 ? "w-full" : ""}`}
                 >
                   {page === 1 ? t("common.next") : page === 2 ? t("auth.createAccount") : "Verify Email"}
                   <ArrowRight className="ms-2 w-4 h-4 rtl:rotate-180" />
@@ -313,11 +318,11 @@ export default function Register() {
               </div>
 
               {/* Login Link */}
-              <p className="text-center text-muted-foreground">
+              <p className="text-center text-muted-foreground text-sm">
                 {t("auth.alreadyHaveAccount")}{" "}
                 <a
                   href="/login"
-                  className="text-primary hover:text-blue-300 font-semibold transition-colors"
+                  className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors"
                 >
                   {t("auth.signIn")}
                 </a>
@@ -325,6 +330,11 @@ export default function Register() {
             </form>
           </CardContent>
         </Card>
+
+        <div className="mt-6 flex items-center justify-center gap-1.5 text-xs text-slate-400">
+          <ShieldCheck className="w-4 h-4 text-emerald-400" />
+          <span>Al-Zaytoonah University of Jordan • Privacy & Academic Sovereignty</span>
+        </div>
       </motion.div>
     </div>
   );

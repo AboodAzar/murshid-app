@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Murshid",
+    "appName": "Oliver",
     "appDescription": "AI-Powered Academic Guidance Platform",
     "language": "Language",
     "english": "English",
@@ -110,7 +110,7 @@
   "landing": {
     "hero": {
       "title": "Your AI Assistant for Every Academic Question.",
-      "subtitle": "Murshid AI understands your academic journey and guides you with smart answers, clear graduation plans, personalized recommendations, and instant academic support.",
+      "subtitle": "Oliver AI understands your academic journey and guides you with smart answers, clear graduation plans, personalized recommendations, and instant academic support.",
       "cta": "Start your journey",
       "ctaSecondary": "Learn More",
       "eyebrow": "Next-generation AI Academic Assistant",
@@ -145,7 +145,7 @@
     },
     "cta": {
       "title": "Ready to Transform Your Academic Journey?",
-      "description": "Join thousands of students using Murshid for academic success",
+      "description": "Join thousands of students using Oliver for academic success",
       "button": "Start Now"
     },
     "nav": {
@@ -506,7 +506,18 @@
     "startNewChat": "Start a new conversation",
     "noMessages": "No messages yet",
     "sendError": "Sorry, I encountered an error. Please try again.",
-    "conversationTitle": "Conversation"
+    "conversationTitle": "Conversation",
+    "statusOnline": "AI Online",
+    "statusLocal": "Local Knowledge Base",
+    "statusChecking": "Checking Status...",
+    "statusOffline": "Offline Mode",
+    "bannerTitle": "Operating in Local Fallback Mode",
+    "bannerDescription": "Responses are generated using local university FAQs and academic regulations while the external model server is offline.",
+    "badgeFaq": "ZUJ Regulations FAQ",
+    "badgeAcademicRules": "Academic Rules",
+    "badgeLocalAdvisor": "Advisor Guidance",
+    "badgeLocalFallback": "Local Fallback",
+    "badgeLiveModel": "Live Model"
   },
   "analytics": {
     "title": "Academic Analytics"

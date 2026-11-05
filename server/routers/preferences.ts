@@ -37,6 +37,7 @@ export const preferencesRouter = router({
         language: user[0].language || "en",
       };
     } catch (error) {
+      if (error instanceof TRPCError) throw error;
       console.error(
         "[Preferences] Failed to get notification preferences:",
         error

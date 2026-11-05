@@ -45,7 +45,7 @@ export default function AuthDebug() {
       <div className="max-w-5xl mx-auto space-y-8">
         <motion.div {...fadeInUp}>
           <h1 className="text-3xl font-bold text-white flex items-center gap-2">
-            <Shield className="w-7 h-7 text-blue-400" />
+            <Shield className="w-7 h-7 text-emerald-400" />
             Authentication Debugger
           </h1>
           <p className="text-slate-400 mt-1">Trace the full authentication flow and diagnose login failures.</p>
@@ -55,7 +55,7 @@ export default function AuthDebug() {
         <motion.div {...fadeInUp} className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-2xl">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-              <Activity className="w-5 h-5 text-blue-400" />
+              <Activity className="w-5 h-5 text-emerald-400" />
               Server Diagnostics
             </h2>
             <Button onClick={() => debugQuery.refetch()} variant="outline" size="sm" className="border-white/10 text-slate-300">
@@ -137,7 +137,7 @@ export default function AuthDebug() {
                       <td className="py-2 pe-4">{u.id}</td>
                       <td className="py-2 pe-4">{u.email}</td>
                       <td className="py-2 pe-4">{u.name || "—"}</td>
-                      <td className="py-2 pe-4"><span className="px-2 py-0.5 rounded bg-blue-500/15 text-blue-400 text-xs">{u.role}</span></td>
+                      <td className="py-2 pe-4"><span className="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 text-xs">{u.role}</span></td>
                       <td className="py-2 pe-4">{u.isEmailVerified ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <AlertCircle className="w-4 h-4 text-amber-400" />}</td>
                       <td className="py-2 pe-4">{u.isActive ? "Yes" : "No"}</td>
                       <td className="py-2">{u.hasPassword ? "Yes" : "No"}</td>
@@ -178,7 +178,7 @@ export default function AuthDebug() {
                 </div>
                 <div className="p-3 rounded-xl bg-white/[0.04]">
                   <p className="text-xs text-slate-400">Role</p>
-                  <p className="text-sm font-medium text-white"><span className="px-2 py-0.5 rounded bg-blue-500/15 text-blue-400 text-xs">{me.role}</span></p>
+                  <p className="text-sm font-medium text-white"><span className="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 text-xs">{me.role}</span></p>
                 </div>
               </div>
               <Button onClick={() => logoutMutation.mutate()} variant="outline" className="mt-2 border-white/10 text-slate-300">
@@ -212,7 +212,7 @@ export default function AuthDebug() {
             </select>
           </div>
           <div className="flex gap-2 flex-wrap">
-            <Button onClick={() => loginMutation.mutate({ email: testEmail, password: testPassword })} className="bg-blue-600 hover:bg-blue-700">
+            <Button onClick={() => loginMutation.mutate({ email: testEmail, password: testPassword })} className="bg-emerald-600 hover:bg-emerald-500">
               <KeyRound className="w-4 h-4 me-2" /> Test Login
             </Button>
             <Button onClick={() => createTestUser.mutate({ email: testEmail, password: testPassword, name: testName, role: testRole })} variant="outline" className="border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10">

@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
 import { useI18n } from "@/contexts/I18nContext";
+import { formatUniversityId, formatGpaDisplay, formatCourseGradeDisplay, getZujCourseModality } from "@/lib/academicUtils";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,7 +16,7 @@ import {
   ChevronRight, GraduationCap, Activity, TrendingUp, Award, Bell, Flame,
   BarChart3, Layers, FileText, User, MessageSquare, Sparkles, Target, Star,
   ArrowUpRight, ArrowDownRight, Lightbulb, Download, ExternalLink, CalendarDays,
-  BrainCircuit, ShieldAlert,
+  BrainCircuit, ShieldAlert, IdCard, Globe, Video,
 } from "lucide-react";
 
 /* ── Animation presets ── */
@@ -29,7 +30,7 @@ const cardHover = { rest: { scale: 1 }, hover: { scale: 1.01, transition: { dura
 
 /* ── Course color palette ── */
 const COURSE_PALETTE = [
-  { bg: "from-blue-600/20 to-cyan-600/20", bar: "from-blue-500 to-cyan-400", glow: "glow-blue", icon: "bg-blue-500" },
+  { bg: "from-emerald-600/20 to-green-600/20", bar: "from-emerald-500 to-green-400", glow: "shadow-[0_0_20px_rgba(34,197,94,0.18)]", icon: "bg-emerald-500" },
   { bg: "from-violet-600/20 to-purple-600/20", bar: "from-violet-500 to-purple-400", glow: "glow-purple", icon: "bg-violet-500" },
   { bg: "from-emerald-600/20 to-teal-600/20", bar: "from-emerald-500 to-teal-400", glow: "glow-emerald", icon: "bg-emerald-500" },
   { bg: "from-amber-600/20 to-orange-600/20", bar: "from-amber-500 to-orange-400", glow: "glow-amber", icon: "bg-amber-500" },
@@ -45,11 +46,11 @@ function StatusBadge({ status, t }: { status: string; t: (k: string) => string }
     completed: "bg-slate-500/15 text-muted-foreground border-slate-500/30",
     present: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
     absent: "bg-red-500/15 text-red-400 border-red-500/30",
-    excused: "bg-blue-500/15 text-blue-400 border-blue-500/30",
+    excused: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
     late: "bg-amber-500/15 text-amber-400 border-amber-500/30",
-    in_progress: "bg-blue-500/15 text-blue-400 border-blue-500/30",
+    in_progress: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
     planned: "bg-slate-500/15 text-muted-foreground border-slate-500/30",
-    submitted: "bg-blue-500/15 text-blue-400 border-blue-500/30",
+    submitted: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
     graded: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
     overdue: "bg-red-500/15 text-red-400 border-red-500/30",
     pending: "bg-amber-500/15 text-amber-400 border-amber-500/30",
@@ -85,7 +86,7 @@ function HealthRing({ score, t }: { score: number; t: (k: string) => string }) {
   let color = "#10b981", label = t("student.excellent");
   if (score < 60) { color = "#ef4444"; label = t("student.critical"); }
   else if (score < 75) { color = "#f59e0b"; label = t("student.needsAttention"); }
-  else if (score < 90) { color = "#3b82f6"; label = t("student.good"); }
+  else if (score < 90) { color = "#0d9488"; label = t("student.good"); }
   return (
     <div className="relative flex items-center justify-center">
       <svg width="78" height="78" className="-rotate-90">
@@ -104,11 +105,11 @@ function AlertIcon({ type }: { type: string }) {
   if (type === "danger") return <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />;
   if (type === "warning") return <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />;
   if (type === "success") return <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />;
-  return <Info className="w-4 h-4 text-blue-400 shrink-0" />;
+  return <Info className="w-4 h-4 text-emerald-400 shrink-0" />;
 }
 
 function AlertBorder(type: string) {
-  const map: Record<string, string> = { danger: "border-red-500/25 bg-red-500/5", warning: "border-amber-500/25 bg-amber-500/5", success: "border-emerald-500/25 bg-emerald-500/5", info: "border-blue-500/25 bg-blue-500/5" };
+  const map: Record<string, string> = { danger: "border-red-500/25 bg-red-500/5", warning: "border-amber-500/25 bg-amber-500/5", success: "border-emerald-500/25 bg-emerald-500/5", info: "border-emerald-500/25 bg-emerald-500/5" };
   return map[type] || map.info;
 }
 
@@ -203,7 +204,7 @@ export default function StudentDashboard() {
     const earned = stats.earnedCredits;
     const total = stats.totalCredits || 1;
     return [
-      { name: "Earned", value: earned, color: "#3b82f6" },
+      { name: "Earned", value: earned, color: "#10b981" },
       { name: "Remaining", value: Math.max(0, total - earned), color: "rgba(255,255,255,0.08)" },
     ];
   }, [dashboard]);
@@ -222,7 +223,7 @@ export default function StudentDashboard() {
     );
   }, [overview?.recentActivity]);
 
-  const gradientText = "bg-gradient-to-r from-blue-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent";
+  const gradientText = "bg-gradient-to-r from-emerald-400 via-green-300 to-amber-300 bg-clip-text text-transparent";
 
   if (!user) {
     return (
@@ -241,7 +242,13 @@ export default function StudentDashboard() {
         <motion.div initial="initial" animate="animate" variants={fadeInUp} className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
           <div className="space-y-1">
             <h1 className={`text-3xl sm:text-4xl font-bold ${gradientText}`}>{t("student.dashboard")}</h1>
-            <p className="text-muted-foreground text-base">{t("common.welcome")}, {userName}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-muted-foreground text-base">{t("common.welcome")}, <span className="text-white font-medium">{userName}</span></p>
+              <span className="inline-flex items-center gap-1.5 font-mono text-emerald-300 bg-emerald-500/15 px-2.5 py-0.5 rounded-lg border border-emerald-500/30 text-xs font-bold">
+                <IdCard className="w-3.5 h-3.5 text-emerald-400" />
+                <span>{dir === "rtl" ? "الرقم الجامعي:" : "Student ID:"} {formatUniversityId(user)}</span>
+              </span>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             {(!alertsL || (alertsData ?? EMPTY_ALERTS)) && (
@@ -323,7 +330,7 @@ export default function StudentDashboard() {
         {/* ===== Stats Row ===== */}
         <motion.div initial="initial" animate="animate" variants={staggerContainer} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: t("student.gpa"), value: (dashboard?.stats ?? EMPTY_STATS).gpa, icon: Award, grad: "from-blue-500 to-cyan-500", glow: "glow-blue", trend: null as any },
+            { label: t("student.gpa"), value: (dashboard?.stats ?? EMPTY_STATS).gpa, icon: Award, grad: "from-emerald-600 to-green-500", glow: "shadow-[0_0_20px_rgba(34,197,94,0.18)]", trend: null as any },
             { label: t("student.completedHours"), value: String((dashboard?.stats ?? EMPTY_STATS).earnedCredits), icon: GraduationCap, grad: "from-violet-500 to-purple-500", glow: "glow-purple", trend: { up: true, val: "+12%" } },
             { label: t("student.totalHours"), value: String((dashboard?.stats ?? EMPTY_STATS).totalCredits), icon: TrendingUp, grad: "from-emerald-500 to-teal-500", glow: "glow-emerald", trend: null },
             { label: t("student.currentSemester"), value: String((dashboard?.stats ?? EMPTY_STATS).currentSemester), icon: Calendar, grad: "from-amber-500 to-orange-500", glow: "glow-amber", trend: null },
@@ -343,11 +350,68 @@ export default function StudentDashboard() {
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wide">{s.label}</p>
-                  <p className="text-xl sm:text-2xl font-bold text-white">{s.value}</p>
+                  {i === 0 ? (
+                    <div>
+                      <p className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-baseline gap-1">
+                        <span>{formatGpaDisplay((dashboard?.stats ?? EMPTY_STATS).gpa).primaryScore}</span>
+                        <span className="text-[11px] text-emerald-400 font-normal">/ 100%</span>
+                      </p>
+                      <p className="text-[11px] text-slate-400 font-mono mt-0.5">
+                        {formatGpaDisplay((dashboard?.stats ?? EMPTY_STATS).gpa).secondaryScale}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-xl sm:text-2xl font-bold text-white">{s.value}</p>
+                  )}
                 </motion.div>
               </motion.div>
             );
           })}
+        </motion.div>
+
+        {/* ===== ZUJ Institutional Status & Financial Ledger Banner ===== */}
+        <motion.div initial="initial" animate="animate" variants={fadeInUp} className="glass-card-strong rounded-2xl p-4 sm:p-5 border border-emerald-500/20 bg-gradient-to-r from-emerald-950/40 via-slate-900/60 to-emerald-950/20 shadow-lg">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
+                <FileText className="w-5 h-5 text-amber-400" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-semibold text-slate-300">{dir === "rtl" ? "الذمة المالية للرسوم الجامعية" : "Tuition & Financial Ledger"}</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+                    {dir === "rtl" ? "رصيد مدين: 1,550 د.أ" : "Debit: 1,550 JOD"}
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                    {dir === "rtl" ? "خصم تفوق: 30% (جيد جداً)" : "Merit Discount: 30% (Very Good)"}
+                  </span>
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  {dir === "rtl"
+                    ? "وفقاً للمادة 28: يحصل الطالب الحاصل على معدل 83.3% على خصم 30%، ويرتفع إلى 40% عند بلوغ 84% (امتياز)."
+                    : "Per Bylaw Art. 28: 83.3% GPA qualifies for 30% discount; advances to 40% when reaching 84% (Excellent)."}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => setLocation("/schedule")}
+                className="min-h-[44px] px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-border text-xs font-semibold text-white flex items-center gap-2 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-emerald-500"
+              >
+                <CalendarDays className="w-4 h-4 text-emerald-400" />
+                <span>{dir === "rtl" ? "جدول 4 أيام (أحد - أربعاء)" : "4-Day Schedule (Sun-Wed)"}</span>
+              </button>
+
+              <button
+                onClick={() => setLocation("/chat")}
+                className="min-h-[44px] px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white flex items-center gap-2 transition-all shadow-md shadow-emerald-900/40 active:scale-95 focus-visible:ring-2 focus-visible:ring-emerald-500"
+              >
+                <Sparkles className="w-4 h-4 text-emerald-100" />
+                <span>{dir === "rtl" ? "استشر أوليفر AI" : "Ask Oliver AI"}</span>
+              </button>
+            </div>
+          </div>
         </motion.div>
 
         {/* ===== Main Grid ===== */}
@@ -360,14 +424,14 @@ export default function StudentDashboard() {
             <motion.div initial="initial" animate="animate" variants={staggerContainer} className="space-y-4">
               <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-600 to-green-500 flex items-center justify-center">
                     <Layers className="w-4 h-4 text-white" />
                   </div>
                   <h2 className="text-lg font-bold text-white">{t("student.myCourses")}</h2>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] text-muted-foreground bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50">{activeCourses.length} {t("student.courses")}</span>
-                  <button onClick={() => setLocation("/courses")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ms-auto">
+                  <button onClick={() => setLocation("/courses")} className="text-[11px] text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-0.5 ms-auto">
                     {t("student.viewAll")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
                   </button>
                 </div>
@@ -399,7 +463,7 @@ export default function StudentDashboard() {
                           <span className="mx-1">·</span>
                           <span>{course.credits} {t("student.credits")}</span>
                           <span className="mx-1">·</span>
-                          <span className={`font-semibold ${typeof course.currentGrade === "string" && course.currentGrade !== "—" ? "text-blue-400" : "text-muted-foreground"}`}>{t("student.currentGrade")}: {course.currentGrade}</span>
+                          <span className={`font-semibold ${typeof course.currentGrade === "string" && course.currentGrade !== "—" ? "text-emerald-400" : "text-muted-foreground"}`}>{t("student.currentGrade")}: {course.currentGrade}</span>
                         </div>
                         {/* Attendance */}
                         <div className="space-y-1.5">
@@ -418,12 +482,12 @@ export default function StudentDashboard() {
                             <span className="text-white font-bold">{course.progress}%</span>
                           </div>
                           <div className="h-1.5 rounded-full bg-slate-700/50 overflow-hidden progress-shine">
-                            <motion.div initial={{ width: 0 }} animate={{ width: `${course.progress}%` }} transition={{ duration: 0.8, delay: i * 0.1 + 0.2 }} className="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-400" />
+                            <motion.div initial={{ width: 0 }} animate={{ width: `${course.progress}%` }} transition={{ duration: 0.8, delay: i * 0.1 + 0.2 }} className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-green-400" />
                           </div>
                         </div>
                         <div className="flex justify-between items-center mt-3 pt-2 border-t border-border">
                           <span className="text-[10px] text-muted-foreground">{course.completedAssignments}/{course.totalAssignments} {t("student.completed")}</span>
-                          <button onClick={() => setLocation(`/courses/${course.courseId}`)} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => setLocation(`/courses/${course.courseId}`)} className="text-[11px] text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                             {t("student.viewDetails")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
                           </button>
                         </div>
@@ -445,7 +509,7 @@ export default function StudentDashboard() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] text-muted-foreground bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50">{(overview?.upcomingAssignments ?? []).length} {t("student.pending")}</span>
-                  <button onClick={() => setLocation("/assignments")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ms-auto">
+                  <button onClick={() => setLocation("/assignments")} className="text-[11px] text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-0.5 ms-auto">
                     {t("student.viewAll")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
                   </button>
                 </div>
@@ -457,15 +521,15 @@ export default function StudentDashboard() {
                 ) : (
                   (overview?.upcomingAssignments ?? []).slice(0, 5).map((a, i) => (
                     <motion.div key={a.id} variants={fadeInUp} whileHover={{ x: dir === "rtl" ? -3 : 3, transition: { duration: 0.2 } }} className="glass-card rounded-xl p-3.5 border border-border hover:border-border transition-all duration-300 flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${a.daysLeft <= 1 ? "bg-red-500/15" : a.daysLeft <= 3 ? "bg-amber-500/15" : "bg-blue-500/15"}`}>
-                        <FileText className={`w-4 h-4 ${a.daysLeft <= 1 ? "text-red-400" : a.daysLeft <= 3 ? "text-amber-400" : "text-blue-400"}`} />
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${a.daysLeft <= 1 ? "bg-red-500/15" : a.daysLeft <= 3 ? "bg-amber-500/15" : "bg-emerald-500/15"}`}>
+                        <FileText className={`w-4 h-4 ${a.daysLeft <= 1 ? "text-red-400" : a.daysLeft <= 3 ? "text-amber-400" : "text-emerald-400"}`} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-white truncate">{a.title}</p>
                         <p className="text-[11px] text-muted-foreground">{a.courseCode} · {a.courseName}</p>
                       </div>
                       <div className="text-end shrink-0">
-                        <p className={`text-xs font-bold ${a.daysLeft <= 1 ? "text-red-400" : a.daysLeft <= 3 ? "text-amber-400" : "text-blue-400"}`}>{a.daysLeft}d</p>
+                        <p className={`text-xs font-bold ${a.daysLeft <= 1 ? "text-red-400" : a.daysLeft <= 3 ? "text-amber-400" : "text-emerald-400"}`}>{a.daysLeft}d</p>
                         <p className="text-[10px] text-muted-foreground">{t("student.dueIn")}</p>
                       </div>
                     </motion.div>
@@ -510,7 +574,7 @@ export default function StudentDashboard() {
               {/* Credits Progress */}
               <motion.div variants={fadeInUp} className="glass-card-strong rounded-2xl p-4 sm:p-5 border border-border flex flex-col">
                 <div className="flex items-center gap-2 mb-2">
-                  <Target className="w-4 h-4 text-blue-400" />
+                  <Target className="w-4 h-4 text-emerald-400" />
                   <h3 className="text-sm font-bold text-white">{t("student.creditsProgress")}</h3>
                 </div>
                 <div className="flex-1 flex items-center justify-center relative">
@@ -529,7 +593,7 @@ export default function StudentDashboard() {
                   </div>
                 </div>
                 <div className="flex justify-between text-[11px] text-muted-foreground mt-2 pt-2 border-t border-border">
-                  <span>{t("student.earnedCredits")}: <strong className="text-blue-400">{dashboard?.stats.earnedCredits ?? 0}</strong></span>
+                  <span>{t("student.earnedCredits")}: <strong className="text-emerald-400">{dashboard?.stats.earnedCredits ?? 0}</strong></span>
                   <span>{t("student.remainingCredits")}: <strong className="text-secondary-foreground">{Math.max(0, (dashboard?.stats.totalCredits ?? 0) - (dashboard?.stats.earnedCredits ?? 0))}</strong></span>
                 </div>
               </motion.div>
@@ -552,14 +616,14 @@ export default function StudentDashboard() {
                   uniqueActivity.map((act) => (
                     <div key={act.id} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors">
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                        act.type === "attendance" ? (act.status === "present" ? "bg-emerald-500/15" : act.status === "absent" ? "bg-red-500/15" : "bg-amber-500/15") : "bg-blue-500/15"
+                        act.type === "attendance" ? (act.status === "present" ? "bg-emerald-500/15" : act.status === "absent" ? "bg-red-500/15" : "bg-amber-500/15") : "bg-emerald-500/15"
                       }`}>
                         {act.type === "attendance" ? (
                           act.status === "present" ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> :
                           act.status === "absent" ? <AlertTriangle className="w-3.5 h-3.5 text-red-400" /> :
                           <Clock className="w-3.5 h-3.5 text-amber-400" />
                         ) : (
-                          <FileText className="w-3.5 h-3.5 text-blue-400" />
+                          <FileText className="w-3.5 h-3.5 text-emerald-400" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -592,7 +656,7 @@ export default function StudentDashboard() {
                 </div>
                 <div className="flex items-center gap-2">
                   {nextUpcoming && <CountdownTimer minutes={nextUpcoming.countdownMinutes} t={t} />}
-                  <button onClick={() => setLocation("/schedule")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ms-auto">
+                  <button onClick={() => setLocation("/schedule")} className="text-[11px] text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-0.5 ms-auto">
                     {t("student.viewFull")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
                   </button>
                 </div>
@@ -675,7 +739,7 @@ export default function StudentDashboard() {
                   {[
                     { count: (alertsData ?? EMPTY_ALERTS).summary.lowAttendanceCount, label: t("student.lowAttendance"), color: "text-red-400", bg: "bg-red-500/10", border: "border-red-500/20" },
                     { count: (alertsData ?? EMPTY_ALERTS).summary.overdueCount, label: t("student.overdueAssignments"), color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20" },
-                    { count: (alertsData ?? EMPTY_ALERTS).summary.upcomingCount, label: t("student.deadlines"), color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20" },
+                    { count: (alertsData ?? EMPTY_ALERTS).summary.upcomingCount, label: t("student.deadlines"), color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
                   ].map((pill, i) => (
                     <div key={i} className={`${pill.bg} rounded-xl p-3 text-center border ${pill.border}`}>
                       <p className={`text-xl font-bold ${pill.color}`}>{pill.count}</p>
@@ -701,7 +765,7 @@ export default function StudentDashboard() {
                                 <p className="text-sm font-semibold text-white leading-tight">{dir === "rtl" && alert.titleAr ? alert.titleAr : alert.title}</p>
                                 <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">{dir === "rtl" && alert.messageAr ? alert.messageAr : alert.message}</p>
                                 {alert.action && (
-                                  <button className="mt-2 text-[11px] font-medium text-blue-400 hover:text-blue-300 flex items-center gap-0.5">
+                                  <button className="mt-2 text-[11px] font-medium text-emerald-400 hover:text-emerald-300 flex items-center gap-0.5">
                                     {dir === "rtl" && alert.actionAr ? alert.actionAr : alert.action} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
                                   </button>
                                 )}
@@ -767,7 +831,7 @@ export default function StudentDashboard() {
                   <span className="text-[10px] text-muted-foreground bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50">
                     {(overview?.achievements ?? EMPTY_ACHIEVEMENTS).filter(a => a.unlocked).length}/{(overview?.achievements ?? EMPTY_ACHIEVEMENTS).length}
                   </span>
-                  <button onClick={() => setLocation("/achievements")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 ms-auto">
+                  <button onClick={() => setLocation("/achievements")} className="text-[11px] text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-0.5 ms-auto">
                     {t("student.viewAll")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
                   </button>
                 </div>
@@ -793,14 +857,14 @@ export default function StudentDashboard() {
             {/* Quick Actions */}
             <motion.div initial="initial" animate="animate" variants={staggerContainer} className="space-y-4">
               <motion.div variants={fadeInUp} className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
                   <Zap className="w-4 h-4 text-white" />
                 </div>
                 <h2 className="text-lg font-bold text-white">{t("student.quickActions")}</h2>
               </motion.div>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { label: t("student.aiAssistant"), icon: MessageSquare, color: "from-blue-500 to-cyan-500", path: "/chat" },
+                  { label: t("student.aiAssistant"), icon: MessageSquare, color: "from-emerald-600 to-green-500", path: "/chat" },
                   { label: t("student.studyPlan"), icon: Target, color: "from-violet-500 to-purple-500", path: "/study-plan" },
                   { label: t("student.contactAdvisor"), icon: User, color: "from-emerald-500 to-teal-500", path: "/chat" },
                   { label: t("student.viewMaterials"), icon: Download, color: "from-amber-500 to-orange-500", path: "/courses" },
@@ -828,13 +892,13 @@ export default function StudentDashboard() {
                     </div>
                     <h2 className="text-lg font-bold text-white">{t("student.announcements")}</h2>
                   </div>
-                  <button onClick={() => setLocation("/announcements")} className="text-[11px] text-blue-400 hover:text-blue-300 font-medium flex items-center gap-0.5 self-start sm:self-auto">
+                  <button onClick={() => setLocation("/announcements")} className="text-[11px] text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-0.5 self-start sm:self-auto">
                     {t("student.viewAll")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
                   </button>
                 </motion.div>
                 <div className="glass-card rounded-2xl p-4 border border-border space-y-2">
                   {announcements.slice(0, 3).map(a => (
-                    <div key={a.id} className="p-2.5 bg-slate-800/40 rounded-lg border-s-2 border-cyan-500/50 hover:bg-slate-800/60 transition-colors">
+                    <div key={a.id} className="p-2.5 bg-slate-800/40 rounded-lg border-s-2 border-emerald-500/50 hover:bg-slate-800/60 transition-colors">
                       <p className="text-xs font-medium text-slate-200 truncate">{a.title}</p>
                       <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{a.content}</p>
                     </div>
@@ -849,7 +913,7 @@ export default function StudentDashboard() {
         {(dashboard?.advisorAlerts?.length || dashboard?.advisorRecommendations?.length || dashboard?.advisorAppointments?.length) ? (
           <motion.div initial="initial" animate="animate" variants={fadeInUp} className="space-y-4">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <User className="w-5 h-5 text-blue-400" />
+              <User className="w-5 h-5 text-emerald-400" />
               {t("advisor.fromYourAdvisor") || "From Your Advisor"}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -900,19 +964,19 @@ export default function StudentDashboard() {
         ) : null}
 
         {/* ===== Graduation Progress ===== */}
-        <motion.div initial="initial" animate="animate" variants={fadeInUp} className="glass-card-strong rounded-2xl p-6 glow-blue border border-blue-500/10">
+        <motion.div initial="initial" animate="animate" variants={fadeInUp} className="glass-card-strong rounded-2xl p-6 shadow-[0_0_20px_rgba(34,197,94,0.18)] border border-emerald-500/10">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div>
               <h3 className="text-lg font-bold text-white">{t("student.graduationProgress")}</h3>
               <p className="text-xs text-muted-foreground mt-0.5">{(dashboard?.stats ?? EMPTY_STATS).earnedCredits} / {(dashboard?.stats ?? EMPTY_STATS).totalCredits} {t("student.completedHours")}</p>
             </div>
             <div className="text-end">
-              <p className="text-2xl font-bold text-blue-400">{(dashboard?.stats ?? EMPTY_STATS).progress}%</p>
+              <p className="text-2xl font-bold text-emerald-400">{(dashboard?.stats ?? EMPTY_STATS).progress}%</p>
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{t("common.complete")}</p>
             </div>
           </div>
           <div className="h-3 rounded-full bg-slate-700/50 overflow-hidden progress-shine">
-            <motion.div initial={{ width: 0 }} animate={{ width: `${(dashboard?.stats ?? EMPTY_STATS).progress}%` }} transition={{ duration: 1.2, ease: "easeOut" }} className="h-full rounded-full bg-gradient-to-r from-blue-500 via-violet-500 to-cyan-400" />
+            <motion.div initial={{ width: 0 }} animate={{ width: `${(dashboard?.stats ?? EMPTY_STATS).progress}%` }} transition={{ duration: 1.2, ease: "easeOut" }} className="h-full rounded-full bg-gradient-to-r from-emerald-600 via-green-500 to-amber-500" />
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 pt-4 border-t border-border">
             <div className="text-center">
@@ -920,7 +984,8 @@ export default function StudentDashboard() {
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{t("student.semestersLeft")}</p>
             </div>
             <div className="text-center">
-              <p className="text-xl font-bold text-emerald-400">{(dashboard?.stats ?? EMPTY_STATS).gpa}</p>
+              <p className="text-xl font-black text-emerald-400">{formatGpaDisplay((dashboard?.stats ?? EMPTY_STATS).gpa).primaryScore}</p>
+              <p className="text-[10px] text-slate-400 font-mono">{formatGpaDisplay((dashboard?.stats ?? EMPTY_STATS).gpa).secondaryScale}</p>
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{t("student.currentGPA")}</p>
             </div>
             <div className="text-center">

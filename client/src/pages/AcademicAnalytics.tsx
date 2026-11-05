@@ -87,7 +87,7 @@ export default function AcademicAnalytics() {
 
   const allLoaded = !riskLoading && !healthLoading && !roadmapLoading && !forecastLoading && !warningsLoading;
   const hasNoData = allLoaded && !risk?.score && !health?.overallScore && (!roadmap || roadmap.roadmap.length === 0);
-  const seedKey = user ? `murshid-seeded-${user.id}` : "";
+  const seedKey = user ? `oliver-seeded-${user.id}` : "";
 
   useEffect(() => {
     if (user?.role === "advisor" && !selectedStudentId) return;
@@ -132,7 +132,7 @@ export default function AcademicAnalytics() {
           <TabsList className="bg-slate-800/50 border border-slate-700 p-1 flex flex-wrap h-auto gap-1">
             <TabsTrigger value="overview" className="data-[state=active]:bg-violet-600 data-[state=active]:text-white">Overview</TabsTrigger>
             <TabsTrigger value="risk" className="data-[state=active]:bg-red-600 data-[state=active]:text-white">Risk & Warnings</TabsTrigger>
-            <TabsTrigger value="forecast" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Forecast & Planner</TabsTrigger>
+            <TabsTrigger value="forecast" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white">Forecast & Planner</TabsTrigger>
             <TabsTrigger value="roadmap" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white">Roadmap & Career</TabsTrigger>
             <TabsTrigger value="simulator" className="data-[state=active]:bg-amber-600 data-[state=active]:text-white">GPA Simulator</TabsTrigger>
           </TabsList>
@@ -231,7 +231,7 @@ export default function AcademicAnalytics() {
                       <div className="space-y-2 max-h-[280px] overflow-y-auto pe-1">
                         {recommendations.recommendations.slice(0, 5).map((rec: any) => (
                           <div key={rec.id} className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors cursor-pointer">
-                            <BookOpen className="w-4 h-4 text-blue-400 shrink-0" />
+                            <BookOpen className="w-4 h-4 text-emerald-400 shrink-0" />
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-white truncate">{rec.name}</p>
                               <p className="text-xs text-slate-400">{rec.code} • {rec.credits} credits • {rec.reason}</p>
@@ -379,7 +379,7 @@ export default function AcademicAnalytics() {
               <motion.div {...fadeInUp}>
                 <Card className="bg-slate-800/50 border-slate-700">
                   <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2"><TrendingUp className="w-5 h-5 text-blue-400" />AI Success Forecast</CardTitle>
+                    <CardTitle className="text-lg flex items-center gap-2"><TrendingUp className="w-5 h-5 text-emerald-400" />AI Success Forecast</CardTitle>
                   </CardHeader>
                   <CardContent>
                     {forecast && forecast.history.length > 0 ? (
@@ -493,8 +493,8 @@ export default function AcademicAnalytics() {
                             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Semester {sem}</p>
                             <div className="space-y-1">
                               {roadmap.roadmap.filter((c: any) => c.semester === sem).map((c: any) => (
-                                <div key={c.id} className={`flex items-center gap-2 p-2 rounded-lg text-sm ${c.status === "completed" ? "bg-emerald-500/10 border border-emerald-500/20" : c.status === "in_progress" ? "bg-blue-500/10 border border-blue-500/20" : "bg-slate-700/30 border border-slate-600/20"}`}>
-                                  <div className={`w-2 h-2 rounded-full ${c.status === "completed" ? "bg-emerald-400" : c.status === "in_progress" ? "bg-blue-400" : "bg-slate-500"}`} />
+                                <div key={c.id} className={`flex items-center gap-2 p-2 rounded-lg text-sm ${c.status === "completed" ? "bg-emerald-500/10 border border-emerald-500/20" : c.status === "in_progress" ? "bg-emerald-500/10 border border-emerald-500/20" : "bg-slate-700/30 border border-slate-600/20"}`}>
+                                  <div className={`w-2 h-2 rounded-full ${c.status === "completed" ? "bg-emerald-400" : c.status === "in_progress" ? "bg-emerald-400" : "bg-slate-500"}`} />
                                   <span className="flex-1 text-white truncate">{c.code} &mdash; {c.name}</span>
                                   <span className="text-xs text-slate-400">{c.credits}cr</span>
                                   {c.status === "completed" && <CheckCircle2 className="w-3 h-3 text-emerald-400" />}
@@ -523,13 +523,13 @@ export default function AcademicAnalytics() {
               <motion.div {...fadeInUp}>
                 <Card className="bg-slate-800/50 border-slate-700">
                   <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2"><Briefcase className="w-5 h-5 text-blue-400" />AI Career Path Recommendations</CardTitle>
+                    <CardTitle className="text-lg flex items-center gap-2"><Briefcase className="w-5 h-5 text-emerald-400" />AI Career Path Recommendations</CardTitle>
                   </CardHeader>
                   <CardContent>
                     {career && career.matches.length > 0 ? (
                       <div className="space-y-3">
                         {career.matches.map((match: any) => (
-                          <div key={match.id} className="p-4 bg-slate-700/30 rounded-xl border border-slate-600/30 hover:border-blue-500/30 transition-colors">
+                          <div key={match.id} className="p-4 bg-slate-700/30 rounded-xl border border-slate-600/30 hover:border-emerald-500/30 transition-colors">
                             <div className="flex items-start justify-between mb-2">
                               <div>
                                 <p className="font-semibold text-white">{match.title}</p>
@@ -547,7 +547,7 @@ export default function AcademicAnalytics() {
                                 <span className="text-slate-400">Skills matched: <span className="text-white">{match.matchedSkills}/{match.requiredSkills.length}</span></span>
                               </div>
                               <div className="flex items-center gap-2 text-xs">
-                                <BookOpen className="w-3 h-3 text-blue-400" />
+                                <BookOpen className="w-3 h-3 text-emerald-400" />
                                 <span className="text-slate-400">Courses matched: <span className="text-white">{match.matchedCourses}/{match.recommendedCourses.length}</span></span>
                               </div>
                               {match.missingCourses.length > 0 && (

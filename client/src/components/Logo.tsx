@@ -9,7 +9,7 @@ export const Logo: React.FC<LogoProps> = ({ className = "", size = 40 }) => {
   return (
     <img
       src="/noback.png"
-      alt="Murshid Logo"
+      alt="Oliver Logo"
       width={size}
       height={size}
       className={`object-contain ${className}`}

@@ -17,11 +17,11 @@ export async function getDb() {
         connectionString = connectionString.split("?ssl=")[0];
       }
 
+      const isLocalhost = connectionString.includes("localhost") || connectionString.includes("127.0.0.1");
+
       const poolConnection = mysql.createPool({
         uri: connectionString,
-        ssl: {
-          rejectUnauthorized: false
-        }
+        ...(isLocalhost ? {} : { ssl: { rejectUnauthorized: false } }),
       });
       
       _db = drizzle(poolConnection as any);

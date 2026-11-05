@@ -76,6 +76,7 @@ export const coursesRouter = router({
           },
         };
       } catch (error) {
+        if (error instanceof TRPCError) throw error;
         console.error("[Courses] Failed to list courses:", error);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
@@ -99,6 +100,7 @@ export const coursesRouter = router({
           .limit(1);
         return result[0] || null;
       } catch (error) {
+        if (error instanceof TRPCError) throw error;
         console.error("[Courses] Failed to get course:", error);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
@@ -128,10 +130,39 @@ export const coursesRouter = router({
           .from(courses)
           .where(inArray(courses.id, prerequisiteIds));
       } catch (error) {
+        if (error instanceof TRPCError) throw error;
         console.error("[Courses] Failed to get prerequisites:", error);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
     }),
+
+  getAllPrerequisites: publicProcedure.query(async () => {
+    const db = await getDb();
+    if (!db)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Database unavailable",
+      });
+
+    try {
+      const prereqs = await db
+        .select({
+          courseId: coursePrerequisites.courseId,
+          prerequisiteId: coursePrerequisites.prerequisiteId,
+          prerequisiteCode: courses.code,
+          prerequisiteName: courses.name,
+          prerequisiteNameAr: courses.nameAr,
+        })
+        .from(coursePrerequisites)
+        .innerJoin(courses, eq(coursePrerequisites.prerequisiteId, courses.id));
+
+      return prereqs;
+    } catch (error) {
+      if (error instanceof TRPCError) throw error;
+      console.error("[Courses] Failed to get all prerequisites:", error);
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+    }
+  }),
 
   getStudentCourses: protectedProcedure
     .input(
@@ -169,6 +200,7 @@ export const coursesRouter = router({
           .from(studentCourses)
           .where(and(...conditions));
       } catch (error) {
+        if (error instanceof TRPCError) throw error;
         console.error("[Courses] Failed to get student courses:", error);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
@@ -178,7 +210,7 @@ export const coursesRouter = router({
     .input(
       z.object({
         courseId: z.number(),
-        semester: z.number(),
+        semester: z.number().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -199,7 +231,21 @@ export const coursesRouter = router({
       }
 
       try {
-        // Check if already enrolled
+        // Verify course exists
+        const [targetCourse] = await db
+          .select()
+          .from(courses)
+          .where(eq(courses.id, input.courseId))
+          .limit(1);
+
+        if (!targetCourse) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Course not found",
+          });
+        }
+
+        // Check if student is already enrolled or completed this course
         const existing = await db
           .select()
           .from(studentCourses)
@@ -211,21 +257,64 @@ export const coursesRouter = router({
           );
 
         if (existing.length > 0) {
+          const isCompleted = existing.some(e => e.status === "completed");
           throw new TRPCError({
             code: "BAD_REQUEST",
-            message: "Already enrolled in this course",
+            message: isCompleted
+              ? "Cannot enroll: Course has already been completed"
+              : "Already enrolled in this course",
           });
         }
+
+        // Prerequisite verification: check if all required prerequisites are completed
+        const prereqs = await db
+          .select()
+          .from(coursePrerequisites)
+          .where(eq(coursePrerequisites.courseId, input.courseId));
+
+        if (prereqs.length > 0) {
+          const prereqIds = prereqs.map(p => p.prerequisiteId);
+
+          const completedCourses = await db
+            .select({ courseId: studentCourses.courseId })
+            .from(studentCourses)
+            .where(
+              and(
+                eq(studentCourses.studentId, ctx.user.id),
+                eq(studentCourses.status, "completed"),
+                inArray(studentCourses.courseId, prereqIds)
+              )
+            );
+
+          const completedPrereqIds = new Set(completedCourses.map(c => c.courseId));
+          const missingPrereqIds = prereqIds.filter(pid => !completedPrereqIds.has(pid));
+
+          if (missingPrereqIds.length > 0) {
+            const missingCourses = await db
+              .select({ code: courses.code, name: courses.name })
+              .from(courses)
+              .where(inArray(courses.id, missingPrereqIds));
+
+            const missingCodes = missingCourses.map(c => c.code || c.name);
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: `Cannot enroll: Missing prerequisite course(s): ${missingCodes.join(", ")}`,
+            });
+          }
+        }
+
+        const semesterToAssign = input.semester ?? targetCourse.semester ?? 1;
 
         await db.insert(studentCourses).values({
           studentId: ctx.user.id,
           courseId: input.courseId,
-          semester: input.semester,
+          semester: semesterToAssign,
           status: "planned",
         });
 
         return { success: true };
       } catch (error) {
+        if (error instanceof TRPCError) throw error;
         console.error("[Courses] Failed to enroll course:", error);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
@@ -280,6 +369,7 @@ export const coursesRouter = router({
 
       return recommendations.slice(0, 5); // Return top 5 recommendations
     } catch (error) {
+      if (error instanceof TRPCError) throw error;
       console.error("[Courses] Failed to get recommendations:", error);
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
     }

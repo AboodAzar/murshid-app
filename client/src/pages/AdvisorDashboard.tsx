@@ -89,7 +89,7 @@ export default function AdvisorDashboard() {
       icon: Users,
       iconBg: "bg-primary/15",
       iconColor: "text-primary",
-      accent: "border-s-2 border-s-blue-500/50",
+      accent: "border-s-2 border-s-emerald-600",
       helper: "Assigned advisees",
     },
     {
@@ -122,11 +122,11 @@ export default function AdvisorDashboard() {
   ];
 
   const quickActions = [
-    { label: t("advisor.myStudents"), icon: Users, path: "/advisor/students", color: "from-blue-600 to-blue-700" },
+    { label: t("advisor.myStudents"), icon: Users, path: "/advisor/students", color: "from-emerald-600 to-green-700" },
     { label: t("advisor.scheduleAppointment"), icon: CalendarDays, path: "/advisor/appointments", color: "from-violet-600 to-violet-700" },
     { label: t("advisor.faqs"), icon: HelpCircle, path: "/advisor/faqs", color: "from-emerald-600 to-emerald-700" },
     { label: t("advisor.documents"), icon: FolderOpen, path: "/advisor/documents", color: "from-amber-600 to-amber-700" },
-    { label: t("advisor.aiReview"), icon: BrainCircuit, path: "/advisor/ai-review", color: "from-cyan-600 to-cyan-700" },
+    { label: t("advisor.aiReview"), icon: BrainCircuit, path: "/advisor/ai-review", color: "from-emerald-700 to-green-800" },
     { label: t("analytics.title"), icon: BarChart3, path: "/analytics", color: "from-slate-600 to-slate-700" },
   ];
 
@@ -150,7 +150,7 @@ export default function AdvisorDashboard() {
           <div className="flex items-center gap-2 flex-wrap">
             <Button
               onClick={() => setLocation("/advisor/students")}
-              className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-900/20"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/20"
             >
               <Users className="w-4 h-4 me-2" />
               {t("advisor.myStudents")}
@@ -250,7 +250,7 @@ export default function AdvisorDashboard() {
                         <span className="text-xs text-muted-foreground w-20 shrink-0">Sem {c.semester}</span>
                         <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
                           <div
-                            className="h-full rounded-full bg-gradient-to-r from-blue-500 to-violet-400 transition-all"
+                            className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-amber-500 transition-all"
                             style={{ width: `${Math.min(100, (parseFloat(c.averageGpa) / 4) * 100)}%` }}
                           />
                         </div>

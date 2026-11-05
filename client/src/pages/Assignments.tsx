@@ -56,7 +56,7 @@ export default function Assignments() {
                   )}
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full mt-1 inline-block ${
                     a.status === "graded" ? "bg-emerald-500/15 text-emerald-400" :
-                    a.status === "submitted" ? "bg-blue-500/15 text-blue-400" :
+                    a.status === "submitted" ? "bg-emerald-500/15 text-emerald-400" :
                     a.status === "overdue" ? "bg-red-500/15 text-red-400" :
                     "bg-amber-500/15 text-amber-400"
                   }`}>
@@ -84,8 +84,8 @@ export default function Assignments() {
               <p className="text-2xl font-bold text-amber-400">{pending.length}</p>
               <p className="text-xs text-slate-400">{t("student.pending")}</p>
             </div>
-            <div className="text-center px-4 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20">
-              <p className="text-2xl font-bold text-blue-400">{submitted.length}</p>
+            <div className="text-center px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+              <p className="text-2xl font-bold text-emerald-400">{submitted.length}</p>
               <p className="text-xs text-slate-400">{t("student.submitted")}</p>
             </div>
             <div className="text-center px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20">
@@ -104,7 +104,7 @@ export default function Assignments() {
         ) : (
           <div className="space-y-6">
             {renderList(pending, t("student.pendingAssignments"), <Clock className="w-5 h-5 text-amber-400" />, t("student.noPendingAssignments"))}
-            {renderList(submitted, t("student.submittedAssignments"), <CheckCircle2 className="w-5 h-5 text-blue-400" />, t("student.noSubmittedAssignments"))}
+            {renderList(submitted, t("student.submittedAssignments"), <CheckCircle2 className="w-5 h-5 text-emerald-400" />, t("student.noSubmittedAssignments"))}
             {renderList(overdue, t("student.overdueAssignments"), <AlertCircle className="w-5 h-5 text-red-400" />, t("student.noOverdueAssignments"))}
           </div>
         )}

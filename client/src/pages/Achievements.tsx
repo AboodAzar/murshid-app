@@ -61,7 +61,7 @@ export default function Achievements() {
               {unlocked.map((a) => {
                 const Icon = iconMap[a.icon] || Star;
                 return (
-                  <div key={a.id} className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-br from-emerald-500/10 to-blue-500/5 border border-emerald-500/20">
+                  <div key={a.id} className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-br from-emerald-500/10 to-amber-500/10 border border-emerald-500/20">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shrink-0">
                       <Icon className="w-6 h-6 text-white" />
                     </div>

@@ -86,11 +86,11 @@ export default function ResetPassword() {
 
   if (tokenValid === null) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-        <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-xl w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-[#040e08] via-[#091f12] to-[#040e08] flex items-center justify-center p-4">
+        <Card className="bg-slate-900/80 border-emerald-500/20 backdrop-blur-xl w-full max-w-md">
           <CardContent className="pt-8">
             <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500" />
             </div>
             <p className="text-center text-slate-400 mt-4">
               {t("auth.verifyingToken")}
@@ -103,19 +103,19 @@ export default function ResetPassword() {
 
   if (!tokenValid) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-        <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-xl w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-[#040e08] via-[#091f12] to-[#040e08] flex items-center justify-center p-4">
+        <Card className="bg-slate-900/80 border-emerald-500/20 backdrop-blur-xl w-full max-w-md">
           <CardHeader className="space-y-2">
-            <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-red-500/20 mb-4">
+            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-red-500/20 border border-red-500/30 mb-4">
               <AlertCircle className="w-6 h-6 text-red-400" />
             </div>
-            <CardTitle className="text-2xl">{t("auth.invalidToken")}</CardTitle>
+            <CardTitle className="text-2xl text-white">{t("auth.invalidToken")}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-slate-400 mb-4">{error}</p>
             <Button
               onClick={() => setLocation("/forgot-password")}
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className="w-full bg-emerald-600 hover:bg-emerald-500 text-white"
             >
               {t("auth.requestNewLink")}
             </Button>
@@ -127,13 +127,13 @@ export default function ResetPassword() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-        <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-xl w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-[#040e08] via-[#091f12] to-[#040e08] flex items-center justify-center p-4">
+        <Card className="bg-slate-900/80 border-emerald-500/20 backdrop-blur-xl w-full max-w-md">
           <CardHeader className="space-y-2">
-            <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-green-500/20 mb-4">
-              <CheckCircle className="w-6 h-6 text-green-400" />
+            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/30 mb-4">
+              <CheckCircle className="w-6 h-6 text-emerald-400" />
             </div>
-            <CardTitle className="text-2xl">
+            <CardTitle className="text-2xl text-white">
               {t("auth.passwordResetSuccess")}
             </CardTitle>
           </CardHeader>
@@ -143,7 +143,7 @@ export default function ResetPassword() {
             </p>
             <Button
               onClick={() => setLocation("/login")}
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className="w-full bg-emerald-600 hover:bg-emerald-500 text-white"
             >
               {t("auth.goToLogin")}
             </Button>
@@ -154,17 +154,17 @@ export default function ResetPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#040e08] via-[#091f12] to-[#040e08] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-xl">
+        <Card className="bg-slate-900/80 border-emerald-500/20 backdrop-blur-xl shadow-2xl">
           <CardHeader className="space-y-2">
-            <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-500/20 mb-4">
-              <Lock className="w-6 h-6 text-blue-400" />
+            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/30 mb-4">
+              <Lock className="w-6 h-6 text-emerald-400" />
             </div>
-            <CardTitle className="text-2xl">
+            <CardTitle className="text-2xl text-white">
               {t("auth.resetPassword")}
             </CardTitle>
-            <CardDescription>{t("auth.enterNewPassword")}</CardDescription>
+            <CardDescription className="text-slate-400">{t("auth.enterNewPassword")}</CardDescription>
           </CardHeader>
 
           <CardContent>
@@ -178,9 +178,12 @@ export default function ResetPassword() {
                   placeholder="••••••••"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
+                  className="bg-slate-800/60 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500"
                   disabled={isLoading}
                 />
+                <p className="text-xs text-slate-400 mt-1">
+                  {t("auth.passwordMinLength")}
+                </p>
               </div>
 
               <div>
@@ -192,20 +195,20 @@ export default function ResetPassword() {
                   placeholder="••••••••"
                   value={confirmPassword}
                   onChange={e => setConfirmPassword(e.target.value)}
-                  className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
+                  className="bg-slate-800/60 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500"
                   disabled={isLoading}
                 />
               </div>
 
               {error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                  <p className="text-sm text-red-400">{error}</p>
+                <div className="p-3 bg-red-500/15 border border-red-500/40 rounded-xl text-red-300 text-sm">
+                  {error}
                 </div>
               )}
 
               <Button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700"
+                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium"
                 disabled={isLoading}
               >
                 {isLoading ? t("auth.resetting") : t("auth.resetPassword")}

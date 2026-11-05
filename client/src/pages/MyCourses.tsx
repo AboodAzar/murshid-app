@@ -15,7 +15,7 @@ const fadeInUp = {
 };
 
 const courseColors = [
-  "from-blue-500 to-cyan-500",
+  "from-emerald-600 to-green-500",
   "from-violet-500 to-purple-500",
   "from-emerald-500 to-teal-500",
   "from-amber-500 to-orange-500",
@@ -73,7 +73,7 @@ export default function MyCourses() {
                     course.status === "completed"
                       ? "bg-emerald-500/15 text-emerald-400"
                       : course.status === "in_progress"
-                      ? "bg-blue-500/15 text-blue-400"
+                      ? "bg-emerald-500/15 text-emerald-400"
                       : "bg-slate-500/15 text-slate-400"
                   }`}>
                     {course.status === "completed" ? t("student.completed") : course.status === "in_progress" ? t("student.inProgress") : t("student.planned")}
@@ -96,10 +96,10 @@ export default function MyCourses() {
                     <span>{course.progress}%</span>
                   </div>
                   <div className="h-1.5 rounded-full bg-slate-700/50 overflow-hidden">
-                    <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-400" style={{ width: `${course.progress}%` }} />
+                    <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-green-400" style={{ width: `${course.progress}%` }} />
                   </div>
                 </div>
-                <div className="mt-4 flex items-center text-sm text-blue-400 group-hover:text-blue-300 transition-colors">
+                <div className="mt-4 flex items-center text-sm text-emerald-400 group-hover:text-emerald-300 transition-colors">
                   {t("student.viewDetails")} <ChevronRight className="w-4 h-4 ms-1 rtl:rotate-180" />
                 </div>
               </motion.div>

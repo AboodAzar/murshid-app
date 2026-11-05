@@ -1,13 +1,19 @@
-import { router, protectedProcedure } from "../_core/trpc";
+import { router, protectedProcedure, publicProcedure } from "../_core/trpc";
 import { getDb } from "../db";
-import { aiConversations, chatMessages, faqs, users, studyPlans, studentCourses, courses, attendance, assignments, studentAssignments, academicAlerts } from "../../drizzle/schema";
+import { aiConversations, chatMessages, faqs, users, studyPlans, studentCourses, courses, coursePrerequisites, attendance, assignments, studentAssignments, academicAlerts } from "../../drizzle/schema";
 import { eq, and, desc, inArray, sql, lt } from "drizzle-orm";
 import { departments, documents } from "../../drizzle/schema";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { invokeLLM } from "../_core/llm";
+import { generateLocalFallbackResponse, getAiServiceStatus } from "../utils/aiFallback";
+import { buildOliverSystemPrompt } from "../utils/oliverSystemPrompt";
 
 export const aiChatRouter = router({
+  getStatus: publicProcedure.query(async () => {
+    return await getAiServiceStatus();
+  }),
+
   createConversation: protectedProcedure
     .input(
       z.object({
@@ -99,6 +105,7 @@ export const aiChatRouter = router({
           .where(eq(chatMessages.conversationId, conversationId))
           .orderBy(chatMessages.createdAt);
       } catch (error) {
+        if (error instanceof TRPCError) throw error;
         console.error("[AI Chat] Failed to get messages:", error);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
@@ -191,84 +198,245 @@ export const aiChatRouter = router({
         const activeFaqs = await db.select({ q: faqs.questionAr, a: faqs.answerAr }).from(faqs).where(eq(faqs.isActive, true));
         const activeDocs = await db.select({ title: documents.title, category: documents.category }).from(documents);
 
+        // Resolve Major with intelligent fallback
+        let resolvedMajor = student?.major;
+        if (!resolvedMajor || resolvedMajor === "غير محدد") {
+          const hasCs = courseDetails.some((c: any) => c.code.startsWith("CS") || c.code.startsWith("SE") || c.code.startsWith("AI"));
+          resolvedMajor = hasCs ? "علم الحاسوب وتكنولوجيا المعلومات (CS)" : "تكنولوجيا المعلومات (IT)";
+        }
+
+        // Calculate Academic Year & Semesters based on standard ZUJ thresholds
+        const completedCr = plan?.completedCredits ?? 0;
+        let academicYear = "السنة الأولى (Freshman)";
+        if (completedCr >= 99) academicYear = "السنة الرابعة (Senior)";
+        else if (completedCr >= 66) academicYear = "السنة الثالثة (Junior)";
+        else if (completedCr >= 33) academicYear = "السنة الثانية (Sophomore)";
+
+        const currentSemester = "الفصل الأول 2026/2027";
+        const nextSemester = "الفصل الثاني 2026/2027";
+
+        // Identify failed courses (F grades or failed status)
+        const failedEnrollments = enrollments.filter((e: any) => e.grade === "F" || e.status === "failed");
+        const failedCourses = failedEnrollments.map((e: any) => {
+          const c = courseDetails.find((cd: any) => cd.id === e.courseId);
+          return c ? `${c.code} - ${c.name} (${c.credits} ساعات معتمدة) [علامة راسبة F - أولوية إعادة لرفع المعدل]` : `مادة راسبة (${e.courseId})`;
+        });
+
+        // Compute recommended next courses from catalog
+        const allCourses = await db.select().from(courses);
+        const allPrereqs = await db.select().from(coursePrerequisites);
+
+        const passedCourseIds = new Set(
+          enrollments.filter((e: any) => e.status === "completed" && e.grade !== "F").map((e: any) => e.courseId)
+        );
+        const inProgressCourseIds = new Set(
+          enrollments.filter((e: any) => e.status === "in_progress" || e.status === "enrolled").map((e: any) => e.courseId)
+        );
+
+        const recommendedNextCourses: string[] = [];
+        // Add failed courses first
+        for (const f of failedCourses) {
+          recommendedNextCourses.push(f);
+        }
+
+        for (const c of allCourses) {
+          if (passedCourseIds.has(c.id) || inProgressCourseIds.has(c.id)) continue;
+          if (failedEnrollments.some((e: any) => e.courseId === c.id)) continue;
+
+          const prereqs = allPrereqs.filter((p: any) => p.courseId === c.id);
+          const prereqsSatisfied = prereqs.every((p: any) =>
+            passedCourseIds.has(p.prerequisiteId) || inProgressCourseIds.has(p.prerequisiteId)
+          );
+
+          if (prereqsSatisfied) {
+            recommendedNextCourses.push(`${c.code} - ${c.name} (${c.credits} ساعات معتمدة)`);
+            if (recommendedNextCourses.length >= 5) break;
+          }
+        }
+
         const studentContext = {
           name: student?.name || "Student",
-          major: student?.major || "غير محدد",
+          major: resolvedMajor,
+          academicYear,
+          currentSemester,
+          nextSemester,
           gpa: plan?.currentGPA ?? "0.00",
-          completedCredits: plan?.completedCredits ?? 0,
-          totalCredits: plan?.totalCredits ?? 132,
+          completedCredits: completedCr,
+          totalCredits: plan?.totalCredits ?? 133,
           attendanceRate: attRate,
           currentCourses: courseDetails.map((c: any) => ({ name: c.name, code: c.code, credits: c.credits, status: enrollments.find((e: any) => e.courseId === c.id)?.status ?? "planned" })),
+          failedCourses,
+          recommendedNextCourses,
           pendingAssignments: pendingAssignments.length,
           activeAlerts: activeAlerts.map((a: any) => ({ title: a.title, severity: a.severity })),
         };
 
-        // Generate AI response via Runpod
-        const runpodUrl = process.env.RUNPOD_API_URL;
-        if (!runpodUrl) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "RUNPOD_API_URL is not configured",
-          });
-        }
+        let aiMessage: string | null = null;
+        let isOfflineFallback = true;
+        let source: "faq" | "academic_rules" | "local_advisor" | "external_llm" = "local_advisor";
 
-        const runpodPayload = {
-          query: input.message,
-          chat_history: chat_history,
-          student_context: studentContext,
-          db_faqs: activeFaqs,
-          db_documents: activeDocs,
-          uploaded_file_name: "None",
-          uploaded_file_context: null
-        };
-
-        const response = await fetch(`${runpodUrl.replace(/\/$/, '')}/chat`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(runpodPayload),
-        });
-
-        if (!response.ok) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: `Runpod API error: ${response.statusText}`,
-          });
-        }
-
-        let runpodData;
-        try {
-          const textResponse = await response.text();
-          try {
-            runpodData = JSON.parse(textResponse);
-          } catch (e) {
-            console.error("Runpod returned non-JSON:", textResponse);
-            runpodData = { answer: "Error: Runpod returned an invalid response format. Check the local console." };
-          }
-        } catch (e) {
-           runpodData = { answer: "Error: Failed to read Runpod response." };
-        }
         
-        const aiMessage = runpodData.answer || "I apologize, I could not generate a response.";
+        // 1. Priority: Local Private Ollama on RTX 3050 (100% Data Privacy)
+        const ollamaUrl = process.env.OLLAMA_API_URL || "http://127.0.0.1:11434";
+        let targetModel = process.env.OLLAMA_MODEL || "oliver-zuj:latest";
+        try {
+          // Probe available models from Ollama to auto-select any installed model (prioritizing custom oliver-zuj)
+          const tagsRes = await fetch(`${ollamaUrl.replace(/\/$/, '')}/api/tags`, {
+            signal: AbortSignal.timeout(800),
+          });
+          if (tagsRes.ok) {
+            const tags = (await tagsRes.json()) as any;
+            const availableNames: string[] = (tags?.models || []).map((m: any) => m.name);
+            if (availableNames.length > 0) {
+              const oliverCustom = availableNames.find((n) => n.includes("oliver-zuj") || n.includes("oliver"));
+              const matched = oliverCustom || availableNames.find((n) => n.startsWith(targetModel) || targetModel.startsWith(n));
+              targetModel = matched || availableNames[0];
+            }
+          }
 
-        // Save AI response
+          const systemPrompt = buildOliverSystemPrompt(
+            studentContext,
+            activeFaqs,
+            activeDocs
+          );
+
+          const arabicChars = (input.message.match(/[\u0600-\u06FF]/g) || []).length;
+          const englishChars = (input.message.match(/[a-zA-Z]/g) || []).length;
+          const isArabic = arabicChars > englishChars;
+          const langInstruction = isArabic
+            ? "CRITICAL: The student wrote in Arabic. You must reply strictly in clean, natural Arabic (العربية الفصحى)."
+            : "CRITICAL: The student wrote in English. You must reply strictly in clear, fluent English.";
+
+          const ollamaMessages = [
+            { role: "system", content: `${systemPrompt}\n\n${langInstruction}` },
+            ...chat_history.slice(-4).map((h: any) => ({
+              role: h.role === "assistant" ? "assistant" : "user",
+              content: h.role === "assistant" && typeof h.content === "string" && h.content.length > 450
+                ? h.content.slice(0, 450) + "..."
+                : h.content,
+            })),
+            { role: "user", content: input.message },
+          ];
+
+          const ollamaRes = await fetch(ollamaUrl.replace(/\/$/, '') + "/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              model: targetModel,
+              messages: ollamaMessages,
+              stream: false,
+              options: {
+                temperature: 0.2, // Strict precision, prevents rambling and hallucination
+                top_p: 0.85,
+                repeat_penalty: 1.15,
+                num_ctx: 4096, // Focused context for ultra-fast GPU processing
+                num_predict: 600, // Crisp, complete response without cut-off
+                stop: ["<|im_start|>", "<|im_end|>", "\n### حالتك الدراسية", "\nStudent Status:"],
+              },
+            }),
+            signal: AbortSignal.timeout(45000),
+          });
+
+          if (ollamaRes.ok) {
+            const ollamaData = await ollamaRes.json() as any;
+            if (ollamaData?.message?.content) {
+              let text = ollamaData.message.content as string;
+              // Clean up any cross-lingual Cyrillic token leaks from base tokenizer (e.g. курсы -> المقررات)
+              text = text.replace(/курсы/gi, "المقررات");
+              aiMessage = text;
+              isOfflineFallback = false;
+              source = "external_llm";
+            }
+          }
+        } catch {
+          // Ollama offline or timed out, gracefully check Runpod or local fallback
+        }
+
+        const runpodUrl = process.env.RUNPOD_API_URL;
+        if (runpodUrl && process.env.AI_FORCE_LOCAL_FALLBACK !== "true") {
+          try {
+            const runpodPayload = {
+              query: input.message,
+              chat_history: chat_history,
+              student_context: studentContext,
+              db_faqs: activeFaqs,
+              db_documents: activeDocs,
+              uploaded_file_name: "None",
+              uploaded_file_context: null,
+            };
+
+            const response = await fetch(`${runpodUrl.replace(/\/$/, '')}/chat`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(runpodPayload),
+              signal: AbortSignal.timeout(1500),
+            });
+
+            if (response.ok) {
+              const runpodData = await response.json();
+              if (runpodData?.answer && typeof runpodData.answer === "string") {
+                aiMessage = runpodData.answer;
+                isOfflineFallback = false;
+                source = "external_llm";
+              }
+            }
+          } catch (fetchError: any) {
+            console.warn("[AI Chat] Runpod request skipped or timed out (1500ms limit); engaging local fallback engine.", fetchError?.message);
+          }
+        }
+
+        // If external model is offline, failed, or timed out, execute 3-tier local fallback engine
+        if (!aiMessage) {
+          const fallback = await generateLocalFallbackResponse({
+            query: input.message,
+            studentContext,
+            dbFaqs: activeFaqs.map(f => ({
+              question: f.q,
+              questionAr: f.q,
+              answer: f.a,
+              answerAr: f.a,
+            })),
+            dbDocs: activeDocs,
+          });
+
+          aiMessage = fallback.response;
+          isOfflineFallback = true;
+          source = fallback.source;
+        }
+
+        // Save AI response to DB and touch conversation timestamp
         try {
           await db.insert(chatMessages).values({
             conversationId: input.conversationId,
             role: "assistant" as const,
-            content: aiMessage as string,
+            content: aiMessage,
             tokens: 0,
           });
+
+          await db.update(aiConversations)
+            .set({ updatedAt: new Date() })
+            .where(eq(aiConversations.id, input.conversationId));
         } catch (dbError) {
-          console.error("Failed to save AI message to DB:", dbError);
-          // Don't throw, we still want to show the message to the user!
+          console.error("[AI Chat] Failed to save AI message to DB:", dbError);
         }
 
-        return { success: true, response: aiMessage };
+        return {
+          success: true,
+          response: aiMessage,
+          isOfflineFallback,
+          source,
+        };
       } catch (error: any) {
+        if (error instanceof TRPCError) throw error;
         console.error("[AI Chat] Failed to send message:", error);
-        return { success: false, response: `Exact Error: ${error.message}` };
+        return {
+          success: false,
+          response: "عذراً، حدث خطأ أثناء معالجة المحادثة. يرجى المحاولة مرة أخرى.",
+          isOfflineFallback: true,
+          source: "local_advisor" as const,
+        };
       }
     }),
 
@@ -290,9 +458,21 @@ export const aiChatRouter = router({
       try {
         // Verify the message exists and belongs to the user's conversation
         const [msg] = await db
-          .select()
+          .select({
+            id: chatMessages.id,
+            conversationId: chatMessages.conversationId,
+            role: chatMessages.role,
+            content: chatMessages.content,
+            studentId: aiConversations.studentId,
+          })
           .from(chatMessages)
-          .where(eq(chatMessages.id, input.messageId))
+          .innerJoin(aiConversations, eq(chatMessages.conversationId, aiConversations.id))
+          .where(
+            and(
+              eq(chatMessages.id, input.messageId),
+              eq(aiConversations.studentId, ctx.user.id)
+            )
+          )
           .limit(1);
 
         if (!msg) throw new TRPCError({ code: "NOT_FOUND" });
@@ -346,6 +526,7 @@ export const aiChatRouter = router({
         }
         return { success: true };
       } catch (error) {
+        if (error instanceof TRPCError) throw error;
         console.error("[AI Chat] Failed to rate message:", error);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
@@ -393,6 +574,7 @@ export const aiChatRouter = router({
 
         return { success: true };
       } catch (error) {
+        if (error instanceof TRPCError) throw error;
         console.error("[AI Chat] Failed to delete conversation:", error);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }

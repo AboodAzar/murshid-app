@@ -140,6 +140,7 @@ export const documentsRouter = router({
             const response = await fetch(`${runpodUrl.replace(/\/$/, '')}/upload_document`, {
               method: "POST",
               body: formData,
+              signal: AbortSignal.timeout(1500),
             });
 
             if (!response.ok) {
@@ -197,8 +198,11 @@ export const documentsRouter = router({
           .from(documents)
           .where(eq(documents.id, documentId))
           .limit(1);
+        if (!doc[0]) {
+          throw new TRPCError({ code: "NOT_FOUND" });
+        }
         const isAdmin = ctx.user.role === "admin";
-        if (!doc[0] || (!isAdmin && doc[0].uploadedBy !== ctx.user.id)) {
+        if (!isAdmin && doc[0].uploadedBy !== ctx.user.id) {
           throw new TRPCError({ code: "FORBIDDEN" });
         }
 
@@ -206,6 +210,7 @@ export const documentsRouter = router({
         await db.delete(documents).where(eq(documents.id, documentId));
         return { success: true };
       } catch (error) {
+        if (error instanceof TRPCError) throw error;
         console.error("[Documents] Failed to delete document:", error);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
@@ -360,6 +365,7 @@ export const documentsRouter = router({
                     title: resource.title,
                     source: resource.source,
                   }),
+                  signal: AbortSignal.timeout(1500),
                 }
               );
               if (response.ok) {
@@ -436,6 +442,7 @@ export const documentsRouter = router({
                     url: input.url,
                     title: input.title,
                   }),
+                  signal: AbortSignal.timeout(1500),
                 }
               );
               if (response.ok) {
@@ -506,6 +513,7 @@ export const documentsRouter = router({
                   url: doc[0].fileUrl,
                   title: doc[0].title,
                 }),
+                signal: AbortSignal.timeout(1500),
               }
             );
             if (response.ok) {
@@ -526,6 +534,7 @@ export const documentsRouter = router({
           return { success: false, message: "Retry for file uploads not yet supported" };
         }
       } catch (error) {
+        if (error instanceof TRPCError) throw error;
         console.error("[Documents] Failed to retry indexing:", error);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }

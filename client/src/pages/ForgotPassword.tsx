@@ -44,26 +44,26 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#040e08] via-[#091f12] to-[#040e08] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Back Button */}
         <button
           onClick={() => setLocation("/login")}
-          className="flex items-center gap-2 text-slate-400 hover:text-slate-200 mb-8 transition-colors"
+          className="flex items-center gap-2 text-slate-400 hover:text-emerald-400 mb-8 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
           {t("auth.backToLogin")}
         </button>
 
-        <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-xl">
+        <Card className="bg-slate-900/80 border-emerald-500/20 backdrop-blur-xl shadow-2xl">
           <CardHeader className="space-y-2">
-            <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-500/20 mb-4">
-              <Mail className="w-6 h-6 text-blue-400" />
+            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/30 mb-4">
+              <Mail className="w-6 h-6 text-emerald-400" />
             </div>
-            <CardTitle className="text-2xl">
+            <CardTitle className="text-2xl text-white">
               {t("auth.forgotPassword")}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-slate-400">
               {submitted
                 ? t("auth.checkEmailDescription")
                 : t("auth.enterEmailToReset")}
@@ -74,10 +74,10 @@ export default function ForgotPassword() {
             {submitted ? (
               <div className="space-y-4">
                 <div className="flex justify-center">
-                  <CheckCircle className="w-16 h-16 text-green-500" />
+                  <CheckCircle className="w-16 h-16 text-emerald-500" />
                 </div>
                 <div className="text-center space-y-2">
-                  <p className="text-slate-300 font-medium">
+                  <p className="text-slate-200 font-medium">
                     {t("auth.emailSent")}
                   </p>
                   <p className="text-slate-400 text-sm">
@@ -86,7 +86,7 @@ export default function ForgotPassword() {
                 </div>
                 <Button
                   onClick={() => setLocation("/login")}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white"
                 >
                   {t("auth.backToLogin")}
                 </Button>
@@ -102,14 +102,14 @@ export default function ForgotPassword() {
                     placeholder="your@email.com"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
-                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500"
+                    className="bg-slate-800/60 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500"
                     disabled={isLoading}
                   />
                 </div>
 
                 <Button
                   type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium"
                   disabled={isLoading}
                 >
                   {isLoading ? t("auth.sending") : t("auth.sendResetLink")}
@@ -124,14 +124,14 @@ export default function ForgotPassword() {
         </Card>
 
         {/* Additional Help */}
-        <div className="mt-6 p-4 bg-slate-800/30 rounded-lg border border-slate-700/50">
+        <div className="mt-6 p-4 bg-slate-900/40 rounded-xl border border-emerald-500/10">
           <p className="text-xs text-slate-400 text-center">
             {t("auth.noResetEmail")} <br />
             <a
-              href="mailto:support@murshid.edu"
-              className="text-blue-400 hover:text-blue-300"
+              href="mailto:support@zuj.edu.jo"
+              className="text-emerald-400 hover:text-emerald-300"
             >
-              support@murshid.edu
+              support@zuj.edu.jo
             </a>
           </p>
         </div>

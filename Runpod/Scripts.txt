@@ -15,7 +15,7 @@ then:
 ollama serve > ollama.log 2>&1 &
 
 Ollama pull model:
-ollama pull qwen3.54:b
+ollama pull qwen3.5:4b
 ollama pull qwen3.6:35b
 ollama pull qwen3.6:35b-a3b-q8_0
 ollama pull nemotron-3-super:120b
@@ -26,6 +26,12 @@ python3 -m streamlit run /workspace/app_v1.py --server.port 8501 --server.addres
 
 to run the api file:
 python3 /workspace/api.py
+
+
+update the model to check the DB !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+to start the DB view, run:
+npx drizzle-kit studio
 
 FAQ:
 سوال عن انه في عندي امتحانين بنفس الوقت، ايش اعمل؟
@@ -64,3 +70,16 @@ tests scripts:
 
 بدي انزل الرياضيات المتقطعة، أساسيات تكنولوجيا المعلومات،التربية الوطنية،اللغة الانجليزية التقنية لطلاب تكنولوجيا المعلومات،مهارات حياتية. وعندي خصم 40%، قديش بطلع الفصل علي؟
 
+عندي امتحانين بنفس الوقت، ايش اعمل؟
+
+Scenario:
+
+ايش المواد اللي لازم أنزلها الفصل الجاي؟
+
+أنا تخصصي علم حاسوب (CS)
+
+عندي امتحانين بنفس الوقت، ايش القوانين؟
+
+ممتاز. بناءً على تخصصي، كم بتكلفني رسوم تسجيل الفصل؟
+
+عندي خصم 45%، قديش بصير هسا؟

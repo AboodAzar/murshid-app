@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useI18n } from "@/contexts/I18nContext";
+import { formatUniversityId, formatGpaDisplay, formatCourseGradeDisplay } from "@/lib/academicUtils";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -8,7 +9,7 @@ import { trpc } from "@/lib/trpc";
 import {
   ArrowLeft, GraduationCap, Mail, BookOpen, Award, Activity,
   AlertTriangle, FileText, CalendarDays, TrendingUp, Target,
-  ChevronRight, Plus, CheckCircle2, X
+  ChevronRight, Plus, CheckCircle2, X, IdCard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +19,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 const fadeInUp = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.35 } };
 const severityColors: Record<string, string> = {
-  low: "bg-blue-500/15 text-blue-400 border-blue-500/20",
+  low: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
   medium: "bg-amber-500/15 text-amber-400 border-amber-500/20",
   high: "bg-orange-500/15 text-orange-400 border-orange-500/20",
   critical: "bg-red-500/15 text-red-400 border-red-500/20",
@@ -63,7 +64,7 @@ export default function AdvisorStudentProfile() {
       <DashboardLayout>
         <div className="p-6 text-center">
           <p className="text-slate-400">{t("advisor.selectStudentFirst")}</p>
-          <Button onClick={() => setLocation("/advisor/students")} className="mt-4 bg-blue-600 hover:bg-blue-700">{t("advisor.myStudents")}</Button>
+          <Button onClick={() => setLocation("/advisor/students")} className="mt-4 bg-emerald-600 hover:bg-emerald-500">{t("advisor.myStudents")}</Button>
         </div>
       </DashboardLayout>
     );
@@ -89,11 +90,17 @@ export default function AdvisorStudentProfile() {
             <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-              <GraduationCap className="w-6 h-6 text-blue-400" />
-              {s?.name || t("advisor.studentProfile")}
-            </h1>
-            <p className="text-slate-400 text-sm flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+                <GraduationCap className="w-6 h-6 text-emerald-400" />
+                {s?.name || t("advisor.studentProfile")}
+              </h1>
+              <span className="inline-flex items-center gap-1.5 font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-lg border border-emerald-500/25 text-xs font-bold">
+                <IdCard className="w-3.5 h-3.5" />
+                <span>ID: {formatUniversityId(s)}</span>
+              </span>
+            </div>
+            <p className="text-slate-400 text-sm flex items-center gap-2 mt-1">
               <Mail className="w-3.5 h-3.5" /> {s?.email}
               {profile?.department && <span className="text-slate-500">• {profile.department.name}</span>}
             </p>
@@ -103,8 +110,8 @@ export default function AdvisorStudentProfile() {
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: t("student.gpa"), value: stats?.gpa ?? "0.00", icon: Award, color: "text-emerald-400 bg-emerald-500/15" },
-            { label: t("student.creditsEarned"), value: stats?.earnedCredits ?? 0, icon: BookOpen, color: "text-blue-400 bg-blue-500/15" },
+            { label: t("student.gpa"), value: formatGpaDisplay(stats?.gpa ?? "0.00").primaryScore, subValue: formatGpaDisplay(stats?.gpa ?? "0.00").secondaryScale, icon: Award, color: "text-emerald-400 bg-emerald-500/15" },
+            { label: t("student.creditsEarned"), value: stats?.earnedCredits ?? 0, icon: BookOpen, color: "text-emerald-400 bg-emerald-500/15" },
             { label: t("student.attendance"), value: `${stats?.attendanceRate ?? 0}%`, icon: Activity, color: "text-sky-400 bg-sky-500/15" },
             { label: t("advisor.activeAlerts"), value: stats?.activeAlerts ?? 0, icon: AlertTriangle, color: "text-rose-400 bg-rose-500/15" },
           ].map((stat, i) => (
@@ -115,6 +122,9 @@ export default function AdvisorStudentProfile() {
                 <span className="text-xs text-slate-400">{stat.label}</span>
               </div>
               <p className="text-xl font-bold text-white">{stat.value}</p>
+              {(stat as any).subValue && (
+                <p className="text-xs text-slate-400 font-mono mt-0.5">{(stat as any).subValue}</p>
+              )}
             </motion.div>
           ))}
         </div>
@@ -123,7 +133,7 @@ export default function AdvisorStudentProfile() {
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
           {tabs.map((tab) => (
             <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors shrink-0 ${activeTab === tab.key ? "bg-blue-600 text-white" : "bg-white/[0.04] text-slate-400 hover:bg-white/[0.07]"}`}>
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors shrink-0 ${activeTab === tab.key ? "bg-emerald-600 text-white" : "bg-white/[0.04] text-slate-400 hover:bg-white/[0.07]"}`}>
               <tab.icon className="w-4 h-4 shrink-0" />{tab.label}
             </button>
           ))}
@@ -134,7 +144,7 @@ export default function AdvisorStudentProfile() {
           {activeTab === "overview" && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2"><BookOpen className="w-5 h-5 text-blue-400" />{t("student.myCourses")}</h3>
+                <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2"><BookOpen className="w-5 h-5 text-emerald-400" />{t("student.myCourses")}</h3>
                 {uniqueCourses.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {uniqueCourses.map((c: any) => (
@@ -143,7 +153,7 @@ export default function AdvisorStudentProfile() {
                           <p className="text-sm font-medium text-white">{c.course?.name || c.course?.code}</p>
                           <p className="text-xs text-slate-400">{c.course?.code} • {c.semester}</p>
                         </div>
-                        <span className={`text-xs px-2 py-0.5 rounded ${c.status === "completed" ? "bg-emerald-500/15 text-emerald-400" : c.status === "in_progress" ? "bg-blue-500/15 text-blue-400" : "bg-slate-500/15 text-slate-400"}`}>{c.status}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded ${c.status === "completed" ? "bg-emerald-500/15 text-emerald-400" : c.status === "in_progress" ? "bg-emerald-500/15 text-emerald-400" : "bg-slate-500/15 text-slate-400"}`}>{c.status}</span>
                       </div>
                     ))}
                   </div>
@@ -246,7 +256,7 @@ export default function AdvisorStudentProfile() {
                     <div key={appt.id} className="p-4 rounded-xl bg-white/[0.04]">
                       <div className="flex items-center justify-between">
                         <p className="text-sm font-medium text-white">{appt.title}</p>
-                        <span className={`text-xs px-2 py-0.5 rounded ${appt.status === "completed" ? "bg-emerald-500/15 text-emerald-400" : appt.status === "cancelled" ? "bg-red-500/15 text-red-400" : "bg-blue-500/15 text-blue-400"}`}>{appt.status}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded ${appt.status === "completed" ? "bg-emerald-500/15 text-emerald-400" : appt.status === "cancelled" ? "bg-red-500/15 text-red-400" : "bg-emerald-500/15 text-emerald-400"}`}>{appt.status}</span>
                       </div>
                       <p className="text-xs text-slate-400 mt-1">{new Date(appt.scheduledAt).toLocaleString()} • {appt.durationMinutes}m</p>
                       {appt.location && <p className="text-xs text-slate-500 mt-1">{appt.location}</p>}
@@ -274,7 +284,7 @@ export default function AdvisorStudentProfile() {
                     <div key={r.id} className="p-4 rounded-xl bg-white/[0.04]">
                       <div className="flex items-center justify-between">
                         <p className="text-sm font-medium text-white">{r.title}</p>
-                        <span className={`text-xs px-2 py-0.5 rounded ${r.status === "completed" ? "bg-emerald-500/15 text-emerald-400" : r.status === "accepted" ? "bg-blue-500/15 text-blue-400" : r.status === "rejected" ? "bg-red-500/15 text-red-400" : "bg-amber-500/15 text-amber-400"}`}>{r.status}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded ${r.status === "completed" ? "bg-emerald-500/15 text-emerald-400" : r.status === "accepted" ? "bg-emerald-500/15 text-emerald-400" : r.status === "rejected" ? "bg-red-500/15 text-red-400" : "bg-amber-500/15 text-amber-400"}`}>{r.status}</span>
                       </div>
                       <p className="text-xs text-slate-400 mt-1">{r.description}</p>
                       <p className="text-xs text-slate-500 mt-2">{new Date(r.createdAt).toLocaleString()}</p>

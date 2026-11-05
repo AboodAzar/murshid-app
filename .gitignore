@@ -105,6 +105,19 @@ temp/
 *.db
 *.sqlite
 *.sqlite3
+Runpod/db/
+Runpod/chroma_*/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Large sample media files
+Sampeles/
+*.mp4
+*.mov
+*.avi
 
 # Webdev artifacts (checkpoint zips, migrations, etc.)
 .webdev/

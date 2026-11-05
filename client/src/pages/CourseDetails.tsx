@@ -53,13 +53,13 @@ export default function CourseDetails() {
           </div>
         ) : (
           <>
-            <motion.div {...fadeInUp} className="rounded-2xl border border-white/10 bg-gradient-to-br from-blue-900/40 to-slate-900/60 p-6 backdrop-blur-2xl">
+            <motion.div {...fadeInUp} className="rounded-2xl border border-white/10 bg-gradient-to-br from-emerald-950/40 to-slate-900/60 p-6 backdrop-blur-2xl">
               <div className="flex items-start justify-between">
                 <div>
                   <h1 className="text-3xl font-bold text-white">{course.name}</h1>
                   <p className="text-slate-400 mt-1">{course.code} • {course.credits} {t("student.credits")} • {t("student.semester")} {course.semester}</p>
                 </div>
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-600 to-green-500 flex items-center justify-center">
                   <BookOpen className="w-7 h-7 text-white" />
                 </div>
               </div>
@@ -82,12 +82,12 @@ export default function CourseDetails() {
 
               <motion.div {...fadeInUp} className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-2xl">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center">
-                    <Users className="w-5 h-5 text-blue-400" />
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center">
+                    <Users className="w-5 h-5 text-emerald-400" />
                   </div>
                   <h3 className="text-lg font-semibold text-white">{t("student.instructor")}</h3>
                 </div>
-                <p className="text-3xl font-bold text-blue-400">{data?.schedule?.[0]?.lecturerName ?? "—"}</p>
+                <p className="text-3xl font-bold text-emerald-400">{data?.schedule?.[0]?.lecturerName ?? "—"}</p>
                 <p className="text-sm text-slate-400 mt-1">{t("student.lecturer")}</p>
               </motion.div>
 
@@ -105,7 +105,7 @@ export default function CourseDetails() {
 
             <motion.div {...fadeInUp} className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-2xl">
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-cyan-400" /> {t("student.schedule")}
+                <Calendar className="w-5 h-5 text-emerald-400" /> {t("student.schedule")}
               </h3>
               {data?.schedule && data.schedule.length > 0 ? (
                 <div className="space-y-3">
@@ -145,7 +145,7 @@ export default function CourseDetails() {
                       <div className="text-end">
                         <span className={`text-xs font-medium px-2 py-1 rounded-full ${
                           a.saStatus === "graded" ? "bg-emerald-500/15 text-emerald-400" :
-                          a.saStatus === "submitted" ? "bg-blue-500/15 text-blue-400" :
+                          a.saStatus === "submitted" ? "bg-emerald-500/15 text-emerald-400" :
                           a.saStatus === "overdue" ? "bg-red-500/15 text-red-400" :
                           "bg-amber-500/15 text-amber-400"
                         }`}>
