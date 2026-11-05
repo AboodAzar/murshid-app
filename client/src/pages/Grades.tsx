@@ -1,8 +1,9 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import DashboardLayout from "@/components/DashboardLayout";
+import WhatIfGradeSimulator from "@/components/WhatIfGradeSimulator";
 import { motion } from "framer-motion";
-import { Award, TrendingUp, BookOpen, BarChart3, IdCard, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Award, TrendingUp, BookOpen, BarChart3, IdCard, CheckCircle2, AlertTriangle, Calculator } from "lucide-react";
 import { useI18n } from "@/contexts/I18nContext";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import {
@@ -258,6 +259,15 @@ export default function Grades() {
             </div>
           </motion.div>
         )}
+
+        {/* Interactive What-If Grade Simulator (Canvas #1 Loved Feature) */}
+        <motion.div {...fadeInUp}>
+          <WhatIfGradeSimulator
+            courses={courses}
+            currentGpa={stats?.gpa ?? "84.50"}
+            totalCredits={stats?.totalCredits ?? 133}
+          />
+        </motion.div>
 
         {/* Course Grades Breakdown Table */}
         <motion.div

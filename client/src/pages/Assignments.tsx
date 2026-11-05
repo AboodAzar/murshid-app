@@ -928,6 +928,80 @@ export default function Assignments() {
                     )}
                   </div>
 
+                  {/* SpeedGrader Rapid Rubric (Canvas Pattern) */}
+                  <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-emerald-500/20 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                        <Award className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>{language === "ar" ? "معايير التقييم السريع (SpeedGrader Rubric)" : "SpeedGrader Rapid Rubrics"}</span>
+                      </span>
+                      <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
+                        1-Click Scoring
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setGradeScore(100);
+                          setGradeFeedback(prev => prev ? prev : (language === "ar" ? "ممتاز! حل متكامل ومتقن ومعالجة دقيقة لجميع الحالات." : "Outstanding work! Fully optimal logic with all edge cases handled."));
+                        }}
+                        className="p-2 rounded-xl bg-slate-900 border border-emerald-500/30 hover:bg-emerald-600/20 text-emerald-300 font-bold transition-all"
+                      >
+                        <span className="block text-sm font-black">100%</span>
+                        <span className="text-[10px] text-slate-400">{language === "ar" ? "علامة كاملة" : "Full Score"}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setGradeScore(85);
+                          setGradeFeedback(prev => prev ? prev : (language === "ar" ? "جيد جداً! الفكرة الأساسية سليمة مع بعض الملاحظات البسيطة." : "Very good! Core concept is solid with minor formatting suggestions."));
+                        }}
+                        className="p-2 rounded-xl bg-slate-900 border border-teal-500/30 hover:bg-teal-600/20 text-teal-300 font-bold transition-all"
+                      >
+                        <span className="block text-sm font-black">85%</span>
+                        <span className="text-[10px] text-slate-400">{language === "ar" ? "جيد جداً" : "Very Good"}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setGradeScore(gradingAssignment.isLateSubmission ? 75 : 80);
+                          setGradeFeedback(prev => prev ? prev : (language === "ar" ? "تم قبول التسليم المتأخر مع خصم 5% حسب تعليمات المساق." : "Late submission accepted with 5% deduction per course policy."));
+                        }}
+                        className="p-2 rounded-xl bg-slate-900 border border-amber-500/30 hover:bg-amber-600/20 text-amber-300 font-bold transition-all"
+                      >
+                        <span className="block text-sm font-black">{gradingAssignment.isLateSubmission ? "75%" : "80%"}</span>
+                        <span className="text-[10px] text-slate-400">{language === "ar" ? "تسليم متأخر" : "Late Grace"}</span>
+                      </button>
+                    </div>
+
+                    {/* Quick Feedback Chips */}
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 block mb-1">
+                        {language === "ar" ? "ملاحظات جاهزة بنقرة واحدة:" : "Quick Feedback Presets:"}
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {[
+                          language === "ar" ? "ممتاز! معالجة دقيقة لحالات الأطراف وإدارة ممتازة للذاكرة." : "🌟 Optimal logic and memory management.",
+                          language === "ar" ? "يرجى الانتباه لمعادلة حساب معامل التوازن (Balance Factor)." : "🔍 Review balance factor calculation formula.",
+                          language === "ar" ? "تم توثيق التسليم المتأخر مع احتساب الدرجة." : "⏱️ Late submission noted and recorded.",
+                        ].map((chip, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setGradeFeedback(prev => prev ? `${prev} ${chip}` : chip)}
+                            className="text-[10px] px-2.5 py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300 hover:text-white hover:border-emerald-500/40 transition-colors text-start"
+                          >
+                            + {chip}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
                   <div>
                     <label className="block text-xs font-semibold text-slate-300 mb-1">
                       {language === "ar" ? "الدرجة المستحقة" : "Score / Points"} ({language === "ar" ? "من" : "out of"}{" "}
