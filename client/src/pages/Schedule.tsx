@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -43,6 +44,7 @@ const dayColors = [
 export default function Schedule() {
   const { t, dir } = useI18n();
   const { user } = useAuth();
+  const [, setLocation] = useLocation();
   const [selectedModality, setSelectedModality] = useState<string>("all");
 
   const advisorStudentId =
@@ -384,7 +386,14 @@ export default function Schedule() {
                                 </p>
                               </div>
 
-                              {/* Interactive Action Button (Teams Join or Moodle Link) */}
+                              {/* Interactive Action Button (Course Template, Teams Join or Moodle Link) */}
+                              <button
+                                onClick={() => setLocation(`/courses/${s.courseId || 41}`)}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-emerald-600/30 text-white text-xs font-bold border border-white/10 hover:border-emerald-500/40 transition-all shrink-0"
+                              >
+                                <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+                                <span>{dir === "rtl" ? "المساق والمواد" : "Course & Materials"}</span>
+                              </button>
                               {isTeams && (
                                 <a
                                   href={s.teamsUrl || "https://teams.microsoft.com"}

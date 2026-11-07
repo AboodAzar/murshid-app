@@ -110,6 +110,9 @@
             <span class="w-2 h-2 rounded-full bg-emerald-300"></span>
             <span>Hanan (240002)</span>
           </button>
+          <button onclick="setStudent('basma')" id="btn-user-basma" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition-all flex items-center gap-1.5">
+            <span>Basma • AI (210029)</span>
+          </button>
           <button onclick="setStudent('abood')" id="btn-user-abood" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition-all flex items-center gap-1.5">
             <span>Abood (202212359)</span>
           </button>
@@ -267,6 +270,27 @@
               </button>
             </div>
 
+            <!-- Visual Graphs & Degree Roadmap Quick Actions -->
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="openRoadmapModal()" class="p-2.5 rounded-2xl bg-gradient-to-br from-indigo-950/60 to-slate-900 border border-indigo-500/30 text-start hover:border-indigo-500/60 transition-all active:scale-95 shadow">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-base">🗺️</span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-mono font-bold">133 Cr</span>
+                </div>
+                <h5 class="text-xs font-bold text-white">Degree Roadmap</h5>
+                <p class="text-[9px] text-slate-300 mt-0.5">8 Semesters • Passed courses crossed out</p>
+              </button>
+
+              <button onclick="openAiGraphsModal()" class="p-2.5 rounded-2xl bg-gradient-to-br from-emerald-950/60 to-slate-900 border border-emerald-500/30 text-start hover:border-emerald-500/60 transition-all active:scale-95 shadow">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-base">📊</span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono font-bold">Graphs</span>
+                </div>
+                <h5 class="text-xs font-bold text-white">AI Study Analytics</h5>
+                <p class="text-[9px] text-slate-300 mt-0.5">Workload & time distribution curves</p>
+              </button>
+            </div>
+
           
           <!-- Multi-Course Deadline Radar (Anti-Deadline Surprises) -->
           <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-emerald-500/25 zuj-card-shadow space-y-2.5">
@@ -315,7 +339,7 @@
           </div>
 
           <!-- Next Lecture with Modality Badge -->
-          <div onclick="switchScreen('attendance')" class="p-3.5 rounded-2xl bg-slate-900/90 border border-emerald-500/25 zuj-card-shadow space-y-2 cursor-pointer hover:border-emerald-500/50">
+          <div id="dash-next-class-card" onclick="openCourseDetailsModal('CS201')" class="p-3.5 rounded-2xl bg-slate-900/90 border border-emerald-500/25 zuj-card-shadow space-y-2 cursor-pointer hover:border-emerald-500/50">
             <div class="flex items-center justify-between border-b border-white/5 pb-2">
               <div class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -341,6 +365,95 @@
               </span>
             </div>
           </div>
+
+          <!-- My Registered Courses: In-Progress at TOP, Completed at BOTTOM -->
+          <div id="dash-my-courses-wrapper" class="p-3.5 rounded-2xl bg-slate-900/90 border border-white/10 zuj-card-shadow space-y-3">
+            <div class="flex items-center justify-between border-b border-white/10 pb-2">
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs">📚</span>
+                <h4 class="text-xs font-bold text-white">My Courses (8 Registered)</h4>
+              </div>
+              <button onclick="openRoadmapModal()" class="px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold active:scale-95 flex items-center gap-1 shadow-sm">
+                <span>🗺️ Major Roadmap</span>
+              </button>
+            </div>
+
+            <!-- In-Progress Courses (TOP - Cyan Theme) -->
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between text-[10px] font-bold text-cyan-300">
+                <span class="flex items-center gap-1"><span>⚡</span> <span>In-Progress (قيد الإنجاز)</span></span>
+                <span class="font-mono text-[9px] bg-cyan-500/15 text-cyan-300 px-1.5 py-0.2 rounded">4 Active</span>
+              </div>
+              <div class="grid grid-cols-1 gap-1.5">
+                <div onclick="openCourseDetailsModal('CS201')" class="p-2 rounded-xl bg-slate-950/80 border border-cyan-500/30 flex items-center justify-between cursor-pointer hover:border-cyan-400">
+                  <div>
+                    <span class="text-[11px] font-bold text-white">CS201 Data Structures (تراكيب البيانات)</span>
+                    <p class="text-[9px] text-slate-400">Dr. Ahmad Khalil • Hall 41 • 3 Cr</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded-full border border-cyan-500/30">⏳ In Progress</span>
+                </div>
+                <div onclick="openCourseDetailsModal('CS202')" class="p-2 rounded-xl bg-slate-950/80 border border-cyan-500/30 flex items-center justify-between cursor-pointer hover:border-cyan-400">
+                  <div>
+                    <span class="text-[11px] font-bold text-white">CS202 OOP (البرمجة كائنية التوجه)</span>
+                    <p class="text-[9px] text-slate-400">Dr. Ahmad Khalil • Hall 42 • 3 Cr</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded-full border border-cyan-500/30">⏳ In Progress</span>
+                </div>
+                <div onclick="openCourseDetailsModal('PHYS102')" class="p-2 rounded-xl bg-slate-950/80 border border-cyan-500/30 flex items-center justify-between cursor-pointer hover:border-cyan-400">
+                  <div>
+                    <span class="text-[11px] font-bold text-white">PHYS102 General Physics II (الفيزياء العامة 2)</span>
+                    <p class="text-[9px] text-slate-400">Dr. Fadi Zayd • Hall 40 • 3 Cr</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded-full border border-cyan-500/30">⏳ In Progress</span>
+                </div>
+                <div onclick="openCourseDetailsModal('ENG102')" class="p-2 rounded-xl bg-slate-950/80 border border-cyan-500/30 flex items-center justify-between cursor-pointer hover:border-cyan-400">
+                  <div>
+                    <span class="text-[11px] font-bold text-white">ENG102 Technical Writing (الكتابة الفنية)</span>
+                    <p class="text-[9px] text-slate-400">Dr. Sara Mahmoud • Hall 39 • 3 Cr</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded-full border border-cyan-500/30">⏳ In Progress</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Completed Courses (BOTTOM - Purple/Gold Theme) -->
+            <div class="space-y-1.5 pt-2 border-t border-white/5">
+              <div class="flex items-center justify-between text-[10px] font-bold text-purple-300">
+                <span class="flex items-center gap-1"><span>🎓</span> <span>Completed & Archived (المواد المكتملة)</span></span>
+                <span class="font-mono text-[9px] bg-purple-500/15 text-purple-300 px-1.5 py-0.2 rounded">4 Passed</span>
+              </div>
+              <div class="grid grid-cols-1 gap-1.5">
+                <div onclick="openCourseDetailsModal('CS101')" class="p-2 rounded-xl bg-purple-950/20 border border-purple-500/30 flex items-center justify-between cursor-pointer hover:border-purple-400">
+                  <div>
+                    <span class="text-[11px] font-semibold text-white">CS101 Intro to Computing (مقدمة الحاسوب)</span>
+                    <p class="text-[9px] text-purple-300/80">3 Cr • 🔒 Locked & Archived Record</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30">✓ Passed (A)</span>
+                </div>
+                <div class="p-2 rounded-xl bg-purple-950/20 border border-purple-500/30 flex items-center justify-between">
+                  <div>
+                    <span class="text-[11px] font-semibold text-white">MATH101 Calculus I (تفاضل وتكامل 1)</span>
+                    <p class="text-[9px] text-purple-300/80">3 Cr • 🔒 Locked & Archived Record</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30">✓ Passed (A-)</span>
+                </div>
+                <div class="p-2 rounded-xl bg-purple-950/20 border border-purple-500/30 flex items-center justify-between">
+                  <div>
+                    <span class="text-[11px] font-semibold text-white">ENG101 English Communication I (انجليزي 1)</span>
+                    <p class="text-[9px] text-purple-300/80">3 Cr • 🔒 Locked & Archived Record</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30">✓ Passed (B+)</span>
+                </div>
+                <div class="p-2 rounded-xl bg-purple-950/20 border border-purple-500/30 flex items-center justify-between">
+                  <div>
+                    <span class="text-[11px] font-semibold text-white">PHYS101 General Physics I (فيزياء عامة 1)</span>
+                    <p class="text-[9px] text-purple-300/80">3 Cr • 🔒 Locked & Archived Record</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30">✓ Passed (A)</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         <!-- ============================================== -->
@@ -357,72 +470,286 @@
             </div>
           </div>
 
-          <!-- Modality Legend Strip -->
-          <div class="grid grid-cols-3 gap-1.5 text-[9px] text-center font-medium">
-            <span class="py-1 px-1 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-bold">
-              🌿 مدمج (Blended)
-            </span>
-            <span class="py-1 px-1 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold">
-              🏛️ وجاهي (In-Person)
-            </span>
-            <span class="py-1 px-1 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 font-bold">
-              💻 إلكتروني (Online)
-            </span>
+          <!-- View Mode Toggle: University Classes vs Evening Study Blocks (9 PM - 11 PM) -->
+          <div class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-white/10 text-[11px] font-semibold">
+            <button onclick="toggleScheduleMode('classes')" id="btn-sched-classes" class="flex-1 py-1 rounded-lg bg-emerald-600 text-white text-center shadow">
+              🏛️ Classes Schedule
+            </button>
+            <button onclick="toggleScheduleMode('freetime')" id="btn-sched-freetime" class="flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center">
+              🌙 Evening Blocks (9 - 11 PM)
+            </button>
           </div>
 
-          <!-- Sunday -->
-          <div class="space-y-1.5">
-            <span class="text-xs font-bold text-white flex items-center gap-1.5">
-              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-              <span>Sunday (الأحد)</span>
-            </span>
-            <div class="p-3 rounded-xl bg-slate-900/80 border-s-4 border-s-amber-500 border border-white/5 space-y-1">
+          <div id="sched-classes-container" class="space-y-3.5">
+            <!-- Day Selector for Visual Timeline -->
+            <div class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-white/10 text-[10px] font-semibold overflow-x-auto scrollbar-hide">
+              <button onclick="filterScheduleDay('all')" id="btn-day-all" class="flex-1 min-w-[50px] py-1 rounded-lg text-slate-400 hover:text-white text-center">
+                All
+              </button>
+              <button onclick="filterScheduleDay('wednesday')" id="btn-day-wednesday" class="flex-1 min-w-[75px] py-1 rounded-lg bg-emerald-600 text-white text-center shadow">
+                Wed (Busiest)
+              </button>
+              <button onclick="filterScheduleDay('tuesday')" id="btn-day-tuesday" class="flex-1 min-w-[60px] py-1 rounded-lg text-slate-400 hover:text-white text-center">
+                Tuesday
+              </button>
+              <button onclick="filterScheduleDay('sunday')" id="btn-day-sunday" class="flex-1 min-w-[60px] py-1 rounded-lg text-slate-400 hover:text-white text-center">
+                Sunday
+              </button>
+            </div>
+
+            <!-- Visual Timeline Bar & Break Ratio Graph -->
+            <div id="timeline-graph-widget" class="p-3 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-emerald-500/25 space-y-2.5">
               <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white font-mono bg-amber-500/20 text-amber-300 px-1.5 py-0.2 rounded">ENG102</span>
-                <span class="text-[9px] font-bold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full">🌿 مدمج (Blended) • 3 Cr</span>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs">📊</span>
+                  <span class="text-[11px] font-bold text-white" id="timeline-graph-title">Wednesday Timeline & Break Graph</span>
+                </div>
+                <span class="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full font-bold">5h 45m Span</span>
               </div>
-              <h5 class="text-xs font-bold text-white">ENG102 Technical Writing (الكتابة الفنية)</h5>
-              <p class="text-[10px] text-slate-300 font-mono">[ 11:30_12:20 ] Sunday • Hall 39 • Dr. Sara Mahmoud</p>
+
+              <!-- Graphical Proportional Balance Bar -->
+              <div class="space-y-1">
+                <div class="flex justify-between text-[9px] text-slate-300">
+                  <span>🏛️ Lectures: <strong>2h 30m (51%)</strong></span>
+                  <span class="text-amber-400 font-bold">☕ Campus Breaks: <strong>2h 25m (49%)</strong></span>
+                </div>
+                <!-- Proportional Bar Stack -->
+                <div class="h-3 w-full rounded-full bg-slate-800 overflow-hidden flex p-0.5 gap-0.5">
+                  <div class="h-full bg-blue-500 rounded-s-full" style="width: 22%" title="08:30-09:45 CS202"></div>
+                  <div class="h-full bg-amber-400 animate-pulse" style="width: 30%" title="09:45-11:30 Library Break"></div>
+                  <div class="h-full bg-emerald-500" style="width: 15%" title="11:30-12:20 Advisory"></div>
+                  <div class="h-full bg-amber-400 animate-pulse" style="width: 11%" title="12:20-13:00 Lunch Break"></div>
+                  <div class="h-full bg-rose-500 rounded-e-full" style="width: 22%" title="13:00-14:15 PHYS102"></div>
+                </div>
+                <div class="flex items-center justify-between text-[8px] text-slate-400 font-mono px-0.5">
+                  <span>08:30 AM</span>
+                  <span class="text-amber-300 font-bold">☕ 1h 45m Library</span>
+                  <span>12:20</span>
+                  <span class="text-amber-300 font-bold">🥪 40m Lunch</span>
+                  <span>02:15 PM</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Modality Legend Strip -->
+            <div class="grid grid-cols-3 gap-1.5 text-[9px] text-center font-medium">
+              <span class="py-1 px-1 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-bold">
+                🌿 مدمج (Blended)
+              </span>
+              <span class="py-1 px-1 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold">
+                🏛️ وجاهي (In-Person)
+              </span>
+              <span class="py-1 px-1 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 font-bold">
+                💻 إلكتروني (Online)
+              </span>
+            </div>
+
+            <!-- Wednesday Schedule Details (Busiest Day with Explicit Breaks) -->
+            <div id="sched-group-wednesday" class="space-y-2">
+              <span class="text-xs font-bold text-white flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
+                  <span>Wednesday (الأربعاء) • 2 Lectures & 2 Campus Breaks</span>
+                </span>
+                <span class="text-[9px] text-slate-400 font-mono">08:30 - 14:15</span>
+              </span>
+
+              <!-- 1. CS202 Lecture -->
+              <div onclick="openCourseDetailsModal('CS202')" class="p-3 rounded-xl bg-slate-900/80 border-s-4 border-s-blue-500 border border-white/5 space-y-1 cursor-pointer hover:border-blue-400">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-white font-mono bg-blue-500/20 text-blue-300 px-1.5 py-0.2 rounded">CS202</span>
+                  <span class="text-[9px] font-bold text-blue-300 bg-blue-500/15 px-2 py-0.5 rounded-full">🏛️ وجاهي كامل • 3 Cr</span>
+                </div>
+                <h5 class="text-xs font-bold text-white">CS202 OOP (البرمجة كائنية التوجه)</h5>
+                <p class="text-[10px] text-slate-300 font-mono">[ 08:30_09:45 ] Wednesday • Hall 42 • Dr. Ahmad Khalil</p>
+              </div>
+
+              <!-- 2. PROMINENT BREAK 1: Library Focus Break (1h 45m) -->
+              <div class="p-3 rounded-xl bg-gradient-to-r from-amber-950/40 via-amber-900/20 to-slate-900/90 border-2 border-dashed border-amber-500/50 space-y-1.5 shadow-md">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-sm">☕</span>
+                    <span class="text-xs font-extrabold text-amber-300">Campus Study Break (1h 45m)</span>
+                  </div>
+                  <span class="text-[9px] font-mono font-bold bg-amber-500/25 text-amber-200 px-2 py-0.5 rounded-full border border-amber-500/40">09:45 - 11:30</span>
+                </div>
+                <div class="text-[10px] text-slate-200 space-y-0.5">
+                  <p class="font-semibold text-white">Central Library Focus Zone (2nd Floor)</p>
+                  <p class="text-slate-300 leading-snug">
+                    💡 <strong>Oliver AI Tip:</strong> 105-minute golden window between CS202 & afternoon classes. Use this to review UML diagrams & solve Gauss's Law pre-lab.
+                  </p>
+                </div>
+              </div>
+
+              <!-- 3. Academic Advisory Office Hour -->
+              <div class="p-2.5 rounded-xl bg-slate-900/60 border border-emerald-500/20 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs">👥</span>
+                  <div>
+                    <span class="font-bold text-white">Office Hour / Peer Study</span>
+                    <p class="text-[9px] text-slate-400">Dr. Ahmad Khalil • Hall 302</p>
+                  </div>
+                </div>
+                <span class="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">11:30 - 12:20</span>
+              </div>
+
+              <!-- 4. PROMINENT BREAK 2: Lunch Break (40m) -->
+              <div class="p-3 rounded-xl bg-gradient-to-r from-amber-950/40 via-amber-900/20 to-slate-900/90 border-2 border-dashed border-amber-500/50 space-y-1.5 shadow-md">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-sm">🥪</span>
+                    <span class="text-xs font-extrabold text-amber-300">Campus Lunch Break (40m)</span>
+                  </div>
+                  <span class="text-[9px] font-mono font-bold bg-amber-500/25 text-amber-200 px-2 py-0.5 rounded-full border border-amber-500/40">12:20 - 13:00</span>
+                </div>
+                <div class="text-[10px] text-slate-200 space-y-0.5">
+                  <p class="font-semibold text-white">Student Union Cafeteria & Garden Courtyard</p>
+                  <p class="text-slate-300 leading-snug">
+                    💡 <strong>Oliver AI Tip:</strong> Refresh and hydrate before the 13:00 Physics II lecture in Hall 40.
+                  </p>
+                </div>
+              </div>
+
+              <!-- 5. PHYS102 Lecture -->
+              <div onclick="openCourseDetailsModal('PHYS102')" class="p-3 rounded-xl bg-slate-900/80 border-s-4 border-s-rose-500 border border-white/5 space-y-1 cursor-pointer hover:border-rose-400">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-white font-mono bg-rose-500/20 text-rose-300 px-1.5 py-0.2 rounded">PHYS102</span>
+                  <span class="text-[9px] font-bold text-rose-300 bg-rose-500/15 px-2 py-0.5 rounded-full">🏛️ وجاهي كامل • 3 Cr</span>
+                </div>
+                <h5 class="text-xs font-bold text-white">PHYS102 General Physics II (الفيزياء العامة 2)</h5>
+                <p class="text-[10px] text-slate-300 font-mono">[ 13:00_14:15 ] Wednesday • Hall 40 • Dr. Omar Hassan</p>
+              </div>
+            </div>
+
+            <!-- Tuesday Schedule Details -->
+            <div id="sched-group-tuesday" class="space-y-2">
+              <span class="text-xs font-bold text-white flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                  <span>Tuesday (الثلاثاء)</span>
+                </span>
+                <span class="text-[9px] text-slate-400 font-mono">11:30 - 14:15</span>
+              </span>
+
+              <div onclick="openCourseDetailsModal('CS201')" class="p-3 rounded-xl bg-slate-900/80 border-s-4 border-s-emerald-500 border border-white/5 space-y-1 cursor-pointer hover:border-emerald-400">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-white font-mono bg-emerald-500/20 text-emerald-300 px-1.5 py-0.2 rounded">CS201</span>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded-full">🏛️ وجاهي كامل • 3 Cr</span>
+                </div>
+                <h5 class="text-xs font-bold text-white">CS201 Data Structures (تراكيب البيانات)</h5>
+                <p class="text-[10px] text-slate-300 font-mono">[ 11:30_12:20 ] Tuesday • Hall 41 • Dr. Ahmad Khalil</p>
+              </div>
+
+              <!-- Tuesday Lunch Break (40m) -->
+              <div class="p-2.5 rounded-xl bg-amber-950/30 border border-dashed border-amber-500/40 space-y-1">
+                <div class="flex items-center justify-between text-[11px] font-bold text-amber-300">
+                  <span>☕ Lunch & Discussion Break (40m)</span>
+                  <span class="text-[9px] font-mono">12:20 - 13:00</span>
+                </div>
+                <p class="text-[9px] text-slate-300">💡 <strong>Oliver AI Tip:</strong> Review BST rotation rules before lab session.</p>
+              </div>
+
+              <div class="p-3 rounded-xl bg-slate-900/80 border-s-4 border-s-emerald-500 border border-white/5 space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-white font-mono bg-emerald-500/20 text-emerald-300 px-1.5 py-0.2 rounded">CS201 Lab</span>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded-full">💻 عملي • Lab 3</span>
+                </div>
+                <h5 class="text-xs font-bold text-white">CS201 Practical Algorithms Lab</h5>
+                <p class="text-[10px] text-slate-300 font-mono">[ 13:00_14:15 ] Tuesday • Lab 3 • Eng. Rawan</p>
+              </div>
+            </div>
+
+            <!-- Sunday Schedule Details -->
+            <div id="sched-group-sunday" class="space-y-2">
+              <span class="text-xs font-bold text-white flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                  <span>Sunday (الأحد)</span>
+                </span>
+                <span class="text-[9px] text-slate-400 font-mono">11:30 - 15:15</span>
+              </span>
+
+              <div onclick="openCourseDetailsModal('ENG102')" class="p-3 rounded-xl bg-slate-900/80 border-s-4 border-s-amber-500 border border-white/5 space-y-1 cursor-pointer hover:border-amber-400">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-white font-mono bg-amber-500/20 text-amber-300 px-1.5 py-0.2 rounded">ENG102</span>
+                  <span class="text-[9px] font-bold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full">🌿 مدمج (Blended) • 3 Cr</span>
+                </div>
+                <h5 class="text-xs font-bold text-white">ENG102 Technical Writing (الكتابة الفنية)</h5>
+                <p class="text-[10px] text-slate-300 font-mono">[ 11:30_12:20 ] Sunday • Hall 39 • Dr. Sara Mahmoud</p>
+              </div>
+
+              <!-- Sunday Research Break (1h 40m) -->
+              <div class="p-2.5 rounded-xl bg-amber-950/30 border border-dashed border-amber-500/40 space-y-1">
+                <div class="flex items-center justify-between text-[11px] font-bold text-amber-300">
+                  <span>📚 Campus & Research Break (1h 40m)</span>
+                  <span class="text-[9px] font-mono">12:20 - 14:00</span>
+                </div>
+                <p class="text-[9px] text-slate-300">💡 <strong>Oliver AI Tip:</strong> Central Library study room reserved. Draft Technical Memo outline.</p>
+              </div>
+
+              <div class="p-3 rounded-xl bg-slate-900/80 border-s-4 border-s-violet-500 border border-white/5 space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-white font-mono bg-violet-500/20 text-violet-300 px-1.5 py-0.2 rounded">MATH102 Clinic</span>
+                  <span class="text-[9px] font-bold text-violet-300 bg-violet-500/15 px-2 py-0.5 rounded-full">🏛️ عيادة تقوية استدراكية</span>
+                </div>
+                <h5 class="text-xs font-bold text-white">MATH102 Calculus II Retake Clinic</h5>
+                <p class="text-[10px] text-slate-300 font-mono">[ 14:00_15:15 ] Sunday • Hall 21 • Dr. Tareq</p>
+              </div>
             </div>
           </div>
 
-          <!-- Tuesday -->
-          <div class="space-y-1.5">
-            <span class="text-xs font-bold text-white flex items-center gap-1.5">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-              <span>Tuesday (الثلاثاء)</span>
-            </span>
-            <div class="p-3 rounded-xl bg-slate-900/80 border-s-4 border-s-emerald-500 border border-white/5 space-y-1">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white font-mono bg-emerald-500/20 text-emerald-300 px-1.5 py-0.2 rounded">CS201</span>
-                <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded-full">🏛️ وجاهي كامل • 3 Cr</span>
+          <!-- Free-Time Evening Study Blocks View (9:00 PM - 11:00 PM) -->
+          <div id="sched-freetime-container" class="hidden space-y-3">
+            <div class="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-base">🌙</span>
+                <div>
+                  <h5 class="text-xs font-bold text-white">Daily Evening Study (9:00 - 11:00 PM)</h5>
+                  <p class="text-[10px] text-emerald-300">Working Student 100% Focused Schedule</p>
+                </div>
               </div>
-              <h5 class="text-xs font-bold text-white">CS201 Data Structures (تراكيب البيانات)</h5>
-              <p class="text-[10px] text-slate-300 font-mono">[ 11:30_12:20 ] Tuesday • Hall 41 • Dr. Ahmad Khalil</p>
+              <button onclick="switchScreen('chat')" class="text-[9px] px-2 py-1 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold active:scale-95">
+                Edit in Oliver AI
+              </button>
             </div>
-          </div>
 
-          <!-- Wednesday -->
-          <div class="space-y-1.5">
-            <span class="text-xs font-bold text-white flex items-center gap-1.5">
-              <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
-              <span>Wednesday (الأربعاء)</span>
-            </span>
-            <div class="p-3 rounded-xl bg-slate-900/80 border-s-4 border-s-blue-500 border border-white/5 space-y-1">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white font-mono bg-blue-500/20 text-blue-300 px-1.5 py-0.2 rounded">CS202</span>
-                <span class="text-[9px] font-bold text-blue-300 bg-blue-500/15 px-2 py-0.5 rounded-full">🏛️ وجاهي كامل • 3 Cr</span>
+            <!-- Evening Study Days -->
+            <div class="space-y-2">
+              <div class="p-2.5 rounded-xl bg-slate-900/80 border border-white/10 space-y-1.5">
+                <div class="flex items-center justify-between text-[11px] font-bold text-amber-300">
+                  <span>الأحد (Sunday Evening)</span>
+                  <span class="text-[9px] text-slate-400 font-mono">21:00 - 23:00</span>
+                </div>
+                <div class="space-y-1 text-[10px]">
+                  <div class="p-1.5 rounded-lg bg-emerald-950/30 border border-emerald-500/20 text-slate-200">
+                    <span class="font-mono text-emerald-400 font-bold">21:00 - 21:50:</span> <strong>CS201</strong> إنهاء واجب أشجار البحث BST و AVL.
+                  </div>
+                  <div class="p-1.5 rounded-lg bg-amber-950/20 text-amber-300 text-[9px]">
+                    <span class="font-mono font-bold">21:50 - 22:00:</span> ☕ استراحة استرجاع نشط (Active Recall).
+                  </div>
+                  <div class="p-1.5 rounded-lg bg-violet-950/30 border border-violet-500/20 text-slate-200">
+                    <span class="font-mono text-violet-400 font-bold">22:00 - 23:00:</span> <strong>PHYS102</strong> حل مسائل قانون غاوس لتسليم الواجب المتأخر.
+                  </div>
+                </div>
               </div>
-              <h5 class="text-xs font-bold text-white">CS202 OOP (البرمجة كائنية التوجه)</h5>
-              <p class="text-[10px] text-slate-300 font-mono">[ 08:30_09:45 ] Wednesday • Hall 42 • Dr. Ahmad Khalil</p>
-            </div>
-            <div class="p-3 rounded-xl bg-slate-900/80 border-s-4 border-s-rose-500 border border-white/5 space-y-1">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white font-mono bg-rose-500/20 text-rose-300 px-1.5 py-0.2 rounded">PHYS102</span>
-                <span class="text-[9px] font-bold text-rose-300 bg-rose-500/15 px-2 py-0.5 rounded-full">🏛️ وجاهي كامل • 3 Cr</span>
+
+              <div class="p-2.5 rounded-xl bg-slate-900/80 border border-white/10 space-y-1.5">
+                <div class="flex items-center justify-between text-[11px] font-bold text-emerald-300">
+                  <span>الإثنين (Monday Evening)</span>
+                  <span class="text-[9px] text-slate-400 font-mono">21:00 - 23:00</span>
+                </div>
+                <div class="space-y-1 text-[10px]">
+                  <div class="p-1.5 rounded-lg bg-emerald-950/30 border border-emerald-500/20 text-slate-200">
+                    <span class="font-mono text-emerald-400 font-bold">21:00 - 21:50:</span> <strong>CS202 OOP</strong> تطبيق الوراثة ومخططات UML.
+                  </div>
+                  <div class="p-1.5 rounded-lg bg-amber-950/20 text-amber-300 text-[9px]">
+                    <span class="font-mono font-bold">21:50 - 22:00:</span> ☕ استراحة ذهنية وترطيب.
+                  </div>
+                  <div class="p-1.5 rounded-lg bg-emerald-950/30 border border-emerald-500/20 text-slate-200">
+                    <span class="font-mono text-emerald-400 font-bold">22:00 - 23:00:</span> <strong>CS201</strong> حل مسألتين على LeetCode.
+                  </div>
+                </div>
               </div>
-              <h5 class="text-xs font-bold text-white">PHYS102 General Physics II (الفيزياء العامة 2)</h5>
-              <p class="text-[10px] text-slate-300 font-mono">[ 13:00_14:15 ] Wednesday • Hall 40 • Dr. Omar Hassan</p>
             </div>
           </div>
         </section>
@@ -444,7 +771,46 @@
             <span class="text-[9px] font-mono text-emerald-400 bg-white/5 px-2 py-0.5 rounded">133 Cr Synced</span>
           </div>
 
-          <div id="chat-messages-container" class="space-y-3 py-1 text-xs max-h-[440px] overflow-y-auto mobile-scroll">
+          <!-- Free-Time AI Study Planner Mobile Bar -->
+          <div class="rounded-2xl bg-gradient-to-r from-emerald-950/70 via-slate-900/90 to-slate-900 border border-emerald-500/35 p-2.5 shadow-lg space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-xs">⏰</span>
+                <div>
+                  <h5 class="text-[11px] font-bold text-white flex items-center gap-1.5">
+                    <span>Free-Time Planner (مخطط وقت الفراغ)</span>
+                    <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono">9-11 PM</span>
+                  </h5>
+                  <p class="text-[9px] text-slate-400">Time-blocked study schedule for working students</p>
+                </div>
+              </div>
+              <button onclick="togglePhoneFreeTimePlanner()" class="text-[10px] px-2 py-1 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 font-semibold active:scale-95 transition-all">
+                <span id="phone-freetime-toggle-text">Configure</span>
+              </button>
+            </div>
+
+            <div id="phone-freetime-form" class="hidden pt-2 border-t border-white/10 space-y-2">
+              <div class="grid grid-cols-2 gap-2 text-[10px]">
+                <div>
+                  <label class="text-slate-400 block mb-0.5">Start Time (من):</label>
+                  <input id="mobile-free-start" type="time" value="21:00" class="w-full bg-slate-950 border border-white/20 rounded-lg p-1 text-white font-mono text-[11px]">
+                </div>
+                <div>
+                  <label class="text-slate-400 block mb-0.5">End Time (إلى):</label>
+                  <input id="mobile-free-end" type="time" value="23:00" class="w-full bg-slate-950 border border-white/20 rounded-lg p-1 text-white font-mono text-[11px]">
+                </div>
+              </div>
+              <div>
+                <label class="text-[10px] text-slate-400 block mb-0.5">Work / Daily Commitments:</label>
+                <input id="mobile-work-note" type="text" value="طالب موظف نهاراً من 9:00 ص إلى 5:00 م" class="w-full bg-slate-950 border border-white/20 rounded-lg p-1 text-white text-[10px]">
+              </div>
+              <button onclick="generatePhoneStudyPlan()" class="w-full py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-slate-950 font-bold text-[11px] shadow-md active:scale-95 transition-all flex items-center justify-center gap-1.5">
+                <span>⚡ Generate 9 PM - 11 PM Study Plan</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="chat-messages-container" class="space-y-3 py-1 text-xs max-h-[380px] overflow-y-auto mobile-scroll">
             <div class="flex justify-end">
               <div class="max-w-[85%] rounded-2xl rounded-tr-xs bg-emerald-600 text-white px-3.5 py-2.5 shadow-md">
                 How does classroom attendance and Article 14 absence limit work?
@@ -463,12 +829,16 @@
             </div>
           </div>
 
+          <!-- Quick Action Chips for Internet Study Strategy & Free-Time Planner -->
           <div class="flex flex-wrap gap-1.5 pt-1">
-            <button onclick="handlePromptChip('What is the difference between In-Person, Blended, and Online?')" class="min-h-[30px] px-2.5 py-1 rounded-full bg-white/5 text-slate-300 text-[10px] border border-white/10 active:scale-95">
-              🌿 Modalities Explained (وجاهي، مدمج)
+            <button onclick="handlePromptChip('ما هي أفضل استراتيجية ومصادر مترجمة لدراسة تراكيب البيانات CS201؟')" class="min-h-[28px] px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 text-[10px] border border-emerald-500/30 active:scale-95 font-medium flex items-center gap-1">
+              <span>🌐</span> CS201 Strategy & Russian Articles
             </button>
-            <button onclick="handlePromptChip('How does the dynamic rolling QR stop photo forwarding?')" class="min-h-[30px] px-2.5 py-1 rounded-full bg-white/5 text-slate-300 text-[10px] border border-white/10 active:scale-95">
-              🛡️ Anti-Cheat 8s TOTP
+            <button onclick="handlePromptChip('أفضل فيديوهات ومقالات ومناقشات لمادة الفيزياء PHYS102')" class="min-h-[28px] px-2.5 py-1 rounded-full bg-violet-500/15 text-violet-300 text-[10px] border border-violet-500/30 active:scale-95 font-medium flex items-center gap-1">
+              <span>🎥</span> PHYS102 Videos & Solutions
+            </button>
+            <button onclick="handlePromptChip('أنا طالب موظف، أوقات فراغي بين 9:00 - 11:00 مساءً، أنشئ لي خطة دراسية')" class="min-h-[28px] px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-300 text-[10px] border border-amber-500/30 active:scale-95 font-medium flex items-center gap-1">
+              <span>⏰</span> Free-Time Plan (9 - 11 PM)
             </button>
           </div>
 
@@ -558,7 +928,7 @@
           </div>
 
           <!-- Per-Course Attendance Cards (4 Registered Courses) -->
-          <div class="space-y-2.5">
+          <div id="attendance-courses-container" class="space-y-2.5">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Per-Course Attendance (4)</p>
 
             <!-- Course 1: CS201 -->
@@ -677,18 +1047,32 @@
 
         <section id="screen-curriculums" class="screen-view hidden space-y-3.5">
           <div class="flex items-center justify-between pb-2 border-b border-white/10">
-            <h4 class="text-xs font-bold text-white">Study Plan (الخطة الدراسية)</h4>
-            <span class="text-[10px] font-mono text-emerald-400">48 / 133 Cr</span>
+            <h4 class="text-xs font-bold text-white">Degree Curriculum & Roadmap</h4>
+            <span class="text-[10px] font-mono text-emerald-400">133 Total Cr</span>
           </div>
-          <div class="p-3 rounded-2xl bg-slate-900/90 border border-emerald-500/20">
-            <div class="flex justify-between text-xs mb-1.5">
-              <span class="text-slate-300 font-medium">Overall Plan Completion</span>
-              <span class="text-emerald-400 font-bold font-mono">36.1%</span>
+          <div class="p-3 rounded-2xl bg-slate-900/90 border border-emerald-500/20 space-y-2">
+            <div class="flex justify-between text-xs mb-1">
+              <span class="text-slate-300 font-medium">Earned + Enrolled</span>
+              <span class="text-emerald-400 font-bold font-mono">30 / 133 Cr (22.5%)</span>
             </div>
-            <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-              <div class="h-full bg-gradient-to-r from-emerald-500 to-amber-400 rounded-full w-[36.1%]"></div>
+            <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden flex">
+              <div class="h-full bg-emerald-500" style="width: 11.2%" title="Passed 15 Cr"></div>
+              <div class="h-full bg-blue-500 animate-pulse" style="width: 11.2%" title="In Progress 15 Cr"></div>
+            </div>
+            <div class="flex justify-between text-[9px] text-slate-300 pt-1">
+              <span>✓ 15 Cr Passed (<s>Crossed</s>)</span>
+              <span class="text-blue-400 font-bold">15 Cr In Progress</span>
+              <span class="text-amber-400 font-bold">1 Retake Pending</span>
             </div>
           </div>
+
+          <button onclick="openRoadmapModal()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-2 active:scale-95 shadow">
+            <span>🗺️ Open Full 8-Semester Roadmap</span>
+          </button>
+
+          <button onclick="openAiGraphsModal()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-bold text-xs flex items-center justify-center gap-2 active:scale-95 shadow">
+            <span>📊 Open AI Study Plan & Workload Graphs</span>
+          </button>
         </section>
 
         <section id="screen-map" class="screen-view hidden space-y-3.5">
@@ -760,14 +1144,18 @@
           <!-- Select Student Persona -->
           <div class="space-y-1.5">
             <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Switch Student Persona</label>
-            <div class="grid grid-cols-2 gap-2">
-              <button onclick="setStudent('hanan'); toggleMobileToolsModal();" id="m-btn-user-hanan" class="p-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs flex flex-col items-center shadow">
-                <span>Hanan (حنان)</span>
-                <span class="text-[9px] text-emerald-200 font-mono">ID: 240002 • SE</span>
+            <div class="grid grid-cols-3 gap-1.5">
+              <button onclick="setStudent('hanan'); toggleMobileToolsModal();" id="m-btn-user-hanan" class="p-2 rounded-xl bg-emerald-600 text-white font-bold text-xs flex flex-col items-center shadow">
+                <span>Hanan</span>
+                <span class="text-[8px] text-emerald-200 font-mono">240002 • SE</span>
               </button>
-              <button onclick="setStudent('abood'); toggleMobileToolsModal();" id="m-btn-user-abood" class="p-2.5 rounded-xl bg-slate-950 border border-white/10 text-slate-300 hover:text-white font-bold text-xs flex flex-col items-center">
-                <span>Abood (عبود)</span>
-                <span class="text-[9px] text-slate-400 font-mono">ID: 202212359 • CS</span>
+              <button onclick="setStudent('basma'); toggleMobileToolsModal();" id="m-btn-user-basma" class="p-2 rounded-xl bg-slate-950 border border-white/10 text-slate-300 hover:text-white font-bold text-xs flex flex-col items-center">
+                <span>Basma</span>
+                <span class="text-[8px] text-cyan-300 font-mono">210029 • AI</span>
+              </button>
+              <button onclick="setStudent('abood'); toggleMobileToolsModal();" id="m-btn-user-abood" class="p-2 rounded-xl bg-slate-950 border border-white/10 text-slate-300 hover:text-white font-bold text-xs flex flex-col items-center">
+                <span>Abood</span>
+                <span class="text-[8px] text-slate-400 font-mono">202212359</span>
               </button>
             </div>
           </div>
@@ -1079,6 +1467,953 @@
         </div>
       </div>
 
+      <!-- 7. Degree Roadmap Modal (Full 8 Semesters with Crossed-Out Finished Courses) -->
+      <div id="roadmap-modal" class="hidden absolute inset-0 z-50 bg-black/85 backdrop-blur-sm flex flex-col justify-end p-2">
+        <div class="bg-slate-900 border border-indigo-500/40 rounded-3xl p-4 space-y-3.5 max-h-[90%] overflow-y-auto mobile-scroll">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <div>
+              <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+                <span>🗺️ Degree Curriculum Roadmap</span>
+                <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-mono font-bold">133 Cr Total</span>
+              </h4>
+              <p class="text-[9px] text-slate-300">Software Engineering • Finished courses crossed out</p>
+            </div>
+            <button onclick="closeRoadmapModal()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center font-bold">✕</button>
+          </div>
+
+          <!-- Progress Header Bar -->
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-white/10 space-y-1.5">
+            <div class="flex justify-between text-[10px] text-slate-300">
+              <span>Passed: <strong class="text-emerald-400">30 Cr (22.7%)</strong></span>
+              <span>In Progress: <strong class="text-cyan-400">12 Cr</strong></span>
+              <span>Remaining: <strong class="text-amber-400">90 Cr</strong></span>
+            </div>
+            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden flex">
+              <div class="bg-emerald-500 h-full" style="width: 22.7%" title="Passed 30 Cr"></div>
+              <div class="bg-cyan-400 h-full animate-pulse" style="width: 9.1%" title="In Progress 12 Cr"></div>
+              <div class="bg-slate-700 h-full" style="width: 68.2%"></div>
+            </div>
+            <!-- Color Key -->
+            <div class="flex items-center justify-between pt-1 text-[9px] text-slate-400">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span><span class="text-emerald-300 font-bold">Completed (Green)</span></span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-cyan-400"></span><span class="text-cyan-300 font-bold">In-Progress (Cyan)</span></span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-slate-600"></span><span>Not Enrolled (Slate)</span></span>
+            </div>
+          </div>
+
+          <!-- View Mode Toggle: Requirement Families vs 8 Semesters -->
+          <div class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-white/10 text-[10px] font-semibold">
+            <button onclick="switchRoadmapView('families')" id="rf-mode-families" class="flex-1 py-1 rounded-lg bg-emerald-600 text-white text-center shadow">
+              🏛️ Requirement Families (خطة التخصص)
+            </button>
+            <button onclick="switchRoadmapView('semesters')" id="rf-mode-semesters" class="flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center">
+              📅 8 Semesters (الفصول)
+            </button>
+          </div>
+
+          <!-- ============================================== -->
+          <!-- 1. REQUIREMENT FAMILIES CONTAINER (6 FAMILIES) -->
+          <!-- ============================================== -->
+          <div id="roadmap-families-container" class="space-y-3 text-xs">
+            <!-- Family 1: University Compulsory (18 Cr) -->
+            <div class="p-3 rounded-2xl bg-slate-950/80 border border-white/10 space-y-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h5 class="text-xs font-bold text-white">1. University Compulsory (متطلبات الجامعة الإجبارية)</h5>
+                  <p class="text-[9px] text-slate-400">Required: 18 Cr • 6 Courses</p>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+                  ⏳ In Progress (9 / 18 Cr • 50%)
+                </span>
+              </div>
+              <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-cyan-400 h-full" style="width: 50%"></div>
+              </div>
+              <div class="grid grid-cols-1 gap-1.5 pt-1">
+                <div class="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/40 flex items-center justify-between">
+                  <span class="font-semibold text-white">420101 Military Sciences (علوم عسكرية)</span>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded">✓ Passed (A) • 3 Cr</span>
+                </div>
+                <div class="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/40 flex items-center justify-between">
+                  <span class="font-semibold text-white">420151 National Education (تربية وطنية)</span>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded">✓ Passed (A-) • 3 Cr</span>
+                </div>
+                <div class="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/40 flex items-center justify-between">
+                  <span class="font-semibold text-white">420123 English Communication I (لغة انجليزية 1)</span>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded">✓ Passed (B+) • 3 Cr</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between opacity-75">
+                  <span class="text-slate-300">420111 Arabic Language I (لغة عربية 1)</span>
+                  <span class="text-[9px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">○ Not Enrolled • 3 Cr</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between opacity-75">
+                  <span class="text-slate-300">420121 English Remedial (استدراكي انجليزي)</span>
+                  <span class="text-[9px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">○ Not Enrolled • 3 Cr</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between opacity-75">
+                  <span class="text-slate-300">420112 Arabic Remedial (استدراكي عربي)</span>
+                  <span class="text-[9px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">○ Not Enrolled • 3 Cr</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Family 2: University Elective (6 Cr) -->
+            <div class="p-3 rounded-2xl bg-slate-950/80 border border-white/10 space-y-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h5 class="text-xs font-bold text-white">2. University Elective (متطلبات الجامعة الاختيارية)</h5>
+                  <p class="text-[9px] text-slate-400">Required: 6 Cr • Select 2 Courses</p>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-800 text-slate-400 border border-white/5">
+                  ○ Not Started (0 / 6 Cr • 0%)
+                </span>
+              </div>
+              <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-slate-600 h-full" style="width: 0%"></div>
+              </div>
+              <div class="grid grid-cols-1 gap-1.5 pt-1">
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between opacity-75">
+                  <span class="text-slate-300">0420152 Leadership & Social Responsibility</span>
+                  <span class="text-[9px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">○ Not Enrolled • 3 Cr</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between opacity-75">
+                  <span class="text-slate-300">0420171 Digital Life & Cyber Ethics</span>
+                  <span class="text-[9px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">○ Not Enrolled • 3 Cr</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between opacity-75">
+                  <span class="text-slate-300">0420181 Sport & Health</span>
+                  <span class="text-[9px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">○ Not Enrolled • 3 Cr</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Family 3: Faculty of IT Compulsory (21 Cr) -->
+            <div class="p-3 rounded-2xl bg-slate-950/80 border border-emerald-500/30 space-y-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h5 class="text-xs font-bold text-white">3. Faculty of IT Compulsory (متطلبات الكلية الإجبارية)</h5>
+                  <p class="text-[9px] text-slate-400">Required: 21 Cr • 7 Courses</p>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+                  ⏳ In Progress (9 / 21 Cr • 43%)
+                </span>
+              </div>
+              <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-cyan-400 h-full" style="width: 43%"></div>
+              </div>
+              <div class="grid grid-cols-1 gap-1.5 pt-1">
+                <div onclick="openCourseDetailsModal('CS101')" class="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/40 flex items-center justify-between cursor-pointer hover:border-emerald-300">
+                  <div>
+                    <span class="font-semibold text-white">130100 Fundamentals of IT (CS101)</span>
+                    <p class="text-[9px] text-slate-400">Introduction to Computer Science & Logic</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded">✓ Passed (A) • 3 Cr</span>
+                </div>
+                <div onclick="openCourseDetailsModal('ENG102')" class="p-2 rounded-xl bg-cyan-950/40 border border-cyan-500/40 flex items-center justify-between cursor-pointer hover:border-cyan-300">
+                  <div>
+                    <span class="font-semibold text-white">135101 Technical English (ENG102)</span>
+                    <p class="text-[9px] text-slate-400">Technical Communication for IT Students</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded">⏳ Enrolled • 3 Cr</span>
+                </div>
+                <div onclick="openCourseDetailsModal('CS202')" class="p-2 rounded-xl bg-cyan-950/40 border border-cyan-500/40 flex items-center justify-between cursor-pointer hover:border-cyan-300">
+                  <div>
+                    <span class="font-semibold text-white">130231 Applied Programming (CS202 OOP)</span>
+                    <p class="text-[9px] text-slate-400">Object-Oriented Design & Implementation</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded">⏳ Enrolled • 3 Cr</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between opacity-75">
+                  <div>
+                    <span class="text-slate-300">130104 Discrete Mathematics (تراكيب متقطعة)</span>
+                    <p class="text-[9px] text-slate-400">Prereq: 101112 (MATH101)</p>
+                  </div>
+                  <span class="text-[9px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">○ Not Enrolled • 3 Cr</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between opacity-75">
+                  <div>
+                    <span class="text-slate-300">130213 Web Systems & Technologies (أنظمة الويب)</span>
+                    <p class="text-[9px] text-slate-400">Prereq: 130100 (CS101)</p>
+                  </div>
+                  <span class="text-[9px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">○ Not Enrolled • 3 Cr</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between opacity-75">
+                  <div>
+                    <span class="text-slate-300">130214 Computer Networks (شبكات الحاسوب)</span>
+                    <p class="text-[9px] text-slate-400">Prereq: 130100 (CS101)</p>
+                  </div>
+                  <span class="text-[9px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">○ Not Enrolled • 3 Cr</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Family 4: Major Compulsory (66 Cr) -->
+            <div class="p-3 rounded-2xl bg-slate-950/80 border border-purple-500/30 space-y-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h5 class="text-xs font-bold text-white">4. Major Compulsory (متطلبات التخصص الإجبارية)</h5>
+                  <p class="text-[9px] text-slate-400">Required: 66 Cr • Core CS & Software Engineering</p>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+                  ⏳ In Progress (6 / 66 Cr • 9%)
+                </span>
+              </div>
+              <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-cyan-400 h-full" style="width: 9%"></div>
+              </div>
+              <div class="grid grid-cols-1 gap-1.5 pt-1">
+                <div onclick="openCourseDetailsModal('CS201')" class="p-2 rounded-xl bg-cyan-950/40 border border-cyan-500/40 flex items-center justify-between cursor-pointer hover:border-cyan-300">
+                  <div>
+                    <span class="font-semibold text-white">0130221 Data Structures (CS201 تراكيب بيانات)</span>
+                    <p class="text-[9px] text-slate-400">Trees, Hash Tables, Graph Traversal, Complexity</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded">⏳ Enrolled • 3 Cr</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between opacity-75">
+                  <div>
+                    <span class="text-slate-300">0130322 Database Management Systems</span>
+                    <p class="text-[9px] text-slate-400">Prereq: 0130221 (CS201)</p>
+                  </div>
+                  <span class="text-[9px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">○ Not Enrolled • 3 Cr</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between opacity-75">
+                  <div>
+                    <span class="text-slate-300">0130323 Design & Analysis of Algorithms</span>
+                    <p class="text-[9px] text-slate-400">Prereq: 0130221 (CS201)</p>
+                  </div>
+                  <span class="text-[9px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">○ Not Enrolled • 3 Cr</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between opacity-75">
+                  <div>
+                    <span class="text-slate-300">0130324 Operating Systems (أنظمة التشغيل)</span>
+                    <p class="text-[9px] text-slate-400">Prereq: 0130221 (CS201)</p>
+                  </div>
+                  <span class="text-[9px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">○ Not Enrolled • 3 Cr</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between opacity-75">
+                  <div>
+                    <span class="text-slate-300">0132211 Software Engineering Principles</span>
+                    <p class="text-[9px] text-slate-400">Prereq: 130231 (CS202)</p>
+                  </div>
+                  <span class="text-[9px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">○ Not Enrolled • 3 Cr</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Family 5: Major Elective (9 Cr) -->
+            <div class="p-3 rounded-2xl bg-slate-950/80 border border-white/10 space-y-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h5 class="text-xs font-bold text-white">5. Major Elective (متطلبات التخصص الاختيارية)</h5>
+                  <p class="text-[9px] text-slate-400">Required: 9 Cr • Specialized Electives</p>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-800 text-slate-400 border border-white/5">
+                  ○ Not Started (0 / 9 Cr • 0%)
+                </span>
+              </div>
+              <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-slate-600 h-full" style="width: 0%"></div>
+              </div>
+              <div class="grid grid-cols-1 gap-1.5 pt-1">
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between opacity-75">
+                  <span class="text-slate-300">0132442 Mobile Application Development</span>
+                  <span class="text-[9px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">○ Not Enrolled • 3 Cr</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between opacity-75">
+                  <span class="text-slate-300">0130427 Cloud Computing & DevOps</span>
+                  <span class="text-[9px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">○ Not Enrolled • 3 Cr</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between opacity-75">
+                  <span class="text-slate-300">0130435 Machine Learning Fundamentals</span>
+                  <span class="text-[9px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">○ Not Enrolled • 3 Cr</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Family 6: Supporting Compulsory (12 Cr) - FINISHED ✓ -->
+            <div class="p-3 rounded-2xl bg-slate-950/80 border border-emerald-500/40 space-y-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h5 class="text-xs font-bold text-white">6. Supporting Compulsory (متطلبات التخصص المساندة)</h5>
+                  <p class="text-[9px] text-slate-400">Required: 12 Cr • Math & Physics</p>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                  ✓ Finished (12 / 12 Cr • 100%)
+                </span>
+              </div>
+              <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-emerald-500 h-full" style="width: 100%"></div>
+              </div>
+              <div class="grid grid-cols-1 gap-1.5 pt-1">
+                <div class="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/40 flex items-center justify-between">
+                  <span class="font-semibold text-white">101112 Foundations of Mathematics (MATH101)</span>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded">✓ Passed (A-) • 3 Cr</span>
+                </div>
+                <div class="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/40 flex items-center justify-between">
+                  <span class="font-semibold text-white">101274 Computer Applications in Math (PHYS101)</span>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded">✓ Passed (A) • 3 Cr</span>
+                </div>
+                <div onclick="openCourseDetailsModal('PHYS102')" class="p-2 rounded-xl bg-cyan-950/40 border border-cyan-500/40 flex items-center justify-between cursor-pointer hover:border-cyan-300">
+                  <span class="font-semibold text-white">131112 General Physics II (PHYS102)</span>
+                  <span class="text-[9px] font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded">⏳ Enrolled • 3 Cr</span>
+                </div>
+                <div class="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/40 flex items-center justify-between">
+                  <span class="font-semibold text-white">101211 Linear Algebra & Probability</span>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded">✓ Passed (A) • 3 Cr</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============================================== -->
+          <!-- 2. SEMESTERS CONTAINER (HIDDEN IN FAMILIES VIEW) -->
+          <!-- ============================================== -->
+          <div id="roadmap-semesters-view" class="hidden space-y-3 text-xs">
+            <!-- Roadmap Filter Tabs -->
+            <div class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-white/10 text-[10px] font-semibold overflow-x-auto scrollbar-hide">
+              <button onclick="filterRoadmap('all')" id="rf-btn-all" class="flex-1 min-w-[50px] py-1 rounded-lg bg-indigo-600 text-white text-center shadow">
+                All (8)
+              </button>
+              <button onclick="filterRoadmap('passed')" id="rf-btn-passed" class="flex-1 min-w-[70px] py-1 rounded-lg text-slate-400 hover:text-white text-center">
+                Passed (<s>Crossed</s>)
+              </button>
+              <button onclick="filterRoadmap('current')" id="rf-btn-current" class="flex-1 min-w-[55px] py-1 rounded-lg text-slate-400 hover:text-white text-center">
+                Current
+              </button>
+              <button onclick="filterRoadmap('upcoming')" id="rf-btn-upcoming" class="flex-1 min-w-[65px] py-1 rounded-lg text-slate-400 hover:text-white text-center">
+                Upcoming
+              </button>
+            </div>
+
+            <!-- Roadmap Course Cards by Semester -->
+            <div id="roadmap-cards-container" class="space-y-3 text-xs">
+            
+            <!-- Semester 1: ALL FINISHED & CROSSED OUT -->
+            <div class="roadmap-sem-block space-y-1.5" data-category="passed">
+              <div class="flex items-center justify-between text-[11px] font-bold text-emerald-400">
+                <span>Semester 1 (Year 1 - Fall) • 15 Cr</span>
+                <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-2 py-0.2 rounded-full font-bold">100% Passed</span>
+              </div>
+              <div class="space-y-1">
+                <!-- CS101 -->
+                <div onclick="openCourseDetailsModal('CS101')" class="p-2 rounded-xl bg-slate-950/70 border border-emerald-500/20 flex items-center justify-between opacity-80 cursor-pointer hover:border-emerald-400">
+                  <div>
+                    <span class="text-xs font-semibold line-through text-slate-400">CS101 Intro to Programming</span>
+                    <p class="text-[9px] text-slate-400">3 Credit Hours • Foundational Java</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-md">✓ Passed (A)</span>
+                </div>
+                <!-- MATH101 -->
+                <div class="p-2 rounded-xl bg-slate-950/70 border border-emerald-500/20 flex items-center justify-between opacity-80">
+                  <div>
+                    <span class="text-xs font-semibold line-through text-slate-400">MATH101 Calculus I</span>
+                    <p class="text-[9px] text-slate-400">3 Credit Hours • Differential Calculus</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-md">✓ Passed (B+)</span>
+                </div>
+                <!-- ENG101 -->
+                <div class="p-2 rounded-xl bg-slate-950/70 border border-emerald-500/20 flex items-center justify-between opacity-80">
+                  <div>
+                    <span class="text-xs font-semibold line-through text-slate-400">ENG101 English Communication I</span>
+                    <p class="text-[9px] text-slate-400">3 Credit Hours • Academic Reading & Writing</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-md">✓ Passed (A-)</span>
+                </div>
+                <!-- PHYS101 -->
+                <div class="p-2 rounded-xl bg-slate-950/70 border border-emerald-500/20 flex items-center justify-between opacity-80">
+                  <div>
+                    <span class="text-xs font-semibold line-through text-slate-400">PHYS101 General Physics I</span>
+                    <p class="text-[9px] text-slate-400">3 Credit Hours • Classical Mechanics</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-md">✓ Passed (B)</span>
+                </div>
+                <!-- CS102 -->
+                <div class="p-2 rounded-xl bg-slate-950/70 border border-emerald-500/20 flex items-center justify-between opacity-80">
+                  <div>
+                    <span class="text-xs font-semibold line-through text-slate-400">CS102 Object-Oriented Basics</span>
+                    <p class="text-[9px] text-slate-400">3 Credit Hours • Class & Object Syntax</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-md">✓ Passed (C+)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Semester 2: RETAKE FOCUSED -->
+            <div class="roadmap-sem-block space-y-1.5" data-category="passed">
+              <div class="flex items-center justify-between text-[11px] font-bold text-amber-300">
+                <span>Semester 2 (Year 1 - Spring)</span>
+                <span class="text-[9px] bg-amber-500/20 text-amber-300 px-2 py-0.2 rounded-full font-bold">1 Retake Pending</span>
+              </div>
+              <div class="space-y-1">
+                <!-- MATH102 Failed Course -->
+                <div class="p-2 rounded-xl bg-rose-950/40 border border-rose-500/50 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-bold text-white">MATH102 Calculus II</span>
+                    <p class="text-[9px] text-rose-300">3 Credit Hours • Integration & Series</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-rose-300 bg-rose-500/25 px-2 py-0.5 rounded-md border border-rose-500/40">⚠️ Failed (F) • Retake</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Semester 3: CURRENT ENROLLED (15 Cr) -->
+            <div class="roadmap-sem-block space-y-1.5" data-category="current">
+              <div class="flex items-center justify-between text-[11px] font-bold text-blue-400">
+                <span>Semester 3 (Year 2 - Fall) • Current Semester</span>
+                <span class="text-[9px] bg-blue-500/20 text-blue-300 px-2 py-0.2 rounded-full font-bold">15 Cr In Progress</span>
+              </div>
+              <div class="space-y-1">
+                <div class="p-2 rounded-xl bg-blue-950/30 border border-blue-500/40 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-bold text-white">CS201 Data Structures</span>
+                    <p class="text-[9px] text-slate-300">3 Cr • 🏛️ وجاهي • Trees, Graphs, Complexity</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-blue-300 bg-blue-500/20 px-2 py-0.5 rounded-md">In Progress</span>
+                </div>
+                <div class="p-2 rounded-xl bg-blue-950/30 border border-blue-500/40 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-bold text-white">CS202 Object-Oriented Programming</span>
+                    <p class="text-[9px] text-slate-300">3 Cr • 🏛️ وجاهي • Inheritance & Design Patterns</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-blue-300 bg-blue-500/20 px-2 py-0.5 rounded-md">In Progress</span>
+                </div>
+                <div class="p-2 rounded-xl bg-blue-950/30 border border-blue-500/40 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-bold text-white">PHYS102 General Physics II</span>
+                    <p class="text-[9px] text-slate-300">3 Cr • 🏛️ وجاهي • Electromagnetism</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-blue-300 bg-blue-500/20 px-2 py-0.5 rounded-md">In Progress</span>
+                </div>
+                <div class="p-2 rounded-xl bg-blue-950/30 border border-blue-500/40 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-bold text-white">ENG102 Technical Writing</span>
+                    <p class="text-[9px] text-slate-300">3 Cr • 🌿 مدمج • Technical Memos & Research</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-blue-300 bg-blue-500/20 px-2 py-0.5 rounded-md">In Progress</span>
+                </div>
+                <div class="p-2 rounded-xl bg-amber-950/30 border border-amber-500/40 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-bold text-white">MATH102 Calculus II (Retake)</span>
+                    <p class="text-[9px] text-amber-300">3 Cr • 🏛️ وجاهي • High GPA Priority Retake</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-md">Retake Enrolled</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Semester 4: UPCOMING (Spring Year 2) -->
+            <div class="roadmap-sem-block space-y-1.5" data-category="upcoming">
+              <div class="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                <span>Semester 4 (Year 2 - Spring) • Planned</span>
+                <span class="text-[9px] bg-white/10 text-slate-300 px-2 py-0.2 rounded-full font-bold">15 Cr</span>
+              </div>
+              <div class="space-y-1">
+                <div class="p-2 rounded-xl bg-slate-950/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-semibold text-slate-200">CS341 Operating Systems</span>
+                    <p class="text-[9px] text-slate-400">3 Cr • Prereq: <span class="text-emerald-400">CS201</span></p>
+                  </div>
+                  <span class="text-[9px] text-slate-400 bg-white/5 px-2 py-0.5 rounded-md">Upcoming</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-950/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-semibold text-slate-200">CS310 Algorithm Design & Analysis</span>
+                    <p class="text-[9px] text-slate-400">3 Cr • Prereqs: <span class="text-emerald-400">CS201, MATH102</span></p>
+                  </div>
+                  <span class="text-[9px] text-slate-400 bg-white/5 px-2 py-0.5 rounded-md">Upcoming</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-950/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-semibold text-slate-200">SE202 Software Engineering Principles</span>
+                    <p class="text-[9px] text-slate-400">3 Cr • Prereq: <span class="text-emerald-400">CS202</span></p>
+                  </div>
+                  <span class="text-[9px] text-slate-400 bg-white/5 px-2 py-0.5 rounded-md">Upcoming</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-950/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-semibold text-slate-200">MATH201 Linear Algebra</span>
+                    <p class="text-[9px] text-slate-400">3 Cr • Prereq: <span class="text-amber-400">MATH102</span></p>
+                  </div>
+                  <span class="text-[9px] text-slate-400 bg-white/5 px-2 py-0.5 rounded-md">Upcoming</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-950/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-semibold text-slate-200">ENG201 Business Communication</span>
+                    <p class="text-[9px] text-slate-400">3 Cr • Prereq: <span class="text-emerald-400">ENG102</span></p>
+                  </div>
+                  <span class="text-[9px] text-slate-400 bg-white/5 px-2 py-0.5 rounded-md">Upcoming</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Semester 5: UPCOMING (Fall Year 3) -->
+            <div class="roadmap-sem-block space-y-1.5" data-category="upcoming">
+              <div class="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                <span>Semester 5 (Year 3 - Fall) • Planned</span>
+                <span class="text-[9px] bg-white/10 text-slate-300 px-2 py-0.2 rounded-full font-bold">15 Cr</span>
+              </div>
+              <div class="space-y-1">
+                <div class="p-2 rounded-xl bg-slate-950/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-semibold text-slate-200">CS320 Database Management Systems</span>
+                    <p class="text-[9px] text-slate-400">3 Cr • SQL, Indexing, Relational Algebra • Prereq: CS201</p>
+                  </div>
+                  <span class="text-[9px] text-slate-400 bg-white/5 px-2 py-0.5 rounded-md">Upcoming</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-950/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-semibold text-slate-200">CS330 Computer Networks</span>
+                    <p class="text-[9px] text-slate-400">3 Cr • TCP/IP, Routing, Sockets • Prereq: CS341</p>
+                  </div>
+                  <span class="text-[9px] text-slate-400 bg-white/5 px-2 py-0.5 rounded-md">Upcoming</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-950/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-semibold text-slate-200">STAT201 Probability & Statistics for CS</span>
+                    <p class="text-[9px] text-slate-400">3 Cr • Prereq: MATH102</p>
+                  </div>
+                  <span class="text-[9px] text-slate-400 bg-white/5 px-2 py-0.5 rounded-md">Upcoming</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-950/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-semibold text-slate-200">CS360 Artificial Intelligence Basics</span>
+                    <p class="text-[9px] text-slate-400">3 Cr • Heuristics, Search, Logic • Prereq: CS310</p>
+                  </div>
+                  <span class="text-[9px] text-slate-400 bg-white/5 px-2 py-0.5 rounded-md">Upcoming</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Semester 6: UPCOMING (Spring Year 3) -->
+            <div class="roadmap-sem-block space-y-1.5" data-category="upcoming">
+              <div class="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                <span>Semester 6 (Year 3 - Spring) • Planned</span>
+                <span class="text-[9px] bg-white/10 text-slate-300 px-2 py-0.2 rounded-full font-bold">15 Cr</span>
+              </div>
+              <div class="space-y-1">
+                <div class="p-2 rounded-xl bg-slate-950/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-semibold text-slate-200">AI301 Machine Learning & Pattern Rec</span>
+                    <p class="text-[9px] text-slate-400">3 Cr • Supervised, Unsupervised • Prereq: STAT201, CS360</p>
+                  </div>
+                  <span class="text-[9px] text-slate-400 bg-white/5 px-2 py-0.5 rounded-md">Upcoming</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-950/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-semibold text-slate-200">CS390 Information Security & Privacy</span>
+                    <p class="text-[9px] text-slate-400">3 Cr • Cryptography, Security Auditing • Prereq: CS330</p>
+                  </div>
+                  <span class="text-[9px] text-slate-400 bg-white/5 px-2 py-0.5 rounded-md">Upcoming</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Semester 7 & 8: SENIOR YEAR (Capstone & Field Training) -->
+            <div class="roadmap-sem-block space-y-1.5" data-category="upcoming">
+              <div class="flex items-center justify-between text-[11px] font-bold text-slate-300">
+                <span>Senior Year (Semesters 7 & 8) • Capstone & Training</span>
+                <span class="text-[9px] bg-white/10 text-slate-300 px-2 py-0.2 rounded-full font-bold">28 Cr</span>
+              </div>
+              <div class="space-y-1">
+                <div class="p-2 rounded-xl bg-slate-950/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-semibold text-white">CS491 Graduation Capstone Project I</span>
+                    <p class="text-[9px] text-slate-400">3 Cr • Prereq: 90+ Credits Completed</p>
+                  </div>
+                  <span class="text-[9px] text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-md font-bold">Capstone I</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-950/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-semibold text-white">CS492 Graduation Capstone Project II</span>
+                    <p class="text-[9px] text-slate-400">3 Cr • Prereq: CS491</p>
+                  </div>
+                  <span class="text-[9px] text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-md font-bold">Capstone II</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-950/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-semibold text-white">CS480 Practical Field Training</span>
+                    <p class="text-[9px] text-slate-400">3 Cr • 8 Weeks Accredited Industry Internship</p>
+                  </div>
+                  <span class="text-[9px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md font-bold">Industry</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+          <button onclick="closeRoadmapModal()" class="w-full py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs active:scale-95 shadow">
+            Close Roadmap
+          </button>
+        </div>
+      </div>
+
+      <!-- 8. AI Analytics & Study Plan Graphs Modal -->
+      <div id="ai-graphs-modal" class="hidden absolute inset-0 z-50 bg-black/85 backdrop-blur-sm flex flex-col justify-end p-2">
+        <div class="bg-slate-900 border border-emerald-500/40 rounded-3xl p-4 space-y-3.5 max-h-[90%] overflow-y-auto mobile-scroll">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <div>
+              <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+                <span>📊 AI Study Plan & Workload Analytics</span>
+              </h4>
+              <p class="text-[9px] text-slate-300">Visual representations replacing raw numbers</p>
+            </div>
+            <button onclick="closeAiGraphsModal()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center font-bold">✕</button>
+          </div>
+
+          <!-- Graph 1: Dedicated Study Hours per Course (Bar Chart) -->
+          <div class="p-3 rounded-2xl bg-slate-950 border border-emerald-500/25 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-white">Dedicated Study Hours / Week</span>
+              <span class="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded font-bold">27h Total</span>
+            </div>
+            
+            <div class="space-y-2 text-[10px]">
+              <!-- CS201 -->
+              <div>
+                <div class="flex justify-between text-slate-300 mb-0.5">
+                  <span class="font-bold text-white">CS201 Data Structures</span>
+                  <span class="text-emerald-400 font-mono font-bold">7.0h (26%)</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                  <div class="bg-emerald-500 h-full rounded-full" style="width: 70%"></div>
+                </div>
+              </div>
+              <!-- PHYS102 -->
+              <div>
+                <div class="flex justify-between text-slate-300 mb-0.5">
+                  <span class="font-bold text-white">PHYS102 General Physics II</span>
+                  <span class="text-rose-400 font-mono font-bold">6.0h (22%)</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                  <div class="bg-rose-500 h-full rounded-full" style="width: 60%"></div>
+                </div>
+              </div>
+              <!-- MATH102 Retake -->
+              <div>
+                <div class="flex justify-between text-slate-300 mb-0.5">
+                  <span class="font-bold text-amber-300">MATH102 Calculus II (Retake Focus)</span>
+                  <span class="text-amber-400 font-mono font-bold">6.0h (22%)</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                  <div class="bg-amber-500 h-full rounded-full" style="width: 60%"></div>
+                </div>
+              </div>
+              <!-- CS202 -->
+              <div>
+                <div class="flex justify-between text-slate-300 mb-0.5">
+                  <span class="font-bold text-white">CS202 OOP</span>
+                  <span class="text-blue-400 font-mono font-bold">5.0h (19%)</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                  <div class="bg-blue-500 h-full rounded-full" style="width: 50%"></div>
+                </div>
+              </div>
+              <!-- ENG102 -->
+              <div>
+                <div class="flex justify-between text-slate-300 mb-0.5">
+                  <span class="font-bold text-white">ENG102 Technical Writing</span>
+                  <span class="text-purple-400 font-mono font-bold">3.0h (11%)</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                  <div class="bg-purple-500 h-full rounded-full" style="width: 30%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Graph 2: Subject Domain Balance -->
+          <div class="p-3 rounded-2xl bg-slate-950 border border-white/10 space-y-2">
+            <span class="text-xs font-bold text-white">Subject Domain Balance</span>
+            <div class="h-3 w-full rounded-full bg-slate-800 overflow-hidden flex p-0.5 gap-0.5">
+              <div class="h-full bg-emerald-500 rounded-s-full" style="width: 44%" title="Algorithms 44%"></div>
+              <div class="h-full bg-amber-500" style="width: 44%" title="Math & Physics 44%"></div>
+              <div class="h-full bg-purple-500 rounded-e-full" style="width: 12%" title="Writing 12%"></div>
+            </div>
+            <div class="grid grid-cols-3 gap-1 text-[9px] text-center pt-1 font-medium">
+              <span class="text-emerald-400">Algorithms 44%</span>
+              <span class="text-amber-400">Math/Physics 44%</span>
+              <span class="text-purple-400">Writing 12%</span>
+            </div>
+          </div>
+
+          <!-- Graph 3: Daily Evening Study Curve (9:00 PM - 11:00 PM) -->
+          <div class="p-3 rounded-2xl bg-slate-950 border border-emerald-500/20 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-white">🌙 Evening Window (9 PM - 11 PM)</span>
+              <span class="text-[9px] font-mono text-emerald-400 font-bold">2 Hours / Night</span>
+            </div>
+            <div class="space-y-1.5 text-[10px]">
+              <div class="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex justify-between items-center">
+                <div>
+                  <span class="font-bold text-white">21:00 - 21:50 (50 min)</span>
+                  <p class="text-[9px] text-slate-300">Phase 1: Deep Work & Theory Mastery</p>
+                </div>
+                <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded">95% Focus</span>
+              </div>
+              <div class="p-2 rounded-xl bg-amber-950/40 border border-amber-500/30 flex justify-between items-center">
+                <div>
+                  <span class="font-bold text-amber-300">21:50 - 22:00 (10 min)</span>
+                  <p class="text-[9px] text-slate-300">Phase 2: Active Recall & Brain Decompression</p>
+                </div>
+                <span class="text-[9px] font-bold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded">☕ Rest</span>
+              </div>
+              <div class="p-2 rounded-xl bg-blue-950/40 border border-blue-500/30 flex justify-between items-center">
+                <div>
+                  <span class="font-bold text-white">22:00 - 23:00 (60 min)</span>
+                  <p class="text-[9px] text-slate-300">Phase 3: Code Practice & Problem Drill</p>
+                </div>
+                <span class="text-[9px] font-bold text-blue-300 bg-blue-500/20 px-2 py-0.5 rounded">90% Drill</span>
+              </div>
+            </div>
+          </div>
+
+          <button onclick="closeAiGraphsModal()" class="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs active:scale-95 shadow">
+            Done
+          </button>
+        </div>
+      </div>
+
+      <!-- 9. Comprehensive Course Details Modal (ZUJ E-Learning Template) -->
+      <div id="course-details-modal" class="hidden absolute inset-0 z-50 bg-black/85 backdrop-blur-sm flex flex-col justify-end p-2">
+        <div class="bg-slate-900 border border-emerald-500/40 rounded-3xl p-4 space-y-3.5 max-h-[92%] overflow-y-auto mobile-scroll">
+          
+          <!-- Header & Title -->
+          <div class="flex items-start justify-between border-b border-white/10 pb-2.5">
+            <div>
+              <div class="flex items-center gap-1.5 mb-1">
+                <span id="cd-modal-code" class="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">CS201</span>
+                <span id="cd-modal-modality" class="text-[9px] font-bold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full">🏛️ وجاهي كامل • 3 Cr</span>
+                <span id="cd-modal-status-badge" class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full">Active</span>
+              </div>
+              <h4 id="cd-modal-title" class="text-xs font-bold text-white">CS201 Data Structures (تراكيب البيانات)</h4>
+              <p id="cd-modal-desc" class="text-[10px] text-slate-300 mt-0.5 leading-snug">
+                Fundamental data structures: AVL trees, graphs, heaps, and asymptotic algorithmic analysis.
+              </p>
+            </div>
+            <button onclick="closeCourseDetailsModal()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center font-bold">✕</button>
+          </div>
+
+          <!-- Locked / Archived Completed Course Banner -->
+          <div id="cd-modal-locked-banner" class="hidden p-2.5 rounded-xl bg-amber-950/60 border border-amber-500/40 space-y-1">
+            <div class="flex items-center justify-between text-xs font-bold text-amber-300">
+              <span class="flex items-center gap-1.5">
+                <span>🔒</span> <span>Archived Semester Offering (Locked)</span>
+              </span>
+              <span class="text-[9px] font-mono bg-emerald-500/20 text-emerald-300 px-1.5 py-0.2 rounded font-bold">Passed (A)</span>
+            </div>
+            <p class="text-[9px] text-slate-300 leading-snug">
+              This course was passed in Fall 2025/2026. Content is permanently archived and locked from other semesters.
+            </p>
+          </div>
+
+          <!-- Progress Bar (Matching recording) -->
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-white/5 space-y-1">
+            <div class="flex justify-between text-[10px]">
+              <span class="text-slate-400">Course Completion Progress</span>
+              <span id="cd-modal-progress-label" class="text-emerald-400 font-mono font-bold">68%</span>
+            </div>
+            <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+              <div id="cd-modal-progress-bar" class="h-full bg-gradient-to-r from-emerald-500 to-green-400 rounded-full w-[68%]"></div>
+            </div>
+          </div>
+
+          <!-- ─── DOCTORS PROFILE & CONTACT (WITH DEACTIVATED RULE) ─── -->
+          <div class="p-3 rounded-2xl bg-slate-950 border border-emerald-500/25 space-y-2">
+            <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
+              <span class="text-[10px] font-bold text-white flex items-center gap-1.5">
+                <span>👨‍🏫</span> <span>Lecturers' Names and Emails:</span>
+              </span>
+              <button onclick="togglePhoneDoctorDeactivated()" class="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 hover:text-white border border-white/10">
+                Simulate Deactivation
+              </button>
+            </div>
+
+            <div class="space-y-1.5 text-xs">
+              <div class="flex items-center gap-2">
+                <span id="cd-modal-doc-name" class="font-bold text-white">Dr. Ahmad Khalil</span>
+                <span id="cd-modal-doc-deactivated-badge" class="hidden text-[9px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 px-1.5 py-0.2 rounded">
+                  [Deactivated]
+                </span>
+              </div>
+              <p id="cd-modal-doc-title" class="text-[10px] text-slate-400">Associate Professor of AI & Software Systems</p>
+
+              <!-- Deactivated Warning Notice -->
+              <div id="cd-modal-doc-deactivated-box" class="hidden p-2 rounded-xl bg-rose-950/40 border border-rose-500/40 text-[10px] text-rose-200">
+                ⚠️ <strong>[Deactivated]:</strong> Contact and office details unavailable — Faculty deactivated. Instructor is no longer active at the university.
+              </div>
+
+              <!-- Active Contact Details -->
+              <div id="cd-modal-doc-active-box" class="grid grid-cols-2 gap-2 pt-1 text-[10px] text-slate-300">
+                <div class="p-1.5 rounded-lg bg-white/[0.03] border border-white/5">
+                  <span class="text-slate-400 block text-[9px]">Office Number:</span>
+                  <span id="cd-modal-doc-office" class="text-white font-semibold">IT Faculty - Room 302</span>
+                </div>
+                <div class="p-1.5 rounded-lg bg-white/[0.03] border border-white/5">
+                  <span class="text-slate-400 block text-[9px]">University Email:</span>
+                  <span id="cd-modal-doc-email" class="text-emerald-400 font-mono font-semibold truncate block">a.khalil@zuj.edu.jo</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Attendance Quick Summary (Article 14) -->
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-white/5 flex items-center justify-between text-xs">
+            <div>
+              <span class="text-[9px] text-slate-400 block">Classroom Attendance</span>
+              <span class="text-emerald-400 font-bold font-mono">93% • Safe (0/4 Absences)</span>
+            </div>
+            <button onclick="switchScreen('attendance'); closeCourseDetailsModal();" class="px-2.5 py-1 rounded-lg bg-blue-600 text-white text-[10px] font-bold active:scale-95">
+              QR Attend
+            </button>
+          </div>
+
+          <!-- ─── CHAPTERS & MODULES LIST (Slides, Notes, Assignments, Quizzes, Exams) ─── -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-xs font-bold text-white border-b border-white/10 pb-1">
+              <span>Course Chapters & Learning Modules</span>
+              <button id="cd-modal-doctor-add-btn" onclick="openDoctorAddMaterialModal()" class="hidden text-[9px] px-2 py-0.5 rounded bg-emerald-600 text-white font-bold flex items-center gap-1 active:scale-95">
+                <span>➕ Add Content</span>
+              </button>
+            </div>
+
+            <!-- Chapter 1 -->
+            <div class="p-2.5 rounded-xl bg-slate-950/80 border border-white/5 space-y-1.5">
+              <div class="flex items-center justify-between text-[11px] font-bold text-emerald-400">
+                <span>Chapter 1: Asymptotic Complexity & Big-O</span>
+                <span class="text-[9px] font-mono text-slate-400">4 items</span>
+              </div>
+              <div class="space-y-1 text-[10px]">
+                <div class="p-1.5 rounded-lg bg-purple-950/30 border border-purple-500/20 flex items-center justify-between text-slate-200">
+                  <div class="flex items-center gap-1.5">
+                    <span>📑</span> <span>Ch1 Slides: Big-O, Omega & Theta (2.8 MB)</span>
+                  </div>
+                  <button onclick="showToast('Downloading Ch1 Slides...')" class="text-[9px] text-purple-300 font-bold">Download</button>
+                </div>
+                <div class="p-1.5 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-between text-slate-200">
+                  <div class="flex items-center gap-1.5">
+                    <span>📝</span> <span>Complexity Cheat Sheet (850 KB)</span>
+                  </div>
+                  <button onclick="showToast('Viewing Cheat Sheet...')" class="text-[9px] text-slate-300">View</button>
+                </div>
+                <div class="p-1.5 rounded-lg bg-blue-950/30 border border-blue-500/20 flex items-center justify-between text-slate-200">
+                  <div class="flex items-center gap-1.5">
+                    <span>⏱️</span> <span>Quiz 1: Big-O Verification (10 pts)</span>
+                  </div>
+                  <span class="text-[9px] font-mono text-amber-300">Due Nov 15</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chapter 2 -->
+            <div class="p-2.5 rounded-xl bg-slate-950/80 border border-white/5 space-y-1.5">
+              <div class="flex items-center justify-between text-[11px] font-bold text-blue-400">
+                <span>Chapter 2: Linear Data Structures (Stacks & Queues)</span>
+                <span class="text-[9px] font-mono text-slate-400">2 items</span>
+              </div>
+              <div class="space-y-1 text-[10px]">
+                <div class="p-1.5 rounded-lg bg-purple-950/30 border border-purple-500/20 flex items-center justify-between text-slate-200">
+                  <div class="flex items-center gap-1.5">
+                    <span>📑</span> <span>Ch2 Slides: Dynamic Array & Nodes (3.4 MB)</span>
+                  </div>
+                  <button onclick="showToast('Downloading Ch2 Slides...')" class="text-[9px] text-purple-300 font-bold">Download</button>
+                </div>
+                <div class="p-1.5 rounded-lg bg-amber-950/30 border border-amber-500/20 flex items-center justify-between text-slate-200">
+                  <div class="flex items-center gap-1.5">
+                    <span>📋</span> <span>Assignment 1: Doubly Linked List Lab (15 pts)</span>
+                  </div>
+                  <span class="text-[9px] font-mono text-emerald-400 font-bold">Graded: 96</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chapter 4: AVL Trees & Midterm -->
+            <div class="p-2.5 rounded-xl bg-slate-950/80 border border-white/5 space-y-1.5">
+              <div class="flex items-center justify-between text-[11px] font-bold text-amber-400">
+                <span>Chapter 4: AVL Trees & Rotations</span>
+                <span class="text-[9px] font-mono text-slate-400">3 items</span>
+              </div>
+              <div class="space-y-1 text-[10px]">
+                <div class="p-1.5 rounded-lg bg-purple-950/30 border border-purple-500/20 flex items-center justify-between text-slate-200">
+                  <div class="flex items-center gap-1.5">
+                    <span>📑</span> <span>Ch4 Slides: Single & Double Rotations (4.1 MB)</span>
+                  </div>
+                  <button onclick="showToast('Downloading Ch4 Slides...')" class="text-[9px] text-purple-300 font-bold">Download</button>
+                </div>
+                <div class="p-1.5 rounded-lg bg-amber-950/30 border border-amber-500/20 flex items-center justify-between text-slate-200">
+                  <div class="flex items-center gap-1.5">
+                    <span>📋</span> <span>Assignment 2: AVL Rotation Complexity (20 pts)</span>
+                  </div>
+                  <button onclick="closeCourseDetailsModal(); switchScreen('assignments');" class="text-[9px] text-amber-300 font-bold underline">Submit</button>
+                </div>
+                <div class="p-1.5 rounded-lg bg-rose-950/30 border border-rose-500/20 flex items-center justify-between text-slate-200">
+                  <div class="flex items-center gap-1.5">
+                    <span>🎓</span> <span>Midterm Exam (30 pts • Hall 41)</span>
+                  </div>
+                  <span class="text-[9px] font-mono text-rose-300">Nov 20</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <button onclick="closeCourseDetailsModal()" class="w-full py-2.5 rounded-xl bg-slate-800 text-slate-200 font-bold text-xs active:scale-95">
+            Done
+          </button>
+        </div>
+      </div>
+
+      <!-- 10. Doctor Add Material Modal (Mobile) -->
+      <div id="doctor-add-material-modal" class="hidden absolute inset-0 z-[60] bg-black/90 backdrop-blur-md flex flex-col justify-end p-2">
+        <div class="bg-slate-900 border border-emerald-500/50 rounded-3xl p-4 space-y-3 max-h-[85%] overflow-y-auto mobile-scroll">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+              <span>➕ Add Course Content</span>
+            </h4>
+            <button onclick="closeDoctorAddMaterialModal()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center font-bold">✕</button>
+          </div>
+
+          <div class="space-y-2.5 text-xs">
+            <div>
+              <label class="text-[10px] text-slate-400 block mb-1">Category:</label>
+              <select id="m-add-type" class="w-full bg-slate-950 border border-white/10 rounded-xl p-2 text-white text-xs">
+                <option value="slides">Slides (شرائح العرض)</option>
+                <option value="notes">Notes / Material (ملاحظات ومراجع)</option>
+                <option value="activity">Activity (نشاط وتمرين)</option>
+                <option value="assignment">Assignment (واجب دراسي)</option>
+                <option value="quiz">Quiz (اختبار قصير)</option>
+                <option value="exam">Exam (امتحان)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="text-[10px] text-slate-400 block mb-1">Chapter:</label>
+              <select id="m-add-chapter" class="w-full bg-slate-950 border border-white/10 rounded-xl p-2 text-white text-xs">
+                <option value="1">Chapter 1: Asymptotic Complexity & Big-O</option>
+                <option value="2">Chapter 2: Linear Data Structures</option>
+                <option value="3">Chapter 3: Binary Search Trees</option>
+                <option value="4">Chapter 4: AVL Trees & Rotations</option>
+                <option value="5">Chapter 5: Graph Theory</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="text-[10px] text-slate-400 block mb-1">Title:</label>
+              <input id="m-add-title" type="text" placeholder="e.g. Ch1 Slides: Amortized Analysis" class="w-full bg-slate-950 border border-white/10 rounded-xl p-2 text-white text-xs">
+            </div>
+
+            <div>
+              <label class="text-[10px] text-slate-400 block mb-1">Attachment File Name:</label>
+              <input id="m-add-filename" type="text" placeholder="e.g. CS201_Ch1_Slides.pdf" class="w-full bg-slate-950 border border-white/10 rounded-xl p-2 text-white text-xs font-mono">
+            </div>
+
+            <button onclick="saveDoctorMaterialFromPhone()" class="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs active:scale-95 shadow">
+              Add to Course Template
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- iOS Home Indicator -->
       <div class="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-32 h-1 bg-white/30 rounded-full z-50 pointer-events-none"></div>
 
@@ -1156,6 +2491,67 @@
         selectedOption: null,
         solutionText: null,
         isLateSubmission: false
+      },
+      // AI Major Assignments for Basma (210029)
+      {
+        id: 32001,
+        title: "Backpropagation & Loss Optimization in PyTorch",
+        titleAr: "التغذية الراجعة وحساب دالة الخسارة في بايتورش",
+        courseCode: "135341",
+        courseName: "Neural Networks & Deep Learning",
+        doctorName: "Dr. Ahmad Khalil",
+        dueDate: "Nov 14, 2026, 23:59",
+        status: "pending",
+        studentTarget: "basma",
+        description: "Implement backward pass, gradient descent step, and compare SGD with Adam optimizer on MNIST dataset.",
+        options: ["SGD with Momentum", "Adam Optimizer", "RMSProp", "Adagrad"],
+        selectedOption: null,
+        solutionText: null,
+        isLateSubmission: false
+      },
+      {
+        id: 32002,
+        title: "Transformer Attention Head Implementation",
+        titleAr: "تطبيق طبقة الانتباه الذاتي لنماذج المحولات",
+        courseCode: "135342",
+        courseName: "Natural Language Processing",
+        doctorName: "Dr. Sara Mahmoud",
+        dueDate: "Nov 12, 2026, 23:59",
+        status: "submitted",
+        studentTarget: "basma",
+        description: "Implement Scaled Dot-Product Attention mechanism in Python using NumPy and PyTorch.",
+        options: null,
+        solutionText: "import numpy as np\ndef scaled_dot_product_attention(q, k, v):\n    d_k = q.shape[-1]\n    scores = np.matmul(q, k.swapaxes(-2, -1)) / np.sqrt(d_k)\n    weights = np.exp(scores) / np.sum(np.exp(scores), axis=-1, keepdims=True)\n    return np.matmul(weights, v)",
+        isLateSubmission: false
+      },
+      {
+        id: 32003,
+        title: "SLAM Navigation & Obstacle Avoidance",
+        titleAr: "خوارزمية الملاحة وتفادي العقبات للروبوتات",
+        courseCode: "135343",
+        courseName: "Intelligent Mobile Robotics",
+        doctorName: "Dr. Omar Hassan",
+        dueDate: "Nov 2, 2026, 23:59",
+        status: "graded",
+        studentTarget: "basma",
+        score: 98,
+        feedback: "عمل متقن يا بسمة! تطبيق نموذجي لخوارزمية A* ومصفوفة التكلفة للروبوت المتنقل.",
+        isLateSubmission: false
+      },
+      {
+        id: 32004,
+        title: "Logistic Regression & Decision Boundaries",
+        titleAr: "الانحدار اللوجستي وحدود القرار للبيانات",
+        courseCode: "135240",
+        courseName: "Machine Learning (Completed Course)",
+        doctorName: "Dr. Ahmad Khalil",
+        dueDate: "Dec 20, 2025, 23:59",
+        status: "graded",
+        studentTarget: "basma",
+        score: 100,
+        feedback: "درجة كاملة. المساق مكتمل ومؤرشف ولا يقبل تسليمات جديدة.",
+        isCompletedCourse: true,
+        isLateSubmission: false
       }
     ];
 
@@ -1163,7 +2559,15 @@
       const container = document.getElementById('assignments-cards-container');
       if (!container) return;
 
-      const filtered = ASSIGNMENTS_DB.filter(a => currentAsgnFilter === 'all' || a.status === currentAsgnFilter);
+      const filtered = ASSIGNMENTS_DB.filter(a => {
+        if (currentStudent === 'basma') {
+          if (a.studentTarget && a.studentTarget !== 'basma') return false;
+          if (!a.studentTarget) return false;
+        } else {
+          if (a.studentTarget === 'basma') return false;
+        }
+        return currentAsgnFilter === 'all' || a.status === currentAsgnFilter;
+      });
       if (filtered.length === 0) {
         container.innerHTML = '<div class="p-4 text-center text-slate-400 text-xs">No assignments in this tab</div>';
         return;
@@ -1190,7 +2594,10 @@
             actionBtn = '<div class="text-center py-1 text-[10px] text-slate-500">Awaiting submission</div>';
           }
         } else {
-          if (a.status === 'pending') {
+          const isCompletedCourse = a.courseCode === 'CS101' || a.courseCode === 'MATH101' || a.courseCode === 'ENG101' || a.courseCode === 'PHYS101' || a.isCompletedCourse;
+          if (isCompletedCourse) {
+            actionBtn = `<button disabled class="w-full py-2 rounded-xl bg-slate-800/80 text-slate-500 text-[11px] font-semibold cursor-not-allowed select-none opacity-50 border border-white/5" onclick="event.stopPropagation(); showToast('🔒 Course completed: submissions are permanently closed.');">🔒 Course Completed (Submissions Closed)</button>`;
+          } else if (a.status === 'pending') {
             actionBtn = `<button onclick="openSubmitModalFor(${a.id})" class="w-full py-2 rounded-xl bg-emerald-600 text-white text-[11px] font-bold active:scale-95">Submit Solution</button>`;
           } else if (a.status === 'overdue') {
             actionBtn = `<button onclick="openSubmitModalFor(${a.id})" class="w-full py-2 rounded-xl bg-rose-600 text-white text-[11px] font-bold border border-rose-400 active:scale-95">Submit Late Solution (Allowed)</button>`;
@@ -1241,6 +2648,10 @@
       activeSubmittingId = id;
       const asgn = ASSIGNMENTS_DB.find(x => x.id === id);
       if (!asgn) return;
+      if (asgn.courseCode === 'CS101' || asgn.courseCode === 'MATH101' || asgn.courseCode === 'ENG101' || asgn.courseCode === 'PHYS101' || asgn.isCompletedCourse) {
+        showToast("🔒 Course is completed. Submissions are permanently closed.");
+        return;
+      }
       document.getElementById('sub-modal-course-badge').textContent = asgn.courseCode;
       document.getElementById('sub-modal-title').textContent = asgn.title;
       document.getElementById('sub-modal-desc').textContent = asgn.description;
@@ -1415,26 +2826,383 @@
       renderAssignments();
     }
 
+    function updateCoursesForStudent(s) {
+      const nextCard = document.getElementById('dash-next-class-card');
+      const coursesWrap = document.getElementById('dash-my-courses-wrapper');
+      const attWrap = document.getElementById('attendance-courses-container');
+
+      if (s === 'basma') {
+        if (nextCard) {
+          nextCard.setAttribute('onclick', "openCourseDetailsModal('135341')");
+          nextCard.className = "p-3.5 rounded-2xl bg-slate-900/90 border border-cyan-500/30 zuj-card-shadow space-y-2 cursor-pointer hover:border-cyan-400";
+          nextCard.innerHTML = `
+            <div class="flex items-center justify-between border-b border-white/5 pb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-wide">Next Class • Sunday 10:00</span>
+              </div>
+              <span class="text-[9px] font-mono bg-cyan-500/15 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-500/30 font-semibold">
+                135341 • Hall IT-201
+              </span>
+            </div>
+            <div>
+              <h4 class="text-xs font-extrabold text-white">135341 Neural Networks & Deep Learning (الشبكات العصبونية والتعلم العميق)</h4>
+              <p class="text-[11px] text-slate-300 mt-0.5">Dr. Ahmad Khalil • Hall IT-201</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 text-[10px]">
+              <span class="px-2 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-bold">
+                🏛️ وجاهي كامل (In-Person)
+              </span>
+              <span class="px-2 py-0.5 rounded-md bg-white/5 text-slate-300 font-mono">
+                3 Credit Hours
+              </span>
+              <span class="px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-300 font-mono">
+                QR Ready
+              </span>
+            </div>
+          `;
+        }
+
+        if (coursesWrap) {
+          coursesWrap.innerHTML = `
+            <div class="flex items-center justify-between border-b border-white/10 pb-2">
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs">📚</span>
+                <h4 class="text-xs font-bold text-white">My Courses (5 In-Progress • 29 Completed)</h4>
+              </div>
+              <button onclick="openRoadmapModal()" class="px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold active:scale-95 flex items-center gap-1 shadow-sm">
+                <span>🗺️ Major Roadmap</span>
+              </button>
+            </div>
+
+            <!-- In-Progress Courses (TOP - Cyan Theme) -->
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between text-[10px] font-bold text-cyan-300">
+                <span class="flex items-center gap-1"><span>⚡</span> <span>In-Progress (قيد الإنجاز)</span></span>
+                <span class="font-mono text-[9px] bg-cyan-500/15 text-cyan-300 px-1.5 py-0.2 rounded">5 Active</span>
+              </div>
+              <div class="grid grid-cols-1 gap-1.5">
+                <div onclick="openCourseDetailsModal('135341')" class="p-2 rounded-xl bg-slate-950/80 border border-cyan-500/30 flex items-center justify-between cursor-pointer hover:border-cyan-400">
+                  <div>
+                    <span class="text-[11px] font-bold text-white">135341 Neural Networks & Deep Learning (الشبكات العصبونية)</span>
+                    <p class="text-[9px] text-slate-400">Dr. Ahmad Khalil • Hall IT-201 • 3 Cr</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded-full border border-cyan-500/30">⏳ In Progress</span>
+                </div>
+                <div onclick="openCourseDetailsModal('135342')" class="p-2 rounded-xl bg-slate-950/80 border border-cyan-500/30 flex items-center justify-between cursor-pointer hover:border-cyan-400">
+                  <div>
+                    <span class="text-[11px] font-bold text-white">135342 Natural Language Processing (معالجة اللغات الطبيعية)</span>
+                    <p class="text-[9px] text-slate-400">Dr. Sara Mahmoud • Hall IT-204 • 3 Cr</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded-full border border-cyan-500/30">⏳ In Progress</span>
+                </div>
+                <div onclick="openCourseDetailsModal('135343')" class="p-2 rounded-xl bg-slate-950/80 border border-cyan-500/30 flex items-center justify-between cursor-pointer hover:border-cyan-400">
+                  <div>
+                    <span class="text-[11px] font-bold text-white">135343 Intelligent Mobile Robotics (الروبوتات المتنقلة الذكية)</span>
+                    <p class="text-[9px] text-slate-400">Dr. Omar Hassan • Hall IT-Robotics • 3 Cr</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded-full border border-cyan-500/30">⏳ In Progress</span>
+                </div>
+                <div onclick="openCourseDetailsModal('135312')" class="p-2 rounded-xl bg-slate-950/80 border border-cyan-500/30 flex items-center justify-between cursor-pointer hover:border-cyan-400">
+                  <div>
+                    <span class="text-[11px] font-bold text-white">135312 Algorithms (الخوارزميات)</span>
+                    <p class="text-[9px] text-slate-400">Dr. Ahmad Khalil • Hall IT-105 • 3 Cr</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded-full border border-cyan-500/30">⏳ In Progress</span>
+                </div>
+                <div onclick="openCourseDetailsModal('135321')" class="p-2 rounded-xl bg-slate-950/80 border border-cyan-500/30 flex items-center justify-between cursor-pointer hover:border-cyan-400">
+                  <div>
+                    <span class="text-[11px] font-bold text-white">135321 Big Data (البيانات الضخمة)</span>
+                    <p class="text-[9px] text-slate-400">Dr. Sara Mahmoud • Hall IT-DataLab • 3 Cr</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded-full border border-cyan-500/30">⏳ In Progress</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Completed Courses (BOTTOM - Purple/Gold Theme) -->
+            <div class="space-y-1.5 pt-2 border-t border-white/5">
+              <div class="flex items-center justify-between text-[10px] font-bold text-purple-300">
+                <span class="flex items-center gap-1"><span>🎓</span> <span>Completed & Archived (المواد المكتملة)</span></span>
+                <span class="font-mono text-[9px] bg-purple-500/15 text-purple-300 px-1.5 py-0.2 rounded">29 Passed</span>
+              </div>
+              <div class="grid grid-cols-1 gap-1.5">
+                <div onclick="openCourseDetailsModal('135240')" class="p-2 rounded-xl bg-purple-950/20 border border-purple-500/30 flex items-center justify-between cursor-pointer hover:border-purple-400">
+                  <div>
+                    <span class="text-[11px] font-semibold text-white">135240 Machine Learning (التعلم الآلي)</span>
+                    <p class="text-[9px] text-purple-300/80">3 Cr • 🔒 Locked & Archived Record</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30">✓ Passed (A)</span>
+                </div>
+                <div onclick="openCourseDetailsModal('135203')" class="p-2 rounded-xl bg-purple-950/20 border border-purple-500/30 flex items-center justify-between cursor-pointer hover:border-purple-400">
+                  <div>
+                    <span class="text-[11px] font-semibold text-white">135203 AI & Computing Systems (الذكاء الاصطناعي)</span>
+                    <p class="text-[9px] text-purple-300/80">3 Cr • 🔒 Locked & Archived Record</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30">✓ Passed (A)</span>
+                </div>
+                <div onclick="openCourseDetailsModal('135102')" class="p-2 rounded-xl bg-purple-950/20 border border-purple-500/30 flex items-center justify-between cursor-pointer hover:border-purple-400">
+                  <div>
+                    <span class="text-[11px] font-semibold text-white">135102 Fundamentals of Data Science (علم البيانات)</span>
+                    <p class="text-[9px] text-purple-300/80">3 Cr • 🔒 Locked & Archived Record</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30">✓ Passed (A)</span>
+                </div>
+                <div onclick="openCourseDetailsModal('135211')" class="p-2 rounded-xl bg-purple-950/20 border border-purple-500/30 flex items-center justify-between cursor-pointer hover:border-purple-400">
+                  <div>
+                    <span class="text-[11px] font-semibold text-white">135211 Data Structures (تراكيب البيانات)</span>
+                    <p class="text-[9px] text-purple-300/80">3 Cr • 🔒 Locked & Archived Record</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30">✓ Passed (A)</span>
+                </div>
+                <div onclick="openCourseDetailsModal('135220')" class="p-2 rounded-xl bg-purple-950/20 border border-purple-500/30 flex items-center justify-between cursor-pointer hover:border-purple-400">
+                  <div>
+                    <span class="text-[11px] font-semibold text-white">135220 Database Systems (قواعد البيانات)</span>
+                    <p class="text-[9px] text-purple-300/80">3 Cr • 🔒 Locked & Archived Record</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30">✓ Passed (A)</span>
+                </div>
+                <div onclick="openCourseDetailsModal('130100')" class="p-2 rounded-xl bg-purple-950/20 border border-purple-500/30 flex items-center justify-between cursor-pointer hover:border-purple-400">
+                  <div>
+                    <span class="text-[11px] font-semibold text-white">130100 IT Fundamentals (أساسيات تكنولوجيا المعلومات)</span>
+                    <p class="text-[9px] text-purple-300/80">3 Cr • 🔒 Locked [Deactivated Faculty]</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30">✓ Passed (A)</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        if (attWrap) {
+          attWrap.innerHTML = `
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Per-Course Attendance (5 Active AI Courses)</p>
+            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-cyan-500/30 zuj-card-shadow space-y-2">
+              <div class="flex items-start justify-between">
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-mono text-cyan-400 bg-cyan-500/10 px-1.5 py-0.2 rounded font-bold">135341</span>
+                    <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-bold">🏛️ وجاهي كامل</span>
+                    <span class="text-[9px] bg-slate-800 text-slate-300 px-1.5 rounded">3 Cr • Hall IT-201</span>
+                  </div>
+                  <h4 class="text-xs font-bold text-white mt-1">135341 Neural Networks & Deep Learning</h4>
+                  <p class="text-[10px] text-slate-400">Dr. Ahmad Khalil • Sunday 10:00</p>
+                </div>
+                <span class="text-base font-black text-emerald-400 font-mono">96%</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                <div class="h-full bg-emerald-500 rounded-full w-[96%]"></div>
+              </div>
+              <div class="flex justify-between text-[10px] text-slate-300 pt-0.5">
+                <span>✓ 22 Present • 0 Absent • 1 Late</span>
+                <span class="text-emerald-400 font-bold">Safe (0/4 Absences)</span>
+              </div>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-white/10 zuj-card-shadow space-y-2">
+              <div class="flex items-start justify-between">
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-mono text-blue-400 bg-blue-500/10 px-1.5 py-0.2 rounded font-bold">135342</span>
+                    <span class="text-[9px] px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-300 font-bold">🏛️ وجاهي كامل</span>
+                    <span class="text-[9px] bg-slate-800 text-slate-300 px-1.5 rounded">3 Cr • Hall IT-204</span>
+                  </div>
+                  <h4 class="text-xs font-bold text-white mt-1">135342 Natural Language Processing</h4>
+                  <p class="text-[10px] text-slate-400">Dr. Sara Mahmoud • Monday 09:30</p>
+                </div>
+                <span class="text-base font-black text-emerald-400 font-mono">100%</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                <div class="h-full bg-emerald-500 rounded-full w-full"></div>
+              </div>
+              <div class="flex justify-between text-[10px] text-slate-300 pt-0.5">
+                <span>✓ 20 Present • 0 Absent • 0 Late</span>
+                <span class="text-emerald-400 font-bold">Safe (0/4 Absences)</span>
+              </div>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-white/10 zuj-card-shadow space-y-2">
+              <div class="flex items-start justify-between">
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-mono text-amber-400 bg-amber-500/10 px-1.5 py-0.2 rounded font-bold">135343</span>
+                    <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-bold">🌿 مدمج (Blended)</span>
+                    <span class="text-[9px] bg-slate-800 text-slate-300 px-1.5 rounded">3 Cr • Hall IT-Robotics</span>
+                  </div>
+                  <h4 class="text-xs font-bold text-white mt-1">135343 Intelligent Mobile Robotics</h4>
+                  <p class="text-[10px] text-slate-400">Dr. Omar Hassan • Sunday 11:00</p>
+                </div>
+                <span class="text-base font-black text-emerald-400 font-mono">92%</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                <div class="h-full bg-emerald-500 rounded-full w-[92%]"></div>
+              </div>
+              <div class="flex justify-between text-[10px] text-slate-300 pt-0.5">
+                <span>✓ 19 Present • 0 Absent • 1 Late</span>
+                <span class="text-emerald-400 font-bold">Safe (0/4 Absences)</span>
+              </div>
+            </div>
+          `;
+        }
+      } else {
+        // Restore SE for Hanan
+        if (nextCard) {
+          nextCard.setAttribute('onclick', "openCourseDetailsModal('CS201')");
+          nextCard.className = "p-3.5 rounded-2xl bg-slate-900/90 border border-emerald-500/25 zuj-card-shadow space-y-2 cursor-pointer hover:border-emerald-500/50";
+          nextCard.innerHTML = `
+            <div class="flex items-center justify-between border-b border-white/5 pb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wide">Next Class • Tuesday 11:30</span>
+              </div>
+              <span class="text-[9px] font-mono bg-emerald-500/15 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30 font-semibold">
+                CS201 • Room 41
+              </span>
+            </div>
+            <div>
+              <h4 class="text-xs font-extrabold text-white">CS201 Data Structures (تراكيب البيانات)</h4>
+              <p class="text-[11px] text-slate-300 mt-0.5">Dr. Ahmad Khalil • Hall 41</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 text-[10px]">
+              <span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">
+                🏛️ وجاهي كامل (In-Person)
+              </span>
+              <span class="px-2 py-0.5 rounded-md bg-white/5 text-slate-300 font-mono">
+                3 Credit Hours
+              </span>
+              <span class="px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-300 font-mono">
+                QR Ready
+              </span>
+            </div>
+          `;
+        }
+        if (coursesWrap) {
+          coursesWrap.innerHTML = `
+            <div class="flex items-center justify-between border-b border-white/10 pb-2">
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs">📚</span>
+                <h4 class="text-xs font-bold text-white">My Courses (8 Registered)</h4>
+              </div>
+              <button onclick="openRoadmapModal()" class="px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold active:scale-95 flex items-center gap-1 shadow-sm">
+                <span>🗺️ Major Roadmap</span>
+              </button>
+            </div>
+
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between text-[10px] font-bold text-cyan-300">
+                <span class="flex items-center gap-1"><span>⚡</span> <span>In-Progress (قيد الإنجاز)</span></span>
+                <span class="font-mono text-[9px] bg-cyan-500/15 text-cyan-300 px-1.5 py-0.2 rounded">4 Active</span>
+              </div>
+              <div class="grid grid-cols-1 gap-1.5">
+                <div onclick="openCourseDetailsModal('CS201')" class="p-2 rounded-xl bg-slate-950/80 border border-cyan-500/30 flex items-center justify-between cursor-pointer hover:border-cyan-400">
+                  <div>
+                    <span class="text-[11px] font-bold text-white">CS201 Data Structures (تراكيب البيانات)</span>
+                    <p class="text-[9px] text-slate-400">Dr. Ahmad Khalil • Hall 41 • 3 Cr</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded-full border border-cyan-500/30">⏳ In Progress</span>
+                </div>
+                <div onclick="openCourseDetailsModal('CS202')" class="p-2 rounded-xl bg-slate-950/80 border border-cyan-500/30 flex items-center justify-between cursor-pointer hover:border-cyan-400">
+                  <div>
+                    <span class="text-[11px] font-bold text-white">CS202 OOP (البرمجة كائنية التوجه)</span>
+                    <p class="text-[9px] text-slate-400">Dr. Ahmad Khalil • Hall 42 • 3 Cr</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded-full border border-cyan-500/30">⏳ In Progress</span>
+                </div>
+                <div onclick="openCourseDetailsModal('PHYS102')" class="p-2 rounded-xl bg-slate-950/80 border border-cyan-500/30 flex items-center justify-between cursor-pointer hover:border-cyan-400">
+                  <div>
+                    <span class="text-[11px] font-bold text-white">PHYS102 General Physics II (الفيزياء العامة 2)</span>
+                    <p class="text-[9px] text-slate-400">Dr. Fadi Zayd • Hall 40 • 3 Cr</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded-full border border-cyan-500/30">⏳ In Progress</span>
+                </div>
+                <div onclick="openCourseDetailsModal('ENG102')" class="p-2 rounded-xl bg-slate-950/80 border border-cyan-500/30 flex items-center justify-between cursor-pointer hover:border-cyan-400">
+                  <div>
+                    <span class="text-[11px] font-bold text-white">ENG102 Technical Writing (الكتابة الفنية)</span>
+                    <p class="text-[9px] text-slate-400">Dr. Sara Mahmoud • Hall 39 • 3 Cr</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded-full border border-cyan-500/30">⏳ In Progress</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-1.5 pt-2 border-t border-white/5">
+              <div class="flex items-center justify-between text-[10px] font-bold text-purple-300">
+                <span class="flex items-center gap-1"><span>🎓</span> <span>Completed & Archived (المواد المكتملة)</span></span>
+                <span class="font-mono text-[9px] bg-purple-500/15 text-purple-300 px-1.5 py-0.2 rounded">4 Passed</span>
+              </div>
+              <div class="grid grid-cols-1 gap-1.5">
+                <div onclick="openCourseDetailsModal('CS101')" class="p-2 rounded-xl bg-purple-950/20 border border-purple-500/30 flex items-center justify-between cursor-pointer hover:border-purple-400">
+                  <div>
+                    <span class="text-[11px] font-semibold text-white">CS101 Intro to Computing (مقدمة الحاسوب)</span>
+                    <p class="text-[9px] text-purple-300/80">3 Cr • 🔒 Locked & Archived Record</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30">✓ Passed (A)</span>
+                </div>
+                <div class="p-2 rounded-xl bg-purple-950/20 border border-purple-500/30 flex items-center justify-between">
+                  <div>
+                    <span class="text-[11px] font-semibold text-white">MATH101 Calculus I (تفاضل وتكامل 1)</span>
+                    <p class="text-[9px] text-purple-300/80">3 Cr • 🔒 Locked & Archived Record</p>
+                  </div>
+                  <span class="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30">✓ Passed (A-)</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      }
+      renderAssignments();
+    }
+
     function setStudent(s) {
       currentStudent = s;
       const bH = document.getElementById('btn-user-hanan');
+      const bB = document.getElementById('btn-user-basma');
       const bA = document.getElementById('btn-user-abood');
-      if (s === 'hanan') {
-        bH.classList.add('bg-emerald-600', 'text-white');
-        bH.classList.remove('text-slate-400');
-        bA.classList.remove('bg-emerald-600', 'text-white');
-        bA.classList.add('text-slate-400');
+      const mbH = document.getElementById('m-btn-user-hanan');
+      const mbB = document.getElementById('m-btn-user-basma');
+      const mbA = document.getElementById('m-btn-user-abood');
+
+      [bH, bB, bA, mbH, mbB, mbA].forEach(b => {
+        if (!b) return;
+        b.classList.remove('bg-emerald-600', 'bg-cyan-600', 'text-white', 'shadow');
+        b.classList.add('text-slate-400');
+      });
+
+      const island = document.getElementById('island-badge');
+      const deptLabel = document.querySelector('#screen-dashboard p.text-\\[10px\\].text-slate-400');
+      const roadmapSub = document.querySelector('#roadmap-modal p.text-\\[9px\\].text-slate-300');
+
+      if (s === 'basma') {
+        if (bB) { bB.classList.add('bg-cyan-600', 'text-white', 'shadow'); bB.classList.remove('text-slate-400'); }
+        if (mbB) { mbB.classList.add('bg-cyan-600', 'text-white', 'shadow'); mbB.classList.remove('text-slate-400'); }
+        document.getElementById('hub-student-name').textContent = "Basma Hassan (بسمة حسان)";
+        document.getElementById('hub-student-id').textContent = "210029";
+        document.getElementById('hub-avatar-initials').textContent = "BH";
+        if (island && currentRole === 'student') island.textContent = "Basma • AI";
+        if (deptLabel) deptLabel.textContent = "Artificial Intelligence & Data Science (قسم الذكاء الاصطناعي)";
+        if (roadmapSub) roadmapSub.textContent = "Artificial Intelligence & Data Science • ZUJ 132 Cr Plan";
+        updateCoursesForStudent('basma');
+        loadDynamicRoadmap(210029);
+      } else if (s === 'hanan') {
+        if (bH) { bH.classList.add('bg-emerald-600', 'text-white', 'shadow'); bH.classList.remove('text-slate-400'); }
+        if (mbH) { mbH.classList.add('bg-emerald-600', 'text-white', 'shadow'); mbH.classList.remove('text-slate-400'); }
         document.getElementById('hub-student-name').textContent = "Hanan (حنان)";
         document.getElementById('hub-student-id').textContent = "240002";
         document.getElementById('hub-avatar-initials').textContent = "HA";
+        if (island && currentRole === 'student') island.textContent = "Hanan • ZUJ";
+        if (deptLabel) deptLabel.textContent = "Software Engineering Department";
+        if (roadmapSub) roadmapSub.textContent = "Software Engineering • Finished courses crossed out";
+        updateCoursesForStudent('hanan');
+        loadDynamicRoadmap(240002);
       } else {
-        bA.classList.add('bg-emerald-600', 'text-white');
-        bA.classList.remove('text-slate-400');
-        bH.classList.remove('bg-emerald-600', 'text-white');
-        bH.classList.add('text-slate-400');
+        if (bA) { bA.classList.add('bg-emerald-600', 'text-white', 'shadow'); bA.classList.remove('text-slate-400'); }
+        if (mbA) { mbA.classList.add('bg-emerald-600', 'text-white', 'shadow'); mbA.classList.remove('text-slate-400'); }
         document.getElementById('hub-student-name').textContent = "Abdualrhman (Abood)";
         document.getElementById('hub-student-id').textContent = "202212359";
         document.getElementById('hub-avatar-initials').textContent = "AB";
+        if (island && currentRole === 'student') island.textContent = "Abood • ZUJ";
+        if (deptLabel) deptLabel.textContent = "Computer Science Department";
+        updateCoursesForStudent('hanan');
       }
     }
 
@@ -1473,6 +3241,117 @@
       setTimeout(() => toast.remove(), 2500);
     }
 
+    function toggleScheduleMode(mode) {
+      const c = document.getElementById('sched-classes-container');
+      const f = document.getElementById('sched-freetime-container');
+      const btnC = document.getElementById('btn-sched-classes');
+      const btnF = document.getElementById('btn-sched-freetime');
+      if (mode === 'freetime') {
+        c?.classList.add('hidden');
+        f?.classList.remove('hidden');
+        btnF?.classList.add('bg-emerald-600', 'text-white', 'shadow');
+        btnF?.classList.remove('text-slate-400');
+        btnC?.classList.remove('bg-emerald-600', 'text-white', 'shadow');
+        btnC?.classList.add('text-slate-400');
+      } else {
+        f?.classList.add('hidden');
+        c?.classList.remove('hidden');
+        btnC?.classList.add('bg-emerald-600', 'text-white', 'shadow');
+        btnC?.classList.remove('text-slate-400');
+        btnF?.classList.remove('bg-emerald-600', 'text-white', 'shadow');
+        btnF?.classList.add('text-slate-400');
+      }
+    }
+
+    function togglePhoneFreeTimePlanner() {
+      const f = document.getElementById('phone-freetime-form');
+      const btn = document.getElementById('phone-freetime-toggle-text');
+      if (f.classList.contains('hidden')) {
+        f.classList.remove('hidden');
+        btn.textContent = 'Close';
+      } else {
+        f.classList.add('hidden');
+        btn.textContent = 'Configure';
+      }
+    }
+
+    function generatePhoneStudyPlan() {
+      const start = document.getElementById('mobile-free-start')?.value || '21:00';
+      const end = document.getElementById('mobile-free-end')?.value || '23:00';
+      const note = document.getElementById('mobile-work-note')?.value || 'طالب موظف نهاراً من 9 ص إلى 5 م';
+
+      const container = document.getElementById('chat-messages-container');
+      const userB = document.createElement('div');
+      userB.className = 'flex justify-end';
+      userB.innerHTML = `<div class="max-w-[85%] rounded-2xl rounded-tr-xs bg-emerald-600 text-white px-3.5 py-2.5 shadow-md">أنا طالب موظف، أوقات فراغي بين ${start} - ${end} مساءً، أنشئ لي خطة دراسية لموادي المسجلة</div>`;
+      container.appendChild(userB);
+
+      setTimeout(() => {
+        const botB = document.createElement('div');
+        botB.className = 'flex justify-start';
+        botB.innerHTML = `
+          <div class="max-w-[92%] rounded-2xl rounded-tl-xs bg-slate-900/95 border border-emerald-500/35 p-3 text-slate-100 shadow-xl text-[11px] space-y-2 leading-relaxed">
+            <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
+              <span class="font-bold text-white flex items-center gap-1.5">
+                <span>📅</span> <span>جدول المذاكرة الذكي لوقت الفراغ (${start} - ${end})</span>
+              </span>
+              <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-mono font-bold">10h/week</span>
+            </div>
+
+            <p class="text-[10px] text-emerald-300">
+              💡 <strong>نصيحة أوليفر:</strong> الالتزام بساعتين بتركيز 100% كل ليلة يتفوق بمراحل على مراكمة 8 ساعات دراسة مجهدة ومشتتة في عطلة نهاية الأسبوع!
+            </p>
+
+            <!-- Day Blocks -->
+            <div class="space-y-1.5 pt-1">
+              <div class="p-2 rounded-xl bg-white/[0.04] border border-white/10 space-y-1">
+                <div class="flex items-center justify-between text-[10px] font-bold text-amber-300">
+                  <span>الأحد (Sunday)</span>
+                  <span class="font-mono text-[9px] text-slate-400">CS201 + PHYS102</span>
+                </div>
+                <div class="text-[10px] text-slate-200">
+                  • <span class="font-mono text-emerald-400">${start} - 21:50:</span> <strong>CS201</strong> إنهاء تسليم واجب أشجار BST والأشجار المتوازنة AVL.<br>
+                  • <span class="font-mono text-amber-400">21:50 - 22:00:</span> ☕ استراحة استرجاع نشط (Active Recall).<br>
+                  • <span class="font-mono text-violet-400">22:00 - ${end}:</span> <strong>PHYS102</strong> حل مسائل قانون غاوس والتدفق لإنهاء الواجب المتأخر.
+                </div>
+              </div>
+
+              <div class="p-2 rounded-xl bg-white/[0.04] border border-white/10 space-y-1">
+                <div class="flex items-center justify-between text-[10px] font-bold text-emerald-300">
+                  <span>الإثنين (Monday)</span>
+                  <span class="font-mono text-[9px] text-slate-400">CS202 + CS201</span>
+                </div>
+                <div class="text-[10px] text-slate-200">
+                  • <span class="font-mono text-emerald-400">${start} - 21:50:</span> <strong>CS202 OOP</strong> تطبيق الوراثة ومخططات UML Factory Pattern.<br>
+                  • <span class="font-mono text-amber-400">21:50 - 22:00:</span> ☕ استراحة ذهنية وترطيب.<br>
+                  • <span class="font-mono text-emerald-400">22:00 - ${end}:</span> <strong>CS201</strong> حل مسألتين على LeetCode في القوائم المترابطة.
+                </div>
+              </div>
+
+              <div class="p-2 rounded-xl bg-white/[0.04] border border-white/10 space-y-1">
+                <div class="flex items-center justify-between text-[10px] font-bold text-violet-300">
+                  <span>الثلاثاء (Tuesday)</span>
+                  <span class="font-mono text-[9px] text-slate-400">PHYS102 + ENG102</span>
+                </div>
+                <div class="text-[10px] text-slate-200">
+                  • <span class="font-mono text-violet-400">${start} - 21:50:</span> <strong>PHYS102</strong> دوائر المواسعات وقوانين كيرشوف.<br>
+                  • <span class="font-mono text-slate-400">22:00 - ${end}:</span> <strong>ENG102</strong> مسودة تقرير الكتابة الفنية الأكاديمية.
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-1 text-[9px] text-slate-400 border-t border-white/10">
+              <span>الجدول متزامن مع واجباتك على المنصة</span>
+              <span class="text-emerald-400 font-bold">✨ معتمد بواسطة Oliver AI</span>
+            </div>
+          </div>
+        `;
+        container.appendChild(botB);
+        container.scrollTop = container.scrollHeight;
+        showToast('تم توليد خطة وقت الفراغ (9 - 11 PM) بنجاح!');
+      }, 400);
+    }
+
     function handleChatSubmit(e) {
       e.preventDefault();
       const input = document.getElementById('chat-input');
@@ -1493,7 +3372,67 @@
       container.scrollTop = container.scrollHeight;
 
       setTimeout(() => {
-        let reply = "Verified against <strong>ZUJ Bylaws 2026</strong>: 125 curriculum courses loaded. Attendance is tracked per course with 15% Article 14 limit.";
+        let reply = '';
+        const qLower = q.toLowerCase();
+
+        if (qLower.includes('cs201') || qLower.includes('تراكيب') || qLower.includes('russian') || qLower.includes('روسي') || qLower.includes('strategy') || qLower.includes('استراتيجية')) {
+          reply = `
+            <div class="space-y-2">
+              <div class="flex items-center justify-between border-b border-white/10 pb-1">
+                <span class="font-bold text-emerald-400 flex items-center gap-1">
+                  <span>🌐</span> <span>استراتيجية ومصادر تراكيب البيانات CS201</span>
+                </span>
+                <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">7h/week</span>
+              </div>
+              <p>💡 <strong>خارطة الطريق:</strong> رسم المؤشرات على الورق، إتقان القوائم والـ Stacks، ثم حالات دوران الأشجار المتوازنة AVL الأربعة.</p>
+              
+              <div class="p-2 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-[10px] space-y-1">
+                <p class="font-bold text-emerald-300">🎬 أفضل الفيديوهات العالمية:</p>
+                <p>• <a href="https://www.youtube.com/playlist?list=PLDN4rrl48XKpZkf03iYFl-O29szjTrs_O" target="_blank" class="underline text-emerald-400 font-semibold">سلسلة عبد الباري (Abdul Bari):</a> الشرح المرئي الأقوى لـ AVL Rotations وإثباتات Big-O.</p>
+                <p>• <a href="https://www.youtube.com/results?search_query=data+structures+adel+nasim+c%2B%2B" target="_blank" class="underline text-emerald-400 font-semibold">سلسلة عادل نسيم (عربي):</a> تطبيق مباشر على المؤشرات ونماذج امتحانات الجامعات الأردنية.</p>
+              </div>
+
+              <div class="p-2 rounded-lg bg-amber-950/30 border border-amber-500/30 text-[10px] space-y-1">
+                <p class="font-bold text-amber-300">📖 مقال تقني روسي مترجم للعربية:</p>
+                <p>• <span class="bg-amber-500/20 px-1 rounded text-[9px] text-amber-200">🇷🇺 من منصة Habr / Stepik الروسية:</span> "أشجار البحث المتوازنة وخوارزميات موازنة AVL" - يشرح متى نطبق الدوران المزدوج وحساب عامل التوازن Balance Factor = h(L) - h(R).</p>
+              </div>
+
+              <div class="p-2 rounded-lg bg-blue-950/40 border border-blue-500/30 text-[10px] space-y-0.5">
+                <p class="font-bold text-blue-300">💡 خلاصة طلاب Reddit الأوائل:</p>
+                <p>80% من أخطاء الامتحانات هي Null Pointer Dereference؛ ارسم المؤشرات على الورق قبل كتابة أي كود.</p>
+              </div>
+            </div>
+          `;
+        } else if (qLower.includes('phys') || qLower.includes('فيزياء') || qLower.includes('physics') || qLower.includes('gauss') || qLower.includes('غاوس')) {
+          reply = `
+            <div class="space-y-2">
+              <div class="flex items-center justify-between border-b border-white/10 pb-1">
+                <span class="font-bold text-violet-400 flex items-center gap-1">
+                  <span>🎥</span> <span>استراتيجية الفيزياء العامة 2 (PHYS102)</span>
+                </span>
+                <span class="text-[9px] px-1.5 py-0.2 rounded bg-violet-500/20 text-violet-300 font-mono">6h/week</span>
+              </div>
+              <p>💡 <strong>القاعدة الذهبية:</strong> الجهد V كمية قياسية (جمع جبري بسيط)، بينما المجال E كمية متجهة تتطلب تحليل المركبات السينية والصادية.</p>
+              
+              <div class="p-2 rounded-lg bg-violet-950/40 border border-violet-500/30 text-[10px] space-y-1">
+                <p class="font-bold text-violet-300">🎬 المحاضرات والمسائل:</p>
+                <p>• <a href="https://www.youtube.com/playlist?list=PLyQSN7X0g3311A6WnZz2eS9_Pz55P2Z" target="_blank" class="underline text-violet-400 font-semibold">Walter Lewin (MIT):</a> تجارب حية لقانون غاوس والمجالات الكهربائية.</p>
+                <p>• <a href="https://www.youtube.com/user/ilectureonline" target="_blank" class="underline text-violet-400 font-semibold">Michel van Biezen:</a> حلول مسائل التدفق وتوزيع الشحنات الكروية والأسطوانية.</p>
+              </div>
+
+              <div class="p-2 rounded-lg bg-amber-950/30 border border-amber-500/30 text-[10px]">
+                <p class="font-bold text-amber-300">🇷🇺 الأولمبياد الفيزيائي الروسي (مترجم):</p>
+                <p>"قانون غاوس لا يفيد كأداة حسابية إلا إذا وجد تماثل يسمح بإخراج المجال E خارج التكامل السطحي."</p>
+              </div>
+            </div>
+          `;
+        } else if (qLower.includes('free') || qLower.includes('فراغ') || qLower.includes('9 - 11') || qLower.includes('9-11') || qLower.includes('موظف')) {
+          generatePhoneStudyPlan();
+          return;
+        } else {
+          reply = "تم التحقق وفق <strong>لوائح جامعة الزيتونة الأردنية 2026</strong>: الخطة الدراسية (133 ساعة معتمدة) متزامنة، ونسبة الغياب المسموحة وفق المادة 14 هي 15% بحد أقصى (4 محاضرات).";
+        }
+
         const botB = document.createElement('div');
         botB.className = 'flex justify-start';
         botB.innerHTML = `<div class="max-w-[88%] rounded-2xl rounded-tl-xs bg-slate-900/90 border border-emerald-500/25 px-3.5 py-2.5 text-slate-100 shadow-md text-[11px] leading-relaxed">${reply}</div>`;
@@ -1502,7 +3441,373 @@
       }, 350);
     }
 
-    // Initialize
+    // Degree Roadmap Modal Controls & Dynamic API Loader
+    async function loadDynamicRoadmap(targetId) {
+      const studentId = targetId || (currentStudent === 'basma' ? 210029 : 240002);
+      try {
+        const url = '/api/trpc/courses.getMajorDegreeRoadmap?input=' + encodeURIComponent(JSON.stringify({ json: { studentId } }));
+        const res = await fetch(url);
+        if (!res.ok) return;
+        const jsonRes = await res.json();
+        const payload = jsonRes?.result?.data?.json || jsonRes?.result?.data;
+        if (!payload || !payload.summary || !payload.families) return;
+
+        const summary = payload.summary;
+        const families = payload.families;
+
+        // Update modal title subtitle
+        const roadmapSub = document.querySelector('#roadmap-modal p.text-\\[9px\\].text-slate-300');
+        if (roadmapSub) {
+          roadmapSub.textContent = `${summary.majorNameEn} • Finished courses crossed out`;
+        }
+
+        // Update progress numbers
+        const headerInfo = document.querySelector('#roadmap-modal .flex.justify-between.text-\\[10px\\]');
+        if (headerInfo) {
+          headerInfo.innerHTML = `
+            <span>Passed: <strong class="text-emerald-400">${summary.completedCredits} Cr (${summary.overallProgressPct}%)</strong></span>
+            <span>In Progress: <strong class="text-cyan-400">${summary.inProgressCredits} Cr</strong></span>
+            <span>Remaining: <strong class="text-amber-400">${summary.remainingCredits} Cr</strong></span>
+          `;
+        }
+        const progBar = document.querySelector('#roadmap-modal .w-full.bg-slate-800.h-2');
+        if (progBar) {
+          const pPct = Math.round((summary.completedCredits / summary.totalDegreeCredits) * 100);
+          const ipPct = Math.round((summary.inProgressCredits / summary.totalDegreeCredits) * 100);
+          const remPct = Math.max(0, 100 - pPct - ipPct);
+          progBar.innerHTML = `
+            <div class="bg-emerald-500 h-full" style="width: ${pPct}%" title="Passed ${summary.completedCredits} Cr"></div>
+            <div class="bg-cyan-400 h-full animate-pulse" style="width: ${ipPct}%" title="In Progress ${summary.inProgressCredits} Cr"></div>
+            <div class="bg-slate-700 h-full" style="width: ${remPct}%"></div>
+          `;
+        }
+
+        // Render families into #roadmap-families-container
+        const famContainer = document.getElementById('roadmap-families-container');
+        if (famContainer) {
+          famContainer.innerHTML = families.map((fam, idx) => {
+            const badgeClass = fam.isFinished
+              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+              : fam.inProgressCredits > 0
+              ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+              : 'bg-slate-800 text-slate-400 border-white/10';
+
+            const coursesHtml = fam.courses.map(c => {
+              if (c.status === 'completed') {
+                return `
+                  <div onclick="openCourseDetailsModal('${c.cleanCode || c.code}')" class="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/40 flex items-center justify-between cursor-pointer hover:bg-emerald-900/30">
+                    <div>
+                      <p class="font-semibold text-white line-through text-slate-300 flex items-center gap-1">
+                        <span>${c.code} ${c.nameEn || c.nameAr}</span>
+                        <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/30 text-emerald-300 font-mono font-bold no-underline">Grade: ${c.grade || 'A'}</span>
+                      </p>
+                      <p class="text-[9px] text-slate-400">${c.credits} Cr • ${c.modalityAr || c.modality} • Passed ✓</p>
+                    </div>
+                    <span class="text-xs text-emerald-400 font-bold">✓</span>
+                  </div>
+                `;
+              } else if (c.status === 'in_progress') {
+                return `
+                  <div onclick="openCourseDetailsModal('${c.cleanCode || c.code}')" class="p-2 rounded-xl bg-cyan-950/40 border border-cyan-500/50 flex items-center justify-between cursor-pointer hover:bg-cyan-900/30 ring-1 ring-cyan-500/30">
+                    <div>
+                      <p class="font-semibold text-white flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                        <span>${c.code} ${c.nameEn || c.nameAr}</span>
+                        <span class="text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/30 text-cyan-200 font-mono font-bold">In Progress</span>
+                      </p>
+                      <p class="text-[9px] text-cyan-300/80">${c.credits} Cr • ${c.modalityAr || c.modality} • Current Semester ⏳</p>
+                    </div>
+                    <span class="text-xs text-cyan-400 font-bold">⏳</span>
+                  </div>
+                `;
+              } else {
+                return `
+                  <div class="p-2 rounded-xl bg-slate-950/60 border border-white/5 flex items-center justify-between opacity-80">
+                    <div>
+                      <p class="font-medium text-slate-300">${c.code} ${c.nameEn || c.nameAr}</p>
+                      <p class="text-[9px] text-slate-500">${c.credits} Cr • ${c.modalityAr || c.modality}${c.prerequisite ? ' • Prereq: ' + c.prerequisite : ''}</p>
+                    </div>
+                    <span class="text-[10px] text-slate-500 font-mono">Not Enrolled</span>
+                  </div>
+                `;
+              }
+            }).join('');
+
+            return `
+              <div class="p-3 rounded-2xl bg-slate-950/80 border border-white/10 space-y-2">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h5 class="text-xs font-bold text-white">${idx + 1}. ${fam.titleEn} (${fam.titleAr})</h5>
+                    <p class="text-[9px] text-slate-400">Required: ${fam.requiredCredits} Cr • ${fam.coursesCount} Courses</p>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${badgeClass}">
+                    ${fam.statusLabelEn} (${fam.completedCredits} / ${fam.requiredCredits} Cr • ${fam.progressPct}%)
+                  </span>
+                </div>
+                <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden flex">
+                  <div class="bg-emerald-500 h-full" style="width: ${fam.progressPct}%"></div>
+                  <div class="bg-cyan-400 h-full" style="width: ${Math.min(100 - fam.progressPct, Math.round((fam.inProgressCredits / fam.requiredCredits) * 100))}%"></div>
+                </div>
+                <div class="space-y-1.5 pt-1">
+                  ${coursesHtml}
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        console.warn('Could not load dynamic roadmap:', err);
+      }
+    }
+
+    function openRoadmapModal() {
+      document.getElementById('roadmap-modal')?.classList.remove('hidden');
+      loadDynamicRoadmap(currentStudent === 'basma' ? 210029 : 240002);
+    }
+    function closeRoadmapModal() {
+      document.getElementById('roadmap-modal')?.classList.add('hidden');
+    }
+    function switchRoadmapView(mode) {
+      const famContainer = document.getElementById('roadmap-families-container');
+      const semContainer = document.getElementById('roadmap-semesters-view');
+      const famBtn = document.getElementById('rf-mode-families');
+      const semBtn = document.getElementById('rf-mode-semesters');
+
+      if (mode === 'families') {
+        if (famContainer) famContainer.classList.remove('hidden');
+        if (semContainer) semContainer.classList.add('hidden');
+        famBtn?.classList.add('bg-emerald-600', 'text-white', 'shadow');
+        famBtn?.classList.remove('text-slate-400');
+        semBtn?.classList.remove('bg-emerald-600', 'text-white', 'shadow');
+        semBtn?.classList.add('text-slate-400');
+      } else {
+        if (famContainer) famContainer.classList.add('hidden');
+        if (semContainer) semContainer.classList.remove('hidden');
+        semBtn?.classList.add('bg-emerald-600', 'text-white', 'shadow');
+        semBtn?.classList.remove('text-slate-400');
+        famBtn?.classList.remove('bg-emerald-600', 'text-white', 'shadow');
+        famBtn?.classList.add('text-slate-400');
+      }
+    }
+    function filterRoadmap(category) {
+      const blocks = document.querySelectorAll('.roadmap-sem-block');
+      const allBtn = document.getElementById('rf-btn-all');
+      const passBtn = document.getElementById('rf-btn-passed');
+      const currBtn = document.getElementById('rf-btn-current');
+      const upBtn = document.getElementById('rf-btn-upcoming');
+
+      [allBtn, passBtn, currBtn, upBtn].forEach(b => {
+        b?.classList.remove('bg-indigo-600', 'text-white', 'shadow');
+        b?.classList.add('text-slate-400');
+      });
+
+      if (category === 'all') {
+        allBtn?.classList.add('bg-indigo-600', 'text-white', 'shadow');
+        allBtn?.classList.remove('text-slate-400');
+        blocks.forEach(b => { b.style.display = 'block'; });
+      } else if (category === 'passed') {
+        passBtn?.classList.add('bg-indigo-600', 'text-white', 'shadow');
+        passBtn?.classList.remove('text-slate-400');
+        blocks.forEach(b => {
+          b.style.display = (b.getAttribute('data-category') === 'passed') ? 'block' : 'none';
+        });
+      } else if (category === 'current') {
+        currBtn?.classList.add('bg-indigo-600', 'text-white', 'shadow');
+        currBtn?.classList.remove('text-slate-400');
+        blocks.forEach(b => {
+          b.style.display = (b.getAttribute('data-category') === 'current') ? 'block' : 'none';
+        });
+      } else if (category === 'upcoming') {
+        upBtn?.classList.add('bg-indigo-600', 'text-white', 'shadow');
+        upBtn?.classList.remove('text-slate-400');
+        blocks.forEach(b => {
+          b.style.display = (b.getAttribute('data-category') === 'upcoming') ? 'block' : 'none';
+        });
+      }
+    }
+
+    // AI Analytics & Study Plan Graphs Modal Controls
+    function openAiGraphsModal() {
+      document.getElementById('ai-graphs-modal')?.classList.remove('hidden');
+    }
+    function closeAiGraphsModal() {
+      document.getElementById('ai-graphs-modal')?.classList.add('hidden');
+    }
+
+    // Schedule Day Filter (Wednesday / Tuesday / Sunday / All)
+    function filterScheduleDay(day) {
+      const gWed = document.getElementById('sched-group-wednesday');
+      const gTue = document.getElementById('sched-group-tuesday');
+      const gSun = document.getElementById('sched-group-sunday');
+      const title = document.getElementById('timeline-graph-title');
+
+      const bAll = document.getElementById('btn-day-all');
+      const bWed = document.getElementById('btn-day-wednesday');
+      const bTue = document.getElementById('btn-day-tuesday');
+      const bSun = document.getElementById('btn-day-sunday');
+
+      [bAll, bWed, bTue, bSun].forEach(b => {
+        b?.classList.remove('bg-emerald-600', 'text-white', 'shadow');
+        b?.classList.add('text-slate-400');
+      });
+
+      if (day === 'all') {
+        bAll?.classList.add('bg-emerald-600', 'text-white', 'shadow');
+        bAll?.classList.remove('text-slate-400');
+        if (gWed) gWed.style.display = 'block';
+        if (gTue) gTue.style.display = 'block';
+        if (gSun) gSun.style.display = 'block';
+        if (title) title.textContent = "Weekly Schedule Timeline & Breaks";
+      } else if (day === 'wednesday') {
+        bWed?.classList.add('bg-emerald-600', 'text-white', 'shadow');
+        bWed?.classList.remove('text-slate-400');
+        if (gWed) gWed.style.display = 'block';
+        if (gTue) gTue.style.display = 'none';
+        if (gSun) gSun.style.display = 'none';
+        if (title) title.textContent = "Wednesday Timeline & Break Graph";
+      } else if (day === 'tuesday') {
+        bTue?.classList.add('bg-emerald-600', 'text-white', 'shadow');
+        bTue?.classList.remove('text-slate-400');
+        if (gWed) gWed.style.display = 'none';
+        if (gTue) gTue.style.display = 'block';
+        if (gSun) gSun.style.display = 'none';
+        if (title) title.textContent = "Tuesday Timeline & Lunch Break";
+      } else if (day === 'sunday') {
+        bSun?.classList.add('bg-emerald-600', 'text-white', 'shadow');
+        bSun?.classList.remove('text-slate-400');
+        if (gWed) gWed.style.display = 'none';
+        if (gTue) gTue.style.display = 'none';
+        if (gSun) gSun.style.display = 'block';
+        if (title) title.textContent = "Sunday Timeline & Research Break";
+      }
+    }
+
+    
+    // Course Details Template & Deactivated Doctor Controls
+    let activePhoneCourseCode = 'CS201';
+    let isPhoneDoctorDeactivated = false;
+
+    const ALL_COURSES_META = {
+      // In-Progress AI Courses (Spring 2026)
+      '135341': { code: '135341', name: "135341 Neural Networks & Deep Learning (الشبكات العصبونية والتعلم العميق)", doc: "Dr. Ahmad Khalil", title: "Associate Professor of AI & Deep Learning", isCompleted: false },
+      '135342': { code: '135342', name: "135342 Natural Language Processing (معالجة اللغات الطبيعية)", doc: "Dr. Sara Mahmoud", title: "Assistant Professor of Data Science & NLP", isCompleted: false },
+      '135343': { code: '135343', name: "135343 Intelligent Mobile Robotics (الروبوتات المتنقلة الذكية)", doc: "Dr. Omar Hassan", title: "Assistant Professor of Robotics & Automation", isCompleted: false },
+      '135312': { code: '135312', name: "135312 Algorithms (الخوارزميات)", doc: "Dr. Ahmad Khalil", title: "Associate Professor of Computer Science", isCompleted: false },
+      '135321': { code: '135321', name: "135321 Big Data (البيانات الضخمة)", doc: "Dr. Sara Mahmoud", title: "Assistant Professor of Data Science", isCompleted: false },
+
+      // Completed AI Courses
+      '135240': { code: '135240', name: "135240 Machine Learning (التعلم الآلي)", doc: "Dr. Ahmad Khalil", title: "Associate Professor of AI", isCompleted: true, grade: 'A' },
+      '135203': { code: '135203', name: "135203 AI & Computing Systems (الذكاء الاصطناعي ونظم الحوسبة)", doc: "Dr. Ahmad Khalil", title: "Associate Professor of AI", isCompleted: true, grade: 'A' },
+      '135102': { code: '135102', name: "135102 Fundamentals of Data Science (أساسيات علم البيانات)", doc: "Dr. Sara Mahmoud", title: "Assistant Professor of Data Science", isCompleted: true, grade: 'A' },
+      '135211': { code: '135211', name: "135211 Data Structures (تراكيب البيانات)", doc: "Dr. Ahmad Khalil", title: "Associate Professor", isCompleted: true, grade: 'A' },
+      '135220': { code: '135220', name: "135220 Database Systems (قواعد البيانات)", doc: "Dr. Ahmad Khalil", title: "Associate Professor", isCompleted: true, grade: 'A' },
+      '135326': { code: '135326', name: "135326 Computer Vision (الرؤية الحاسوبية)", doc: "Dr. Ahmad Khalil", title: "Associate Professor", isCompleted: true, grade: 'A-' },
+      '130100': { code: '130100', name: "130100 IT Fundamentals (أساسيات تكنولوجيا المعلومات)", doc: "Dr. Samir Al-Najjar", title: "Former Faculty Member [Deactivated]", isCompleted: true, isDeactivated: true, grade: 'A' },
+
+      // SE Courses (Hanan)
+      'CS201': { code: 'CS201', name: "CS201 Data Structures (تراكيب البيانات)", doc: "Dr. Ahmad Khalil", title: "Associate Professor", isCompleted: false },
+      'CS202': { code: 'CS202', name: "CS202 OOP (البرمجة كائنية التوجه)", doc: "Dr. Ahmad Khalil", title: "Associate Professor", isCompleted: false },
+      'PHYS102': { code: 'PHYS102', name: "PHYS102 General Physics II (الفيزياء العامة 2)", doc: "Dr. Fadi Zayd", title: "Associate Professor of Physics", isCompleted: false },
+      'ENG102': { code: 'ENG102', name: "ENG102 Technical Writing (الكتابة الفنية)", doc: "Dr. Sara Mahmoud", title: "Assistant Professor", isCompleted: false },
+      'CS101': { code: 'CS101', name: "CS101 Intro to Computing (مقدمة الحاسوب)", doc: "Dr. Samir Al-Najjar", title: "Former Faculty Member [Deactivated]", isCompleted: true, isDeactivated: true, grade: 'A' },
+    };
+
+    function openCourseDetailsModal(courseCode = 'CS201') {
+      activePhoneCourseCode = courseCode;
+      const modal = document.getElementById('course-details-modal');
+      const titleEl = document.getElementById('cd-modal-title');
+      const codeEl = document.getElementById('cd-modal-code');
+      const lockedBanner = document.getElementById('cd-modal-locked-banner');
+      const docNameEl = document.getElementById('cd-modal-doc-name');
+      const docTitleEl = document.getElementById('cd-modal-doc-title');
+      const deactBadge = document.getElementById('cd-modal-doc-deactivated-badge');
+      const deactBox = document.getElementById('cd-modal-doc-deactivated-box');
+      const activeBox = document.getElementById('cd-modal-doc-active-box');
+      const addBtn = document.getElementById('cd-modal-doctor-add-btn');
+
+      const meta = ALL_COURSES_META[courseCode] || {
+        code: courseCode,
+        name: `${courseCode} Course Details`,
+        doc: "Dr. Ahmad Khalil",
+        title: "Associate Professor",
+        isCompleted: false
+      };
+
+      if (codeEl) codeEl.textContent = meta.code;
+      if (titleEl) titleEl.textContent = meta.name;
+
+      if (meta.isCompleted) {
+        if (lockedBanner) lockedBanner.classList.remove('hidden');
+        if (addBtn) addBtn.classList.add('hidden');
+
+        if (docNameEl) docNameEl.textContent = meta.doc;
+        if (docTitleEl) docTitleEl.textContent = meta.title;
+
+        if (meta.isDeactivated || isPhoneDoctorDeactivated) {
+          if (deactBadge) deactBadge.classList.remove('hidden');
+          if (deactBox) deactBox.classList.remove('hidden');
+          if (activeBox) activeBox.classList.add('hidden');
+        } else {
+          if (deactBadge) deactBadge.classList.add('hidden');
+          if (deactBox) deactBox.classList.add('hidden');
+          if (activeBox) activeBox.classList.remove('hidden');
+        }
+
+        const asgnBadge = document.querySelector('#course-details-modal [onclick*="submit"]');
+        if (asgnBadge) {
+          asgnBadge.outerHTML = '<span class="text-[9px] font-mono text-slate-400 font-bold bg-slate-800/80 px-2 py-0.5 rounded border border-white/10 select-none">🔒 Closed (Course Completed)</span>';
+        }
+      } else {
+        if (lockedBanner) lockedBanner.classList.add('hidden');
+        if (addBtn) addBtn.classList.add('hidden');
+
+        if (docNameEl) docNameEl.textContent = meta.doc;
+        if (docTitleEl) docTitleEl.textContent = meta.title;
+
+        if (isPhoneDoctorDeactivated) {
+          if (deactBadge) deactBadge.classList.remove('hidden');
+          if (deactBox) deactBox.classList.remove('hidden');
+          if (activeBox) activeBox.classList.add('hidden');
+        } else {
+          if (deactBadge) deactBadge.classList.add('hidden');
+          if (deactBox) deactBox.classList.add('hidden');
+          if (activeBox) activeBox.classList.remove('hidden');
+        }
+      }
+
+      modal?.classList.remove('hidden');
+    }
+
+    function closeCourseDetailsModal() {
+      document.getElementById('course-details-modal')?.classList.add('hidden');
+    }
+
+    function togglePhoneDoctorDeactivated() {
+      isPhoneDoctorDeactivated = !isPhoneDoctorDeactivated;
+      showToast(isPhoneDoctorDeactivated ? "Faculty Deactivated: contact details hidden" : "Faculty Active: contact details visible");
+      openCourseDetailsModal(activePhoneCourseCode);
+    }
+
+    function openDoctorAddMaterialModal() {
+      showToast("⚠️ Access Denied: Students cannot add or edit course materials, assignments, or exams. Restricted to instructors.");
+      return;
+    }
+
+    function closeDoctorAddMaterialModal() {
+      document.getElementById('doctor-add-material-modal')?.classList.add('hidden');
+    }
+
+    function saveDoctorMaterialFromPhone() {
+      const type = document.getElementById('m-add-type')?.value || 'slides';
+      const chapter = document.getElementById('m-add-chapter')?.value || '1';
+      const title = document.getElementById('m-add-title')?.value || 'New Lecture Slide';
+      const filename = document.getElementById('m-add-filename')?.value || 'Lecture_Slide.pdf';
+
+      showToast(`Added ${type.toUpperCase()} to Chapter ${chapter} successfully!`);
+      closeDoctorAddMaterialModal();
+    }
+
+// Initialize
     renderAssignments();
   </script>
 </body>

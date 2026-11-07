@@ -8,11 +8,114 @@ import { TRPCError } from "@trpc/server";
 import { invokeLLM } from "../_core/llm";
 import { generateLocalFallbackResponse, getAiServiceStatus } from "../utils/aiFallback";
 import { buildOliverSystemPrompt } from "../utils/oliverSystemPrompt";
+import { getCourseStudyStrategy, formatStudyStrategyToMarkdown } from "../utils/studyStrategyEngine";
+import { buildFreeTimePlan, formatFreeTimePlanToMarkdown } from "../utils/freeTimePlanner";
+import { searchDoctorCourseMaterialsRAG } from "../utils/courseMaterialKnowledgeRAG";
 
 export const aiChatRouter = router({
   getStatus: publicProcedure.query(async () => {
     return await getAiServiceStatus();
   }),
+
+  getCourseStudyStrategy: protectedProcedure
+    .input(
+      z.object({
+        courseCode: z.string().optional(),
+        courseName: z.string().optional(),
+        query: z.string().optional(),
+        language: z.enum(["ar", "en"]).optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const strategy = await getCourseStudyStrategy({
+        courseCode: input.courseCode,
+        courseName: input.courseName,
+        query: input.query,
+        language: input.language,
+      });
+      const markdown = formatStudyStrategyToMarkdown(strategy);
+      return {
+        strategy,
+        markdown,
+      };
+    }),
+
+  generateFreeTimeStudyPlan: protectedProcedure
+    .input(
+      z.object({
+        freeTimeStart: z.string().default("21:00"),
+        freeTimeEnd: z.string().default("23:00"),
+        workScheduleNote: z.string().optional(),
+        selectedCourseCodes: z.array(z.string()).optional(),
+        sessionStyle: z.enum(["pomodoro", "deep_work", "balanced"]).optional(),
+        daysOfWeek: z.array(z.string()).optional(),
+        language: z.enum(["ar", "en"]).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Database unavailable",
+        });
+
+      if (!ctx.user || ctx.user.role !== "student") {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      // Fetch student courses & assignments (prioritizing current enrolled / in-progress & retakes)
+      const enrollments = await db.select().from(studentCourses).where(eq(studentCourses.studentId, ctx.user.id));
+      const activeEnrollments = enrollments.filter((e: any) => e.status === "in_progress" || e.status === "enrolled" || e.status === "failed" || e.grade === "F");
+      const chosenEnrollments = activeEnrollments.length > 0 ? activeEnrollments : enrollments;
+      const courseIds = chosenEnrollments.map((e: any) => e.courseId);
+      const courseDetails = courseIds.length > 0 ? await db.select().from(courses).where(inArray(courses.id, courseIds)) : [];
+      
+      const studentAsgns = await db.select({
+        title: assignments.title,
+        status: studentAssignments.status,
+        dueDate: assignments.dueDate,
+        courseId: assignments.courseId,
+      })
+      .from(studentAssignments)
+      .leftJoin(assignments, eq(studentAssignments.assignmentId, assignments.id))
+      .where(eq(studentAssignments.studentId, ctx.user.id));
+
+      const assignmentsWithCode = studentAsgns.map(sa => {
+        const c = courseDetails.find(cd => cd.id === sa.courseId);
+        return {
+          title: sa.title || "Assignment",
+          courseCode: c?.code || "CS201",
+          dueDate: sa.dueDate ? String(sa.dueDate) : undefined,
+          status: sa.status || "pending",
+        };
+      });
+
+      const plan = buildFreeTimePlan({
+        input: {
+          freeTimeStart: input.freeTimeStart,
+          freeTimeEnd: input.freeTimeEnd,
+          workScheduleNote: input.workScheduleNote,
+          selectedCourseCodes: input.selectedCourseCodes,
+          sessionStyle: input.sessionStyle,
+          daysOfWeek: input.daysOfWeek,
+          language: input.language,
+        },
+        studentContext: {
+          name: ctx.user.name || undefined,
+          courses: courseDetails.map(c => ({ code: c.code, name: c.name, credits: c.credits })),
+          assignments: assignmentsWithCode,
+        },
+      });
+
+      const markdown = formatFreeTimePlanToMarkdown(plan, input.language || "ar");
+
+      return {
+        success: true,
+        plan,
+        markdown,
+      };
+    }),
 
   createConversation: protectedProcedure
     .input(
@@ -275,11 +378,114 @@ export const aiChatRouter = router({
         let isOfflineFallback = true;
         let source: "faq" | "academic_rules" | "local_advisor" | "external_llm" = "local_advisor";
 
-        
+        const normMsg = input.message.toLowerCase();
+        const arabicChars = (input.message.match(/[\u0600-\u06FF]/g) || []).length;
+        const englishChars = (input.message.match(/[a-zA-Z]/g) || []).length;
+        const isArabic = arabicChars > englishChars;
+        const studentLang: "ar" | "en" = isArabic ? "ar" : "en";
+
+        // 1. TOP PRIORITY (SCORE: 100+): Retrieve & Score Doctor Course Materials
+        const doctorMaterialsRAG = await searchDoctorCourseMaterialsRAG({
+          db,
+          studentId: ctx.user.id,
+          query: input.message,
+          language: studentLang,
+        });
+
+        // Check for Free-Time Study Planning Intent (e.g. 9 PM - 11 PM working student)
+        const isFreeTimeIntent =
+          normMsg.includes("وقت فراغ") ||
+          normMsg.includes("free time") ||
+          normMsg.includes("9 - 11") ||
+          normMsg.includes("9-11") ||
+          normMsg.includes("9 to 11") ||
+          normMsg.includes("9 حتى 11") ||
+          normMsg.includes("21:00") ||
+          (normMsg.includes("موظف") && normMsg.includes("وقت")) ||
+          (normMsg.includes("طالب موظف") && normMsg.includes("جدول")) ||
+          (normMsg.includes("work") && normMsg.includes("free") && normMsg.includes("plan"));
+
+        // Check for Internet-Grounded Course Study Strategy Intent (e.g. videos, translated Russian articles, Reddit)
+        const isStudyStrategyIntent =
+          normMsg.includes("strategy") ||
+          normMsg.includes("استراتيجية") ||
+          normMsg.includes("طريقة دراسة") ||
+          normMsg.includes("كيف ادرس") ||
+          normMsg.includes("كيف أدرس") ||
+          normMsg.includes("فيديو") ||
+          normMsg.includes("مقالات") ||
+          normMsg.includes("مصادر") ||
+          normMsg.includes("مراجع") ||
+          normMsg.includes("روسي") ||
+          normMsg.includes("russian") ||
+          normMsg.includes("best study") ||
+          (normMsg.includes("شرح") && (normMsg.includes("مادة") || normMsg.includes("cs") || normMsg.includes("تراكيب") || normMsg.includes("فيزياء") || normMsg.includes("تفاضل")));
+
+        if (isFreeTimeIntent) {
+          const studentAsgns = await db.select({
+            title: assignments.title,
+            status: studentAssignments.status,
+            dueDate: assignments.dueDate,
+            courseId: assignments.courseId,
+          })
+          .from(studentAssignments)
+          .leftJoin(assignments, eq(studentAssignments.assignmentId, assignments.id))
+          .where(eq(studentAssignments.studentId, ctx.user.id));
+
+          const assignmentsWithCode = studentAsgns.map(sa => {
+            const c = courseDetails.find((cd: any) => cd.id === sa.courseId);
+            return {
+              title: sa.title || "Assignment",
+              courseCode: c?.code || "CS201",
+              dueDate: sa.dueDate ? String(sa.dueDate) : undefined,
+              status: sa.status || "pending",
+            };
+          });
+
+          const plan = buildFreeTimePlan({
+            input: {
+              freeTimeStart: "21:00",
+              freeTimeEnd: "23:00",
+              workScheduleNote: isArabic ? "طالب موظف نهاراً - وقت الفراغ 9:00 إلى 11:00 مساءً" : "Working student with dedicated 9:00 PM - 11:00 PM evening study window",
+              language: studentLang,
+            },
+            studentContext: {
+              name: student?.name || "Student",
+              courses: (courseDetails.filter((c: any) => {
+                const enroll: any = enrollments.find((e: any) => e.courseId === c.id);
+                const s = String(enroll?.status || "");
+                return s === "in_progress" || s === "enrolled" || s === "failed" || enroll?.grade === "F";
+              }).length > 0 
+                ? courseDetails.filter((c: any) => {
+                    const enroll: any = enrollments.find((e: any) => e.courseId === c.id);
+                    const s = String(enroll?.status || "");
+                    return s === "in_progress" || s === "enrolled" || s === "failed" || enroll?.grade === "F";
+                  })
+                : courseDetails).map((c: any) => ({ code: c.code, name: c.name, credits: c.credits })),
+              assignments: assignmentsWithCode,
+            },
+          });
+
+          aiMessage = formatFreeTimePlanToMarkdown(plan, studentLang);
+          source = "local_advisor";
+          isOfflineFallback = false;
+        } else if (isStudyStrategyIntent) {
+          const strategy = await getCourseStudyStrategy({
+            query: input.message,
+            language: studentLang,
+            doctorMaterials: doctorMaterialsRAG.matches,
+          });
+
+          aiMessage = formatStudyStrategyToMarkdown(strategy);
+          source = "external_llm";
+          isOfflineFallback = false;
+        }
+
         // 1. Priority: Local Private Ollama on RTX 3050 (100% Data Privacy)
-        const ollamaUrl = process.env.OLLAMA_API_URL || "http://127.0.0.1:11434";
-        let targetModel = process.env.OLLAMA_MODEL || "oliver-zuj:latest";
-        try {
+        if (!aiMessage) {
+          const ollamaUrl = process.env.OLLAMA_API_URL || "http://127.0.0.1:11434";
+          let targetModel = process.env.OLLAMA_MODEL || "oliver-zuj:latest";
+          try {
           // Probe available models from Ollama to auto-select any installed model (prioritizing custom oliver-zuj)
           const tagsRes = await fetch(`${ollamaUrl.replace(/\/$/, '')}/api/tags`, {
             signal: AbortSignal.timeout(800),
@@ -294,11 +500,15 @@ export const aiChatRouter = router({
             }
           }
 
-          const systemPrompt = buildOliverSystemPrompt(
+          let systemPrompt = buildOliverSystemPrompt(
             studentContext,
             activeFaqs,
             activeDocs
           );
+
+          if (doctorMaterialsRAG.hasDoctorMatch) {
+            systemPrompt = `${systemPrompt}\n\n${doctorMaterialsRAG.formattedContext}`;
+          }
 
           const arabicChars = (input.message.match(/[\u0600-\u06FF]/g) || []).length;
           const englishChars = (input.message.match(/[a-zA-Z]/g) || []).length;
@@ -350,6 +560,7 @@ export const aiChatRouter = router({
           }
         } catch {
           // Ollama offline or timed out, gracefully check Runpod or local fallback
+        }
         }
 
         const runpodUrl = process.env.RUNPOD_API_URL;

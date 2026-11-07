@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -6,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   FileText,
   Clock,
+  Lock,
   AlertCircle,
   CheckCircle2,
   Award,
@@ -174,6 +176,10 @@ export default function Assignments() {
   };
 
   const openSubmitModal = (item: AssignmentItem) => {
+    if (item.courseCode === "CS101" || item.courseCode === "MATH101" || (item as any).isCourseCompleted) {
+      toast.error(language === "ar" ? "هذا المساق مكتمل ومؤرشف. التسليم مغلق نهائياً." : "This course is completed and archived. Submissions are permanently closed.");
+      return;
+    }
     setSubmittingAssignment(item);
     setSolutionText(item.solutionText || "");
     setSolutionImageUrl(item.solutionImageUrl || "");
@@ -629,7 +635,12 @@ export default function Assignments() {
 
                     <div className="flex items-center gap-2">
                       {/* Submit / Edit Solution Button for Students */}
-                      {(a.status === "pending" || a.status === "submitted" || a.status === "overdue") && (
+                      {(a.courseCode === "CS101" || a.courseCode === "MATH101" || (a as any).isCourseCompleted) ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 text-slate-400 border border-white/10 text-xs font-semibold select-none cursor-not-allowed">
+                          <Lock className="w-3.5 h-3.5 text-amber-400" />
+                          <span>{language === "ar" ? "مساق مكتمل (مغلق للتسليم)" : "Course Completed (Submissions Closed)"}</span>
+                        </span>
+                      ) : (a.status === "pending" || a.status === "submitted" || a.status === "overdue") && (
                         <button
                           onClick={() => openSubmitModal(a)}
                           className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold shadow-md transition-all hover:scale-[1.02] ${

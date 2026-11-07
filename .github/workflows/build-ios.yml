@@ -1,0 +1,75 @@
+name: Build Oliver iOS App (.IPA)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'ios-app/**'
+
+jobs:
+  build-ios:
+    name: Build & Package iOS App
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 'ios-app/package-lock.json'
+
+      - name: Install Dependencies
+        working-directory: ./ios-app
+        run: |
+          npm install
+
+      - name: Build Web App Bundle
+        working-directory: ./ios-app
+        run: |
+          npm run build
+
+      - name: Sync Capacitor iOS
+        working-directory: ./ios-app
+        run: |
+          npx cap sync ios
+
+      - name: Install CocoaPods
+        working-directory: ./ios-app/ios/App
+        run: |
+          pod install
+
+      - name: Build iOS Archive with Xcode
+        working-directory: ./ios-app/ios/App
+        run: |
+          xcodebuild \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination "generic/platform=iOS" \
+            -archivePath ./build/OliverApp.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            archive
+
+      - name: Export Payload to IPA Package
+        working-directory: ./ios-app/ios/App
+        run: |
+          mkdir -p ./build/Payload
+          cp -r ./build/OliverApp.xcarchive/Products/Applications/App.app ./build/Payload/
+          cd ./build
+          zip -r Oliver-ZUJ.ipa Payload
+          echo "Created Oliver-ZUJ.ipa successfully!"
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Oliver-ZUJ-iOS-App
+          path: ./ios-app/ios/App/build/Oliver-ZUJ.ipa
+          retention-days: 14

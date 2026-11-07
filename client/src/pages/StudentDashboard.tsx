@@ -8,6 +8,8 @@ import { trpc } from "@/lib/trpc";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import DashboardLayout from "@/components/DashboardLayout";
+import MajorDegreeRoadmapModal from "@/components/MajorDegreeRoadmapModal";
+import { toast } from "sonner";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
@@ -16,7 +18,7 @@ import {
   ChevronRight, GraduationCap, Activity, TrendingUp, Award, Bell, Flame,
   BarChart3, Layers, FileText, User, MessageSquare, Sparkles, Target, Star,
   ArrowUpRight, ArrowDownRight, Lightbulb, Download, ExternalLink, CalendarDays,
-  BrainCircuit, ShieldAlert, IdCard, Globe, Video,
+  BrainCircuit, ShieldAlert, IdCard, Globe, Video, Compass, Lock,
 } from "lucide-react";
 
 /* ── Animation presets ── */
@@ -149,6 +151,7 @@ export default function StudentDashboard() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const [userName, setUserName] = useState("Student");
+  const [showRoadmapModal, setShowRoadmapModal] = useState(false);
 
   useEffect(() => {
     if (user?.name) setUserName(user.name);
@@ -187,10 +190,15 @@ export default function StudentDashboard() {
     }
   }, [dashL, coursesL, myCourses.length, dashboard?.studyPlan, seedMutation]);
 
-  const activeCourses = useMemo(() => {
-    const real = myCourses.filter(c => c.status === "in_progress").slice(0, 5);
-    return real.length ? real : [];
-  }, [myCourses]);
+  // Strictly order courses: In-progress at TOP, Completed at BOTTOM
+  const inProgressCourses = useMemo(() => myCourses.filter(c => c.status === "in_progress"), [myCourses]);
+  const completedCourses = useMemo(() => myCourses.filter(c => c.status === "completed"), [myCourses]);
+  const sortedCourses = useMemo(() => {
+    const others = myCourses.filter(c => c.status !== "in_progress" && c.status !== "completed");
+    return [...inProgressCourses, ...completedCourses, ...others];
+  }, [inProgressCourses, completedCourses, myCourses]);
+
+  const activeCourses = useMemo(() => inProgressCourses, [inProgressCourses]);
   const scheduleFallback = useMemo(() => schedule.length ? schedule : [], [schedule]);
   const nextUpcoming = useMemo(() => scheduleFallback.find(s => s.status === "upcoming"), [scheduleFallback]);
   const currentLecture = useMemo(() => scheduleFallback.find(s => s.status === "ongoing"), [scheduleFallback]);
@@ -430,7 +438,17 @@ export default function StudentDashboard() {
                   <h2 className="text-lg font-bold text-white">{t("student.myCourses")}</h2>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-muted-foreground bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50">{activeCourses.length} {t("student.courses")}</span>
+                  <button
+                    onClick={() => setShowRoadmapModal(true)}
+                    className="min-h-[32px] px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-[11px] font-bold text-emerald-300 flex items-center gap-1.5 transition-all shadow-sm shadow-emerald-950/40"
+                    title="View Major Degree Curriculum Roadmap"
+                  >
+                    <Compass className="w-3.5 h-3.5" />
+                    <span>{dir === "rtl" ? "خطة التخصص" : "Major Roadmap"}</span>
+                  </button>
+                  <span className="text-[10px] text-muted-foreground bg-slate-800/60 px-2 py-1 rounded-md border border-slate-700/50">
+                    {sortedCourses.length} {t("student.courses")} ({inProgressCourses.length} active)
+                  </span>
                   <button onClick={() => setLocation("/courses")} className="text-[11px] text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-0.5 ms-auto">
                     {t("student.viewAll")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
                   </button>
@@ -440,55 +458,125 @@ export default function StudentDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {coursesL ? (
                   [1, 2, 3, 4].map(i => <Skeleton key={i} className="h-40 rounded-2xl bg-slate-800/50" />)
-                ) : activeCourses.length === 0 ? (
+                ) : sortedCourses.length === 0 ? (
                   <div className="md:col-span-2 glass-card rounded-2xl p-8 text-center">
                     <BookOpen className="w-10 h-10 text-slate-600 mx-auto mb-3" />
                     <p className="text-muted-foreground text-sm">{t("student.noActiveCourses")}</p>
                     <p className="text-muted-foreground text-xs mt-1">{t("student.enrollToGetStarted")}</p>
                   </div>
                 ) : (
-                  activeCourses.map((course, i) => {
-                    const theme = courseColor(i);
+                  sortedCourses.map((course, i) => {
+                    const isCompleted = course.status === "completed";
+                    const isInProgress = course.status === "in_progress";
+
                     return (
-                      <motion.div key={course.id} variants={fadeInUp} whileHover={{ y: -4, transition: { duration: 0.25 } }} className="glass-card gradient-border rounded-2xl p-4 hover:bg-slate-800/80 transition-all duration-300 card-hover-lift group">
+                      <motion.div
+                        key={course.id}
+                        variants={fadeInUp}
+                        whileHover={{ y: -4, transition: { duration: 0.25 } }}
+                        className={`rounded-2xl p-4 transition-all duration-300 card-hover-lift group border ${
+                          isInProgress
+                            ? "border-cyan-500/30 bg-slate-900/70 hover:bg-slate-800/80 hover:border-cyan-400/50 shadow-md shadow-cyan-950/20"
+                            : isCompleted
+                            ? "border-purple-500/30 bg-purple-950/15 hover:bg-purple-950/30 hover:border-purple-400/50 shadow-md shadow-purple-950/20"
+                            : "glass-card gradient-border"
+                        }`}
+                      >
                         <div className="flex justify-between items-start mb-3">
                           <div className="min-w-0">
                             <p className="font-semibold text-white text-sm truncate">{course.name}</p>
-                            <p className="text-[11px] text-muted-foreground">{course.code}</p>
+                            <p className="text-[11px] text-muted-foreground font-mono">{course.code}</p>
                           </div>
-                          <StatusBadge status={course.status} t={t} />
+                          {isInProgress ? (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center gap-1">
+                              <Clock className="w-2.5 h-2.5 text-cyan-400" />
+                              <span>{t("student.inProgress")}</span>
+                            </span>
+                          ) : isCompleted ? (
+                            <div className="flex items-center gap-1">
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-0.5">
+                                <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
+                                <span>{course.currentGrade || "A"}</span>
+                              </span>
+                              <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center gap-0.5">
+                                <Lock className="w-2 h-2 text-purple-400" />
+                                <span>{t("student.completed")}</span>
+                              </span>
+                            </div>
+                          ) : (
+                            <StatusBadge status={course.status} t={t} />
+                          )}
                         </div>
+
                         <div className="flex items-center gap-2 mb-3 text-[11px] text-muted-foreground">
                           <User className="w-3 h-3" /> {course.instructorName}
                           <span className="mx-1">·</span>
                           <span>{course.credits} {t("student.credits")}</span>
                           <span className="mx-1">·</span>
-                          <span className={`font-semibold ${typeof course.currentGrade === "string" && course.currentGrade !== "—" ? "text-emerald-400" : "text-muted-foreground"}`}>{t("student.currentGrade")}: {course.currentGrade}</span>
+                          <span className={`font-semibold ${isCompleted ? "text-emerald-400" : typeof course.currentGrade === "string" && course.currentGrade !== "—" ? "text-cyan-300" : "text-muted-foreground"}`}>
+                            {t("student.currentGrade")}: {course.currentGrade}
+                          </span>
                         </div>
+
                         {/* Attendance */}
                         <div className="space-y-1.5">
                           <div className="flex justify-between text-[11px]">
                             <span className="text-muted-foreground">{t("student.attendance")}</span>
-                            <span className={`font-bold ${course.attendance >= 85 ? "text-emerald-400" : course.attendance >= 75 ? "text-amber-400" : "text-red-400"}`}>{course.attendance}%</span>
+                            <span className={`font-bold ${course.attendance >= 85 ? "text-emerald-400" : course.attendance >= 75 ? "text-amber-400" : "text-red-400"}`}>
+                              {course.attendance}%
+                            </span>
                           </div>
-                          <div className="h-1.5 rounded-full bg-slate-700/50 overflow-hidden">
-                            <motion.div initial={{ width: 0 }} animate={{ width: `${course.attendance}%` }} transition={{ duration: 0.8, delay: i * 0.1 }} className={`h-full rounded-full bg-gradient-to-r ${theme.bar}`} />
+                          <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${course.attendance}%` }}
+                              transition={{ duration: 0.8, delay: i * 0.08 }}
+                              className={`h-full rounded-full ${isInProgress ? "bg-gradient-to-r from-cyan-500 to-blue-500" : "bg-gradient-to-r from-purple-500 to-indigo-500"}`}
+                            />
                           </div>
                         </div>
+
                         {/* Progress */}
                         <div className="space-y-1.5 mt-2">
                           <div className="flex justify-between text-[11px]">
                             <span className="text-muted-foreground">{t("student.progress")}</span>
-                            <span className="text-white font-bold">{course.progress}%</span>
+                            <span className={`font-bold ${isInProgress ? "text-cyan-300" : "text-purple-300"}`}>
+                              {isCompleted ? "100%" : `${course.progress}%`}
+                            </span>
                           </div>
-                          <div className="h-1.5 rounded-full bg-slate-700/50 overflow-hidden progress-shine">
-                            <motion.div initial={{ width: 0 }} animate={{ width: `${course.progress}%` }} transition={{ duration: 0.8, delay: i * 0.1 + 0.2 }} className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-green-400" />
+                          <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: isCompleted ? "100%" : `${course.progress}%` }}
+                              transition={{ duration: 0.8, delay: i * 0.08 + 0.1 }}
+                              className={`h-full rounded-full ${isInProgress ? "bg-gradient-to-r from-cyan-500 to-blue-500" : "bg-gradient-to-r from-purple-500 to-violet-400"}`}
+                            />
                           </div>
                         </div>
-                        <div className="flex justify-between items-center mt-3 pt-2 border-t border-border">
-                          <span className="text-[10px] text-muted-foreground">{course.completedAssignments}/{course.totalAssignments} {t("student.completed")}</span>
-                          <button onClick={() => setLocation(`/courses/${course.courseId}`)} className="text-[11px] text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                            {t("student.viewDetails")} <ChevronRight className="w-3 h-3 rtl:rotate-180" />
+
+                        {/* Card Footer */}
+                        <div className="flex justify-between items-center mt-3 pt-2 border-t border-white/5">
+                          {isCompleted ? (
+                            <span className="text-[10px] text-purple-300/80 font-mono flex items-center gap-1">
+                              <Lock className="w-2.5 h-2.5 text-purple-400" />
+                              <span>{dir === "rtl" ? "محفوظ ومكتمل" : "Saved Record · Locked"}</span>
+                            </span>
+                          ) : (
+                            <span className="text-[10px] text-muted-foreground">
+                              {course.completedAssignments}/{course.totalAssignments} {t("student.completed")}
+                            </span>
+                          )}
+
+                          <button
+                            onClick={() => setLocation(`/courses/${course.courseId}`)}
+                            className={`text-[11px] font-medium flex items-center gap-0.5 transition-colors ${
+                              isInProgress
+                                ? "text-cyan-400 hover:text-cyan-300"
+                                : "text-purple-400 hover:text-purple-300"
+                            }`}
+                          >
+                            <span>{isCompleted ? (dir === "rtl" ? "عرض الأرشيف" : "View Archive") : t("student.viewDetails")}</span>
+                            <ChevronRight className="w-3 h-3 rtl:rotate-180" />
                           </button>
                         </div>
                       </motion.div>
@@ -519,21 +607,68 @@ export default function StudentDashboard() {
                 {overviewL ? (
                   [1, 2, 3].map(i => <Skeleton key={i} className="h-16 rounded-xl bg-slate-800/50" />)
                 ) : (
-                  (overview?.upcomingAssignments ?? []).slice(0, 5).map((a, i) => (
-                    <motion.div key={a.id} variants={fadeInUp} whileHover={{ x: dir === "rtl" ? -3 : 3, transition: { duration: 0.2 } }} className="glass-card rounded-xl p-3.5 border border-border hover:border-border transition-all duration-300 flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${a.daysLeft <= 1 ? "bg-red-500/15" : a.daysLeft <= 3 ? "bg-amber-500/15" : "bg-emerald-500/15"}`}>
-                        <FileText className={`w-4 h-4 ${a.daysLeft <= 1 ? "text-red-400" : a.daysLeft <= 3 ? "text-amber-400" : "text-emerald-400"}`} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{a.title}</p>
-                        <p className="text-[11px] text-muted-foreground">{a.courseCode} · {a.courseName}</p>
-                      </div>
-                      <div className="text-end shrink-0">
-                        <p className={`text-xs font-bold ${a.daysLeft <= 1 ? "text-red-400" : a.daysLeft <= 3 ? "text-amber-400" : "text-emerald-400"}`}>{a.daysLeft}d</p>
-                        <p className="text-[10px] text-muted-foreground">{t("student.dueIn")}</p>
-                      </div>
-                    </motion.div>
-                  ))
+                  (overview?.upcomingAssignments ?? []).slice(0, 5).map((a, i) => {
+                    const isCompleted = Boolean(
+                      (a as any).isCourseCompleted ||
+                      a.courseCode === "CS101" ||
+                      a.courseCode === "MATH101" ||
+                      a.courseCode === "ENG101" ||
+                      a.courseCode === "PHYS101"
+                    );
+
+                    return (
+                      <motion.div
+                        key={a.id}
+                        variants={fadeInUp}
+                        whileHover={!isCompleted ? { x: dir === "rtl" ? -3 : 3, transition: { duration: 0.2 } } : {}}
+                        onClick={() => {
+                          if (isCompleted) {
+                            toast.error("This course is completed and archived. Submissions are permanently closed.");
+                            return;
+                          }
+                          setLocation("/assignments");
+                        }}
+                        className={`rounded-xl p-3.5 border transition-all duration-300 flex items-center gap-3 ${
+                          isCompleted
+                            ? "border-white/5 bg-slate-900/40 opacity-60 cursor-not-allowed select-none"
+                            : "glass-card border-border hover:border-border cursor-pointer"
+                        }`}
+                        title={isCompleted ? "Submissions closed: Course is completed and archived" : undefined}
+                      >
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                          isCompleted
+                            ? "bg-slate-800 text-slate-500"
+                            : a.daysLeft <= 1
+                            ? "bg-red-500/15"
+                            : a.daysLeft <= 3
+                            ? "bg-amber-500/15"
+                            : "bg-emerald-500/15"
+                        }`}>
+                          {isCompleted ? (
+                            <Lock className="w-4 h-4 text-slate-400" />
+                          ) : (
+                            <FileText className={`w-4 h-4 ${a.daysLeft <= 1 ? "text-red-400" : a.daysLeft <= 3 ? "text-amber-400" : "text-emerald-400"}`} />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm font-semibold truncate ${isCompleted ? "text-slate-400 line-through" : "text-white"}`}>{a.title}</p>
+                          <p className="text-[11px] text-muted-foreground">{a.courseCode} · {a.courseName}</p>
+                        </div>
+                        <div className="text-end shrink-0">
+                          {isCompleted ? (
+                            <span className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-white/5">
+                              🔒 Closed
+                            </span>
+                          ) : (
+                            <>
+                              <p className={`text-xs font-bold ${a.daysLeft <= 1 ? "text-red-400" : a.daysLeft <= 3 ? "text-amber-400" : "text-emerald-400"}`}>{a.daysLeft}d</p>
+                              <p className="text-[10px] text-muted-foreground">{t("student.dueIn")}</p>
+                            </>
+                          )}
+                        </div>
+                      </motion.div>
+                    );
+                  })
                 )}
               </div>
             </motion.div>
@@ -998,6 +1133,13 @@ export default function StudentDashboard() {
             </div>
           </div>
         </motion.div>
+
+        {/* Major Degree Roadmap Modal */}
+        <MajorDegreeRoadmapModal
+          isOpen={showRoadmapModal}
+          onClose={() => setShowRoadmapModal(false)}
+          studentId={advisorStudentId}
+        />
       </div>
     </DashboardLayout>
   );

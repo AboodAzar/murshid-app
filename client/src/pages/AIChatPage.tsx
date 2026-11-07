@@ -20,9 +20,13 @@ import {
   BookOpen, GraduationCap, Calendar, Clock, Award, Briefcase,
   Lightbulb, ShieldAlert, ArrowRight, BarChart3, Compass, FlaskConical,
   Layers, Star, ClipboardList, PenLine, Bell, ChevronRight, Mic, Hash,
-  Download, Share2, RefreshCw, Info, Frown, Smile, Meh, ThumbsUp, ThumbsDown, X
+  Download, Share2, RefreshCw, Info, Frown, Smile, Meh, ThumbsUp, ThumbsDown, X,
+  Moon, Coffee, Check, ExternalLink, Globe
 } from "lucide-react";
 import { toast } from "sonner";
+import { LectureBreakTimelineChart } from "@/components/analytics/LectureBreakTimelineChart";
+import { StudyPlanWorkloadGraph } from "@/components/analytics/StudyPlanWorkloadGraph";
+import { DegreeRoadmapVisualizer } from "@/components/analytics/DegreeRoadmapVisualizer";
 
 const fadeInUp = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.4 } };
 const staggerContainer = { animate: { transition: { staggerChildren: 0.06 } } };
@@ -77,21 +81,23 @@ const QUICK_ACTIONS = [
 ];
 
 const SUGGESTED_PROMPTS_EN = [
+  "What is the best study strategy & translated articles for Data Structures CS201?",
+  "Curated video lectures & problem walkthroughs for Physics PHYS102",
+  "I am a working student with free time between 9 PM - 11 PM, build me a study plan",
+  "Mastery roadmap and design patterns for OOP CS202",
   "How is my cumulative GPA calculated on the 100% scale?",
   "How do integrated (blended) courses work on our 4-day schedule?",
-  "Am I eligible for the 30% or 40% academic merit discount?",
-  "What are the requirements for Capstone Project 1 and Field Training?",
   "What are the rules regarding the 15% absence deprivation limit?",
-  "Where are Hall 9303 and the IT computer labs located?",
 ];
 
 const SUGGESTED_PROMPTS_AR = [
+  "ما هي أفضل استراتيجية ومصادر مترجمة لدراسة تراكيب البيانات CS201؟",
+  "أفضل فيديوهات ومقالات ومناقشات لمادة الفيزياء PHYS102",
+  "أنا طالب موظف، أوقات فراغي بين 9:00 - 11:00 مساءً، أنشئ لي خطة دراسية",
+  "أفضل خارطة طريق لشرح مادة البرمجة كائنية التوجه CS202",
   "كيف يُحتسب معدلي التراكمي على النظام المئوي (100%)؟",
   "كيف يعمل نمط التعليم المدمج في نظام الدوام 4 أيام؟",
-  "هل أستحق خصم التفوق الأكاديمي (30% أو 40%) على الرسوم؟",
-  "ما هي شروط تسجيل مشروع التخرج (1) والتدريب الميداني؟",
   "ما هي عقوبة تجاوز نسبة 15% من الغياب (المادة 11)؟",
-  "أين تقع قاعة 9303 ومختبرات الحاسوب في مبنى IT؟",
 ];
 
 interface Message {
@@ -203,6 +209,47 @@ export default function AIChatPage() {
   const sendMsg = trpc.aiChat.sendMessage.useMutation();
   const deleteConv = trpc.aiChat.deleteConversation.useMutation();
   const rateMsg = trpc.aiChat.rateMessage.useMutation();
+  const generatePlanMutation = trpc.aiChat.generateFreeTimeStudyPlan.useMutation();
+
+  // Free-Time Availability Study Planner state
+  const [freeTimeStart, setFreeTimeStart] = useState("21:00");
+  const [freeTimeEnd, setFreeTimeEnd] = useState("23:00");
+  const [workScheduleNote, setWorkScheduleNote] = useState(
+    language === "ar" ? "طالب موظف نهاراً من 9:00 ص إلى 5:00 م" : "Working daytime 9 AM - 5 PM"
+  );
+  const [sessionStyle, setSessionStyle] = useState<"pomodoro" | "deep_work">("deep_work");
+  const [generatedPlan, setGeneratedPlan] = useState<any>(null);
+  const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
+  const [copiedPlan, setCopiedPlan] = useState(false);
+
+  const handleGenerateFreeTimePlan = async () => {
+    setIsGeneratingPlan(true);
+    try {
+      const res = await generatePlanMutation.mutateAsync({
+        freeTimeStart,
+        freeTimeEnd,
+        workScheduleNote,
+        sessionStyle,
+        language: language === "ar" ? "ar" : "en",
+      });
+      if (res?.plan) {
+        setGeneratedPlan(res.plan);
+        toast.success(language === "ar" ? "تم توليد جدول المذاكرة الذكي بنجاح!" : "Study plan generated successfully!");
+      }
+    } catch (e: any) {
+      toast.error(language === "ar" ? "تعذر توليد الجدول، يرجى المحاولة لاحقاً" : "Failed to generate study plan");
+    } finally {
+      setIsGeneratingPlan(false);
+    }
+  };
+
+  const handleSendPlanToChat = () => {
+    const prompt = language === "ar"
+      ? `أنا طالب موظف، أوقات فراغي بين ${freeTimeStart} - ${freeTimeEnd} مساءً، أنشئ لي خطة دراسية لموادي المسجلة`
+      : `I am a working student with free time between ${freeTimeStart} - ${freeTimeEnd}, build me a study plan`;
+    setActiveTab("chat");
+    setInput(prompt);
+  };
 
   useEffect(() => {
     if (conversationsData) {
@@ -501,35 +548,30 @@ export default function AIChatPage() {
 
           {/* ─── Insights Tab ─── */}
           <TabsContent value="insights" className="mt-6 space-y-6">
+            {/* Top Row: AI Trajectory & Fast KPIs */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <motion.div {...fadeInUp}>
                 <Card className="bg-card border-border backdrop-blur-2xl">
-                  <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Zap className="w-4 h-4 text-amber-400" />AI Academic Insights</CardTitle></CardHeader>
+                  <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Zap className="w-4 h-4 text-amber-400" />{language === "ar" ? "رؤى الذكاء الاصطناعي الأكاديمية" : "AI Academic Trajectory & Forecast"}</CardTitle></CardHeader>
                   <CardContent className="p-5 space-y-3">
                     {allLoaded ? (
                       <>
                         {forecast && (
                           <div className="flex items-start gap-3 p-3 rounded-lg bg-card border border-border">
                             <div className="w-8 h-8 rounded-lg bg-emerald-500/15 flex items-center justify-center shrink-0"><TrendingUp className="w-4 h-4 text-primary" /></div>
-                            <div><p className="text-sm text-white">Predicted GPA: <span className="font-bold text-primary">{forecast?.overallProjection?.currentGPA?.toFixed(2) ?? "—"}</span></p><p className="text-xs text-muted-foreground">Based on current trajectory</p></div>
+                            <div><p className="text-sm text-white">Predicted GPA: <span className="font-bold text-primary">{forecast?.overallProjection?.currentGPA?.toFixed(2) ?? "—"}</span></p><p className="text-xs text-muted-foreground">Based on active enrolled credit hours & historical momentum</p></div>
                           </div>
                         )}
                         {risk && (
                           <div className="flex items-start gap-3 p-3 rounded-lg bg-card border border-border">
                             <div className="w-8 h-8 rounded-lg bg-violet-500/15 flex items-center justify-center shrink-0"><Target className="w-4 h-4 text-violet-400" /></div>
-                            <div><p className="text-sm text-white">Graduation Risk: <span className="font-bold" style={{ color: RISK_COLORS[risk.overallRisk] ?? "#94a3b8" }}>{risk.overallRisk}</span></p><p className="text-xs text-muted-foreground">Score: {risk.score}</p></div>
+                            <div><p className="text-sm text-white">Graduation Risk Status: <span className="font-bold uppercase" style={{ color: RISK_COLORS[risk.overallRisk] ?? "#94a3b8" }}>{risk.overallRisk}</span></p><p className="text-xs text-muted-foreground">Risk Score Index: {risk.score} / 100</p></div>
                           </div>
                         )}
                         {warnings?.warnings && warnings.warnings.length > 0 && (
                           <div className="flex items-start gap-3 p-3 rounded-lg bg-red-500/5 border border-red-500/10">
                             <div className="w-8 h-8 rounded-lg bg-red-500/15 flex items-center justify-center shrink-0"><AlertTriangle className="w-4 h-4 text-red-400" /></div>
-                            <div><p className="text-sm text-white">At-Risk Courses</p><p className="text-xs text-muted-foreground">{warnings.warnings.length} course(s) need attention</p></div>
-                          </div>
-                        )}
-                        {overview?.upcomingAssignments && overview.upcomingAssignments.length > 0 && (
-                          <div className="flex items-start gap-3 p-3 rounded-lg bg-card border border-border">
-                            <div className="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center shrink-0"><Clock className="w-4 h-4 text-amber-400" /></div>
-                            <div><p className="text-sm text-white">Upcoming Deadlines</p><p className="text-xs text-muted-foreground">{overview.upcomingAssignments.length} assignment(s) due soon</p></div>
+                            <div><p className="text-sm text-white">Prerequisite / Retake Alert</p><p className="text-xs text-muted-foreground">{warnings.warnings.length} course(s) require proactive recovery</p></div>
                           </div>
                         )}
                       </>
@@ -539,42 +581,273 @@ export default function AIChatPage() {
               </motion.div>
               <motion.div {...fadeInUp}>
                 <Card className="bg-card border-border backdrop-blur-2xl">
-                  <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><BarChart3 className="w-4 h-4 text-emerald-400" />AI Analytics</CardTitle></CardHeader>
+                  <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><BarChart3 className="w-4 h-4 text-emerald-400" />{language === "ar" ? "نشاط التعلم والتفاعل" : "Engagement & Learning Metrics"}</CardTitle></CardHeader>
                   <CardContent className="p-5 space-y-4">
                     {allLoaded ? (
                       <>
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="p-3 rounded-xl bg-card border border-border text-center"><p className="text-[10px] text-muted-foreground uppercase">Questions</p><p className="text-xl font-bold text-white mt-1">{conversations.length * 3 + 12}</p></div>
-                          <div className="p-3 rounded-xl bg-card border border-border text-center"><p className="text-[10px] text-muted-foreground uppercase">Engagement</p><p className="text-xl font-bold text-white mt-1">{healthScore > 0 ? Math.min(100, Math.round(healthScore * 0.8 + 20)) : "—"}</p></div>
-                          <div className="p-3 rounded-xl bg-card border border-border text-center"><p className="text-[10px] text-muted-foreground uppercase">Courses</p><p className="text-xl font-bold text-white mt-1">{dashboard?.courses?.length ?? 0}</p></div>
-                          <div className="p-3 rounded-xl bg-card border border-border text-center"><p className="text-[10px] text-muted-foreground uppercase">Streak</p><p className="text-xl font-bold text-white mt-1">{overview?.streak?.current ?? 0}d</p></div>
+                          <div className="p-3 rounded-xl bg-card border border-border text-center"><p className="text-[10px] text-muted-foreground uppercase">AI Consultations</p><p className="text-xl font-bold text-white mt-1">{conversations.length * 3 + 12}</p></div>
+                          <div className="p-3 rounded-xl bg-card border border-border text-center"><p className="text-[10px] text-muted-foreground uppercase">Engagement Score</p><p className="text-xl font-bold text-white mt-1">{healthScore > 0 ? Math.min(100, Math.round(healthScore * 0.8 + 20)) : "—"}</p></div>
+                          <div className="p-3 rounded-xl bg-card border border-border text-center"><p className="text-[10px] text-muted-foreground uppercase">Registered Courses</p><p className="text-xl font-bold text-white mt-1">{dashboard?.courses?.length ?? 0}</p></div>
+                          <div className="p-3 rounded-xl bg-card border border-border text-center"><p className="text-[10px] text-muted-foreground uppercase">Study Streak</p><p className="text-xl font-bold text-white mt-1">{overview?.streak?.current ?? 0}d</p></div>
                         </div>
-                        <div><p className="text-xs text-muted-foreground mb-2">Academic Improvement</p><MiniBar value={gpa >= 3 ? 85 : gpa >= 2.5 ? 60 : 35} color="#10b981" /></div>
+                        <div><p className="text-xs text-muted-foreground mb-2">Academic Improvement Index</p><MiniBar value={gpa >= 3 ? 85 : gpa >= 2.5 ? 60 : 35} color="#10b981" /></div>
                       </>
                     ) : <div className="space-y-4">{[1, 2, 3].map(i => <Skeleton key={i} className="h-16" />)}</div>}
                   </CardContent>
                 </Card>
               </motion.div>
             </div>
+
+            {/* Visual Study Plan Graphs: Workload Allocation, Subject Domain Balance & 9-11 PM Window */}
             <motion.div {...fadeInUp}>
-              <Card className="bg-card border-border backdrop-blur-2xl">
-                <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><ClipboardList className="w-4 h-4 text-emerald-400" />Study Planner Snapshot</CardTitle></CardHeader>
-                <CardContent className="p-5">
-                  {allLoaded ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                      <div className="p-4 rounded-xl bg-card border border-border text-center"><Calendar className="w-5 h-5 text-emerald-400 mx-auto mb-2" /><p className="text-xs text-muted-foreground">Weekly Schedule</p><p className="text-sm font-bold text-white mt-1">{dashboard?.courses?.length ?? 0} courses</p></div>
-                      <div className="p-4 rounded-xl bg-card border border-border text-center"><PenLine className="w-5 h-5 text-amber-400 mx-auto mb-2" /><p className="text-xs text-muted-foreground">Assignments</p><p className="text-sm font-bold text-white mt-1">{overview?.upcomingAssignments?.length ?? 0} pending</p></div>
-                      <div className="p-4 rounded-xl bg-card border border-border text-center"><Clock className="w-5 h-5 text-primary mx-auto mb-2" /><p className="text-xs text-muted-foreground">Study Hours</p><p className="text-sm font-bold text-white mt-1">{Math.round((dashboard?.courses?.length ?? 0) * 4.5)}h/week</p></div>
-                      <div className="p-4 rounded-xl bg-card border border-border text-center"><Target className="w-5 h-5 text-emerald-400 mx-auto mb-2" /><p className="text-xs text-muted-foreground">Focus Areas</p><p className="text-sm font-bold text-white mt-1">{warnings?.warnings?.filter((w: any) => w.type === 'at_risk').length ?? 0} at risk</p></div>
-                    </div>
-                  ) : <div className="grid grid-cols-4 gap-3">{[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-20" />)}</div>}
-                </CardContent>
-              </Card>
+              <StudyPlanWorkloadGraph language={language} />
+            </motion.div>
+
+            {/* Visual Schedule with Breaks Between Lectures */}
+            <motion.div {...fadeInUp}>
+              <LectureBreakTimelineChart language={language} />
+            </motion.div>
+
+            {/* Full 8-Semester Courses Roadmap with Completed Courses Crossed Out */}
+            <motion.div {...fadeInUp}>
+              <DegreeRoadmapVisualizer language={language} />
             </motion.div>
           </TabsContent>
 
           {/* ─── Planner Tab ─── */}
           <TabsContent value="planner" className="mt-6 space-y-6">
+            {/* ─── Free-Time AI Availability Study Planner ─── */}
+            <motion.div {...fadeInUp}>
+              <Card className="bg-gradient-to-br from-emerald-950/40 via-card to-card border-emerald-500/30 backdrop-blur-2xl shadow-xl overflow-hidden">
+                <CardHeader className="pb-3 border-b border-white/5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
+                        <Clock className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-base sm:text-lg flex items-center gap-2 text-white">
+                          <span>{language === "ar" ? "مخطط وقت الفراغ الذكي (للطلبة الموظفين)" : "Free-Time AI Study Planner"}</span>
+                          <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-[10px]">
+                            {language === "ar" ? "ذكاء اصطناعي مخصص" : "Time-Blocked"}
+                          </Badge>
+                        </CardTitle>
+                        <CardDescription className="text-xs text-muted-foreground mt-0.5">
+                          {language === "ar"
+                            ? "أدخل وقت فراغك اليومي (مثلاً 9 - 11 مساءً) وسيقوم أوليفر بتوليد جدول مذاكرة دقيق يوزع موادك وواجباتك"
+                            : "Enter your daily availability (e.g. 9:00 PM - 11:00 PM) to generate a personalized time-blocked study schedule."}
+                        </CardDescription>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 self-start sm:self-auto">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleSendPlanToChat}
+                        className="h-8 text-xs bg-white/5 border-white/10 hover:bg-white/10 text-slate-200"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 me-1.5 text-primary" />
+                        {language === "ar" ? "استشارة أوليفر بالدردشة" : "Discuss in Chat"}
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6 space-y-5">
+                  {/* Controls Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Time Window */}
+                    <div className="space-y-2 p-3.5 rounded-xl bg-white/[0.03] border border-border">
+                      <label className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+                        <Moon className="w-3.5 h-3.5 text-emerald-400" />
+                        {language === "ar" ? "نافذة وقت الفراغ اليومي" : "Daily Free-Time Window"}
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <span className="text-[10px] text-muted-foreground block mb-1">{language === "ar" ? "من (البداية)" : "From"}</span>
+                          <Input
+                            type="time"
+                            value={freeTimeStart}
+                            onChange={(e) => setFreeTimeStart(e.target.value)}
+                            className="bg-black/30 border-border text-white text-xs h-9 font-mono"
+                          />
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-muted-foreground block mb-1">{language === "ar" ? "إلى (النهاية)" : "To"}</span>
+                          <Input
+                            type="time"
+                            value={freeTimeEnd}
+                            onChange={(e) => setFreeTimeEnd(e.target.value)}
+                            className="bg-black/30 border-border text-white text-xs h-9 font-mono"
+                          />
+                        </div>
+                      </div>
+                      {/* Presets */}
+                      <div className="flex flex-wrap gap-1 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => { setFreeTimeStart("21:00"); setFreeTimeEnd("23:00"); }}
+                          className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${freeTimeStart === "21:00" && freeTimeEnd === "23:00" ? "bg-emerald-500/25 border-emerald-500/50 text-emerald-300 font-semibold" : "bg-white/5 border-white/10 text-muted-foreground hover:text-white"}`}
+                        >
+                          🌙 9 - 11 PM
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setFreeTimeStart("18:00"); setFreeTimeEnd("20:30"); }}
+                          className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${freeTimeStart === "18:00" && freeTimeEnd === "20:30" ? "bg-emerald-500/25 border-emerald-500/50 text-emerald-300 font-semibold" : "bg-white/5 border-white/10 text-muted-foreground hover:text-white"}`}
+                        >
+                          🌆 6 - 8:30 PM
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setFreeTimeStart("06:00"); setFreeTimeEnd("08:00"); }}
+                          className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${freeTimeStart === "06:00" && freeTimeEnd === "08:00" ? "bg-emerald-500/25 border-emerald-500/50 text-emerald-300 font-semibold" : "bg-white/5 border-white/10 text-muted-foreground hover:text-white"}`}
+                        >
+                          🌅 6 - 8 AM
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Commitments & Work Note */}
+                    <div className="space-y-2 p-3.5 rounded-xl bg-white/[0.03] border border-border">
+                      <label className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+                        <Briefcase className="w-3.5 h-3.5 text-amber-400" />
+                        {language === "ar" ? "طبيعة العمل والالتزامات" : "Work Commitments Note"}
+                      </label>
+                      <Input
+                        value={workScheduleNote}
+                        onChange={(e) => setWorkScheduleNote(e.target.value)}
+                        placeholder={language === "ar" ? "مثلاً: طالب موظف نهاراً من 9 ص إلى 5 م" : "e.g. Working daytime 9 AM - 5 PM"}
+                        className="bg-black/30 border-border text-white text-xs h-9"
+                      />
+                      <p className="text-[10px] text-muted-foreground">
+                        {language === "ar"
+                          ? "يراعي الذكاء الاصطناعي مستويات الطاقة الذهنية بعد ساعات العمل."
+                          : "AI adapts cognitive load to fit evening energy reserves."}
+                      </p>
+                    </div>
+
+                    {/* Study Style & Action */}
+                    <div className="space-y-2 p-3.5 rounded-xl bg-white/[0.03] border border-border flex flex-col justify-between">
+                      <div>
+                        <label className="text-xs font-semibold text-slate-200 flex items-center gap-1.5 mb-1.5">
+                          <Target className="w-3.5 h-3.5 text-primary" />
+                          {language === "ar" ? "نمط الجلسة الدراسية" : "Session Rhythm"}
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setSessionStyle("deep_work")}
+                            className={`p-1.5 rounded-lg border text-xs text-center transition-all ${sessionStyle === "deep_work" ? "bg-emerald-600/25 border-emerald-500/50 text-white font-semibold" : "bg-white/5 border-white/10 text-muted-foreground"}`}
+                          >
+                            <span className="block font-semibold">Deep Work</span>
+                            <span className="text-[10px] opacity-75">50m + 10m break</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSessionStyle("pomodoro")}
+                            className={`p-1.5 rounded-lg border text-xs text-center transition-all ${sessionStyle === "pomodoro" ? "bg-emerald-600/25 border-emerald-500/50 text-white font-semibold" : "bg-white/5 border-white/10 text-muted-foreground"}`}
+                          >
+                            <span className="block font-semibold">Pomodoro</span>
+                            <span className="text-[10px] opacity-75">25m sprints</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <Button
+                        onClick={handleGenerateFreeTimePlan}
+                        disabled={isGeneratingPlan}
+                        className="w-full h-9 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold mt-2 shadow-lg shadow-emerald-950/40"
+                      >
+                        {isGeneratingPlan ? (
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin me-1.5" />
+                        ) : (
+                          <Sparkles className="w-3.5 h-3.5 me-1.5" />
+                        )}
+                        {language === "ar" ? "توليد الخطة المخصصة للوقت" : "Generate Free-Time Plan"}
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Render Generated Plan */}
+                  {generatedPlan && (
+                    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 pt-2">
+                      <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-xs shrink-0">
+                            {generatedPlan.weeklyTotalHours}h
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold text-white flex items-center gap-2">
+                              <span>{generatedPlan.freeTimeWindow}</span>
+                              <Badge className="bg-emerald-500/20 text-emerald-300 border-none text-[9px]">
+                                {generatedPlan.dailyAvailableMinutes} min / day
+                              </Badge>
+                            </p>
+                            <p className="text-[11px] text-emerald-200/80 mt-0.5">
+                              {language === "ar" ? generatedPlan.wellnessAdviceAr : generatedPlan.wellnessAdvice}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              navigator.clipboard.writeText(JSON.stringify(generatedPlan, null, 2));
+                              setCopiedPlan(true);
+                              setTimeout(() => setCopiedPlan(false), 2000);
+                              toast.success(language === "ar" ? "تم نسخ تفاصيل الخطة!" : "Plan details copied!");
+                            }}
+                            className="h-8 text-xs border-emerald-500/40 text-emerald-200 bg-emerald-950/30 hover:bg-emerald-900/50"
+                          >
+                            {copiedPlan ? <Check className="w-3.5 h-3.5 me-1 text-emerald-400" /> : <ClipboardList className="w-3.5 h-3.5 me-1" />}
+                            {copiedPlan ? (language === "ar" ? "تم النسخ" : "Copied") : (language === "ar" ? "نسخ الجدول" : "Copy")}
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Day By Day Blocks */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                        {generatedPlan.days.map((day: any, dIdx: number) => (
+                          <div key={dIdx} className="p-3 rounded-xl bg-card border border-border hover:border-emerald-500/40 transition-all flex flex-col justify-between space-y-2">
+                            <div>
+                              <div className="flex items-center justify-between pb-1.5 border-b border-border">
+                                <span className="text-xs font-bold text-white">{language === "ar" ? day.dayNameAr : day.dayName}</span>
+                                <Badge variant="outline" className="text-[9px] border-border text-muted-foreground px-1.5">
+                                  {language === "ar" ? day.focusSummaryAr : day.focusSummary}
+                                </Badge>
+                              </div>
+                              <div className="space-y-2 mt-2">
+                                {day.blocks.map((b: any, bIdx: number) => (
+                                  <div
+                                    key={bIdx}
+                                    className={`p-2 rounded-lg text-[11px] ${b.isBreak ? "bg-amber-500/10 border border-amber-500/20 text-amber-200" : "bg-white/[0.04] border border-border text-slate-200"}`}
+                                  >
+                                    <div className="flex items-center justify-between font-mono text-[9px] opacity-75 mb-0.5">
+                                      <span>{b.timeRange}</span>
+                                      <span>{b.durationMinutes}m</span>
+                                    </div>
+                                    <p className="font-semibold text-white leading-tight">
+                                      {b.courseCode !== "RECOVERY" ? `${b.courseCode}: ` : "☕ "}
+                                      {language === "ar" ? b.topicAr : b.topic}
+                                    </p>
+                                    <p className="text-[10px] text-muted-foreground mt-1 line-clamp-2">
+                                      {language === "ar" ? b.notesAr : b.notes}
+                                    </p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <motion.div {...fadeInUp}>
                 <Card className="bg-card border-border backdrop-blur-2xl">
@@ -752,6 +1025,49 @@ export default function AIChatPage() {
                         </AnimatePresence>
                       )}
                       <div ref={messagesEndRef} />
+                    </div>
+
+                    {/* Quick Smart Chips Bar */}
+                    <div className="px-3 pt-2 pb-1 border-t border-border/50 bg-card/60 backdrop-blur flex items-center gap-1.5 overflow-x-auto scrollbar-hide shrink-0">
+                      <span className="text-[10px] text-muted-foreground uppercase font-semibold shrink-0 me-1">
+                        {language === "ar" ? "⚡ استفسارات سريعة:" : "⚡ Quick Ask:"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const q = language === "ar"
+                            ? "ما هي أفضل استراتيجية ومصادر مترجمة لدراسة تراكيب البيانات CS201؟"
+                            : "What is the best study strategy & translated articles for Data Structures CS201?";
+                          setInput(q);
+                        }}
+                        className="shrink-0 px-2.5 py-1 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/25 text-[11px] font-medium transition-all"
+                      >
+                        🌐 {language === "ar" ? "استراتيجية CS201 ومقالات روسية" : "CS201 Strategy & Russian Articles"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const q = language === "ar"
+                            ? "أفضل فيديوهات ومقالات ومناقشات لمادة الفيزياء PHYS102"
+                            : "Curated video lectures & problem walkthroughs for Physics PHYS102";
+                          setInput(q);
+                        }}
+                        className="shrink-0 px-2.5 py-1 rounded-full bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/25 text-[11px] font-medium transition-all"
+                      >
+                        🎥 {language === "ar" ? "فيديوهات ومسائل فيزياء 2" : "PHYS102 Videos & Sets"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const q = language === "ar"
+                            ? "أنا طالب موظف، أوقات فراغي بين 9:00 - 11:00 مساءً، أنشئ لي خطة دراسية"
+                            : "I am a working student with free time between 9 PM - 11 PM, build me a study plan";
+                          setInput(q);
+                        }}
+                        className="shrink-0 px-2.5 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/25 text-[11px] font-medium transition-all"
+                      >
+                        ⏰ {language === "ar" ? "خطة وقت الفراغ (9 - 11 PM)" : "Free-Time Plan (9 - 11 PM)"}
+                      </button>
                     </div>
 
                     {/* Sticky Input */}
