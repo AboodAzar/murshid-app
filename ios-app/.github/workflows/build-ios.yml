@@ -12,7 +12,7 @@ on:
 jobs:
   build-ios:
     name: Build & Package iOS App
-    runs-on: macos-14
+    runs-on: macos-latest
 
     steps:
       - name: Checkout Code
@@ -56,6 +56,8 @@ jobs:
             -destination "generic/platform=iOS" \
             -archivePath ./build/OliverApp.xcarchive \
             CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
             archive
 
       - name: Export Payload to IPA Package
