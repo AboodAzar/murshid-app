@@ -32,11 +32,27 @@ export type LocalAuthPayload = {
   type: "local-auth";
 };
 
+// Extract Bearer token from Authorization header
+export function extractBearerToken(req: Request): string | null {
+  const authHeader = req.headers.authorization;
+  const headerValue = Array.isArray(authHeader) ? authHeader[0] : authHeader;
+  if (headerValue && typeof headerValue === "string" && headerValue.toLowerCase().startsWith("bearer ")) {
+    const token = headerValue.substring(7).trim();
+    return token || null;
+  }
+  return null;
+}
+
 // Extract session cookie from request
-function extractSessionCookie(req: Request): string | null {
+export function extractSessionCookie(req: Request): string | null {
   const cookies = req.headers.cookie || "";
   const cookieMatch = cookies.match(new RegExp(`${COOKIE_NAME}=([^;]*)`));
   return cookieMatch ? cookieMatch[1] : null;
+}
+
+// Extract token from request (prioritizing Bearer header over session cookie)
+export function extractToken(req: Request): string | null {
+  return extractBearerToken(req) || extractSessionCookie(req);
 }
 
 // Verify local JWT token
@@ -94,8 +110,8 @@ async function verifyFrameworkSession(
 }
 
 // Authenticate request and return user from database
-async function authenticateRequest(req: Request): Promise<User | null> {
-  const token = extractSessionCookie(req);
+export async function authenticateRequest(req: Request): Promise<User | null> {
+  const token = extractToken(req);
   if (!token) {
     return null;
   }
@@ -192,9 +208,15 @@ async function getUserInfo(accessToken: string): Promise<{
   };
 }
 
+export const getUserFromRequest = authenticateRequest;
+
 // Export as default object for compatibility
 export const sdk = {
   authenticateRequest,
+  getUserFromRequest,
+  extractBearerToken,
+  extractSessionCookie,
+  extractToken,
   createSessionToken,
   exchangeCodeForToken,
   getUserInfo,

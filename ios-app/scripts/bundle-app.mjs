@@ -25,7 +25,7 @@ content = content.replace(
 
 content = content.replace(
   '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
-  '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">\n  <meta name="apple-mobile-web-app-capable" content="yes">\n  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">'
+  '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">\n  <meta name="apple-mobile-web-app-capable" content="yes">\n  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">\n  <script src="capacitor.js"></script>\n  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>'
 );
 
 // 2. Hide simulator desktop header permanently in native iOS app
@@ -33,6 +33,9 @@ content = content.replace(
   '<header id="simulator-header"',
   '<header id="simulator-header" style="display: none !important;"'
 );
+
+// 2b. Remove any residual 9:41 fake clock from content
+content = content.replace(/>9:41</g, '><');
 
 // 3. Add Native iOS Fullscreen CSS Overrides
 const nativeIosStyles = `
@@ -50,6 +53,9 @@ const nativeIosStyles = `
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif !important;
     }
     #simulator-header {
+      display: none !important;
+    }
+    #dynamic-island {
       display: none !important;
     }
     #phone-chassis {
@@ -70,12 +76,13 @@ const nativeIosStyles = `
       width: 100% !important;
       height: 100% !important;
       box-shadow: none !important;
+      padding-top: max(env(safe-area-inset-top), 14px) !important;
     }
     #status-bar {
+      display: none !important;
       padding-top: max(env(safe-area-inset-top), 14px) !important;
       padding-left: max(env(safe-area-inset-left), 18px) !important;
       padding-right: max(env(safe-area-inset-right), 18px) !important;
-      height: calc(44px + env(safe-area-inset-top)) !important;
     }
     #viewport-content {
       padding-bottom: calc(84px + env(safe-area-inset-bottom)) !important;

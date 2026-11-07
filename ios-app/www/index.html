@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <script src="capacitor.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
   <title>Oliver ZUJ Mobile</title>
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -93,6 +95,9 @@
     #simulator-header {
       display: none !important;
     }
+    #dynamic-island {
+      display: none !important;
+    }
     #phone-chassis {
       width: 100vw !important;
       max-width: 100vw !important;
@@ -111,12 +116,13 @@
       width: 100% !important;
       height: 100% !important;
       box-shadow: none !important;
+      padding-top: max(env(safe-area-inset-top), 14px) !important;
     }
     #status-bar {
+      display: none !important;
       padding-top: max(env(safe-area-inset-top), 14px) !important;
       padding-left: max(env(safe-area-inset-left), 18px) !important;
       padding-right: max(env(safe-area-inset-right), 18px) !important;
-      height: calc(44px + env(safe-area-inset-top)) !important;
     }
     #viewport-content {
       padding-bottom: calc(84px + env(safe-area-inset-bottom)) !important;
@@ -242,19 +248,10 @@
     
     <div id="phone-screen" dir="ltr" class="relative w-full h-full rounded-[42px] bg-[#05110a] overflow-hidden flex flex-col border border-white/10 shadow-inner">
 
-      <!-- Dynamic Top Bar -->
-      <div id="status-bar" class="relative z-50 h-11 w-full pt-3 px-6 flex items-center justify-between text-white text-xs select-none">
-        <span class="font-semibold text-[13px] tracking-tight">9:41</span>
-        <div id="dynamic-island" class="absolute left-1/2 -translate-x-1/2 top-2.5 h-6 w-32 bg-black rounded-full flex items-center justify-between px-3 border border-white/10 shadow-sm transition-all duration-300">
-          <div class="w-2.5 h-2.5 rounded-full bg-slate-900 border border-slate-800"></div>
-          <div class="flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span id="island-badge" class="text-[9px] text-emerald-400 font-mono font-bold">Hanan • ZUJ</span>
-          </div>
-        </div>
-        <div class="flex items-center gap-2 text-white/90">
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 18.25A10.93 10.93 0 012 12C2 6.48 6.48 2 12 2s10 4.48 10 10c0 2.32-.78 4.46-2.1 6.18l-.62-.62A8.96 8.96 0 0021 12c0-4.97-4.03-9-9-9z"/></svg>
-          <div class="w-5 h-2.5 rounded-xs border border-white/70 p-0.5 flex items-center"><div class="h-full w-full bg-emerald-400 rounded-2xs"></div></div>
+      <!-- Native Dynamic Top Bar (handled by iOS system status bar) -->
+      <div id="status-bar" class="relative z-50 w-full flex items-center justify-between select-none" style="display: none;">
+        <div id="dynamic-island" style="display: none;">
+          <span id="island-badge" class="hidden">Hanan • ZUJ</span>
         </div>
       </div>
 
@@ -1266,10 +1263,13 @@
             <button onclick="closePhoneScanner()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-300">✕</button>
           </div>
           <div class="relative h-44 rounded-2xl bg-black border border-emerald-500/50 flex flex-col items-center justify-center overflow-hidden">
-            <div id="phone-scanner-content" class="text-center p-3 space-y-1">
-              <div class="w-10 h-10 mx-auto rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg">📷</div>
-              <p class="text-[11px] text-white font-bold">Scanning Classroom Projector</p>
-              <p class="text-[9px] text-slate-400">Checking 8-second dynamic token...</p>
+            <video id="phone-scanner-video" playsinline autoplay muted class="w-full h-full object-cover"></video>
+            <canvas id="phone-scanner-canvas" class="hidden"></canvas>
+            <div id="phone-scanner-content" class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-3 space-y-1 bg-black/30">
+              <div class="w-24 h-24 border-2 border-emerald-400/80 rounded-2xl flex items-center justify-center relative">
+                <div class="absolute inset-x-2 top-0 h-0.5 bg-emerald-400 animate-pulse"></div>
+              </div>
+              <p class="text-[10px] text-emerald-300 font-bold mt-1">Live Camera Viewfinder</p>
             </div>
           </div>
           <div class="p-2 rounded-xl bg-slate-950 border border-white/5 text-[10px] space-y-0.5 text-slate-300">
@@ -2803,15 +2803,216 @@
       showToast("✓ Official grade (" + asgn.score + "/100) recorded!");
     }
 
-    // Attendance QR Modals
-    function openPhoneScanner() {
-      document.getElementById('phone-scanner-modal').classList.remove('hidden');
+    // Native Hardware Feedback Engine (Capacitor Haptics + Web Audio Synthesizer)
+    const NativeFeedback = {
+      audioCtx: null,
+      getAudioContext() {
+        if (typeof window === 'undefined') return null;
+        if (!this.audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) {
+            this.audioCtx = new AudioContextClass();
+          }
+        }
+        if (this.audioCtx && this.audioCtx.state === 'suspended') {
+          this.audioCtx.resume();
+        }
+        return this.audioCtx;
+      },
+      async impact(style = 'MEDIUM') {
+        const s = style || 'MEDIUM';
+        try {
+          if (typeof window !== 'undefined' && (window.Capacitor || typeof Capacitor !== 'undefined')) {
+            const Haptics = (window.Capacitor?.Plugins?.Haptics) || (typeof Capacitor !== 'undefined' && Capacitor.Plugins?.Haptics);
+            if (Haptics && Haptics.impact) {
+              await Haptics.impact({ style: s });
+              return;
+            }
+          }
+          if (typeof navigator !== 'undefined' && navigator.vibrate) {
+            navigator.vibrate(20);
+          }
+        } catch (e) {
+          console.warn('Haptic impact error:', e);
+        }
+      },
+      async notification(type = 'SUCCESS') {
+        const t = type || 'SUCCESS';
+        try {
+          if (typeof window !== 'undefined' && (window.Capacitor || typeof Capacitor !== 'undefined')) {
+            const Haptics = (window.Capacitor?.Plugins?.Haptics) || (typeof Capacitor !== 'undefined' && Capacitor.Plugins?.Haptics);
+            if (Haptics && Haptics.notification) {
+              await Haptics.notification({ type: t });
+              return;
+            }
+          }
+          if (typeof navigator !== 'undefined' && navigator.vibrate) {
+            navigator.vibrate(40);
+          }
+        } catch (e) {
+          console.warn('Haptic notification error:', e);
+        }
+      },
+      playChime(type = 'success') {
+        try {
+          const ctx = this.getAudioContext();
+          if (!ctx) return;
+          const t = type || 'success';
+          const now = ctx.currentTime;
+          const gainNode = ctx.createGain();
+          gainNode.connect(ctx.destination);
+          gainNode.gain.setValueAtTime(0.15, now);
+
+          if (t === 'success') {
+            [523.25, 659.25, 783.99].forEach((freq, idx) => {
+              const osc = ctx.createOscillator();
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+              osc.connect(gainNode);
+              osc.start(now + idx * 0.08);
+              osc.stop(now + idx * 0.08 + 0.15);
+            });
+            gainNode.gain.linearRampToValueAtTime(0.01, now + 0.4);
+          } else if (t === 'error') {
+            [220, 196].forEach((freq, idx) => {
+              const osc = ctx.createOscillator();
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+              osc.connect(gainNode);
+              osc.start(now + idx * 0.12);
+              osc.stop(now + idx * 0.12 + 0.18);
+            });
+            gainNode.gain.linearRampToValueAtTime(0.01, now + 0.35);
+          } else if (t === 'scan') {
+            const osc = ctx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, now);
+            osc.connect(gainNode);
+            osc.start(now);
+            osc.stop(now + 0.08);
+            gainNode.gain.linearRampToValueAtTime(0.01, now + 0.08);
+          } else {
+            const osc = ctx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1200, now);
+            osc.connect(gainNode);
+            osc.start(now);
+            osc.stop(now + 0.02);
+            gainNode.gain.linearRampToValueAtTime(0.01, now + 0.02);
+          }
+        } catch (e) {
+          console.warn('Audio chime error:', e);
+        }
+      }
+    };
+
+    // Attendance QR Modals & Real-Time Camera Scanner
+    let phoneScannerStream = null;
+    let phoneScannerAnimFrame = null;
+
+    async function openPhoneScanner() {
+      const modal = document.getElementById('phone-scanner-modal');
+      if (modal) modal.classList.remove('hidden');
+      const video = document.getElementById('phone-scanner-video');
+      const canvas = document.getElementById('phone-scanner-canvas');
+
+      try {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          phoneScannerStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment' }
+          });
+          if (video) {
+            video.srcObject = phoneScannerStream;
+            video.setAttribute('playsinline', 'true');
+            await video.play();
+            requestAnimationFrame(tickPhoneScanner);
+          }
+        }
+      } catch (err) {
+        console.warn('Camera access error:', err);
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          showToast('⚠️ Camera permission denied. Please allow camera access in Settings.');
+        } else {
+          showToast('⚠️ Could not open camera: ' + (err.message || 'Permission denied'));
+        }
+      }
     }
+
+    function tickPhoneScanner() {
+      const video = document.getElementById('phone-scanner-video');
+      const canvas = document.getElementById('phone-scanner-canvas');
+      if (!video || !canvas || video.readyState !== video.HAVE_ENOUGH_DATA) {
+        if (phoneScannerStream) phoneScannerAnimFrame = requestAnimationFrame(tickPhoneScanner);
+        return;
+      }
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+      if (typeof jsQR !== 'undefined') {
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: 'dontInvert',
+        });
+        if (code && code.data) {
+          NativeFeedback.impact('MEDIUM');
+          NativeFeedback.playChime('scan');
+          closePhoneScanner();
+          handleScannedQrPayload(code.data);
+          return;
+        }
+      }
+      if (phoneScannerStream) phoneScannerAnimFrame = requestAnimationFrame(tickPhoneScanner);
+    }
+
     function closePhoneScanner() {
-      document.getElementById('phone-scanner-modal').classList.add('hidden');
+      const modal = document.getElementById('phone-scanner-modal');
+      if (modal) modal.classList.add('hidden');
+      if (phoneScannerAnimFrame) {
+        cancelAnimationFrame(phoneScannerAnimFrame);
+        phoneScannerAnimFrame = null;
+      }
+      if (phoneScannerStream) {
+        phoneScannerStream.getTracks().forEach(t => t.stop());
+        phoneScannerStream = null;
+      }
     }
+
+    async function handleScannedQrPayload(qrPayload) {
+      try {
+        const serverUrl = localStorage.getItem('oliver_server_url') || 'http://172.20.10.4:3000';
+        const token = localStorage.getItem('murshid_auth_token') || localStorage.getItem('oliver_auth_token');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch(serverUrl + '/api/trpc/student.recordAttendanceViaQr', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ "0": { json: { courseId: 1, qrPayload } } }),
+        });
+        const data = await res.json();
+        if (res.ok && data?.result?.data?.json?.success) {
+          NativeFeedback.notification('SUCCESS');
+          NativeFeedback.playChime('success');
+          showToast('✓ Attendance verified & recorded via live QR scan!');
+        } else {
+          NativeFeedback.notification('ERROR');
+          NativeFeedback.playChime('error');
+          showToast('⚠️ Attendance failed: ' + (data?.error?.json?.message || 'Invalid QR token'));
+        }
+      } catch (err) {
+        NativeFeedback.notification('ERROR');
+        NativeFeedback.playChime('error');
+        showToast('⚠️ Attendance network error');
+      }
+    }
+
     function confirmMobileAttendance() {
       closePhoneScanner();
+      NativeFeedback.impact('MEDIUM');
+      NativeFeedback.notification('SUCCESS');
+      NativeFeedback.playChime('success');
       showToast("✓ Attendance logged in Hall 41 for CS201!");
     }
 
@@ -2875,7 +3076,7 @@
       const btnStudent = document.getElementById('btn-role-student');
       const btnDoctor = document.getElementById('btn-role-doctor');
       const attDoctorBanner = document.getElementById('att-doctor-banner');
-      const island = document.getElementById('island-badge');
+      const badge = document.getElementById('island-badge');
 
       if (role === 'doctor') {
         btnDoctor.classList.add('bg-blue-600', 'text-white');
@@ -2883,14 +3084,14 @@
         btnStudent.classList.remove('bg-emerald-600', 'text-white');
         btnStudent.classList.add('text-slate-400');
         if (attDoctorBanner) attDoctorBanner.classList.remove('hidden');
-        if (island) island.textContent = "Dr. Ahmad Khalil";
+        if (badge) badge.textContent = "Dr. Ahmad Khalil";
       } else {
         btnStudent.classList.add('bg-emerald-600', 'text-white');
         btnStudent.classList.remove('text-slate-400');
         btnDoctor.classList.remove('bg-blue-600', 'text-white');
         btnDoctor.classList.add('text-slate-400');
         if (attDoctorBanner) attDoctorBanner.classList.add('hidden');
-        if (island) island.textContent = "Hanan • ZUJ";
+        if (badge) badge.textContent = "Hanan • ZUJ";
       }
       renderAssignments();
     }
@@ -3237,7 +3438,7 @@
         b.classList.add('text-slate-400');
       });
 
-      const island = document.getElementById('island-badge');
+      const badge = document.getElementById('island-badge');
       const deptLabel = document.querySelector('#screen-dashboard p.text-\\[10px\\].text-slate-400');
       const roadmapSub = document.querySelector('#roadmap-modal p.text-\\[9px\\].text-slate-300');
 
@@ -3247,7 +3448,7 @@
         document.getElementById('hub-student-name').textContent = "Basma Hassan (بسمة حسان)";
         document.getElementById('hub-student-id').textContent = "210029";
         document.getElementById('hub-avatar-initials').textContent = "BH";
-        if (island && currentRole === 'student') island.textContent = "Basma • AI";
+        if (badge && currentRole === 'student') badge.textContent = "Basma • AI";
         if (deptLabel) deptLabel.textContent = "Artificial Intelligence & Data Science (قسم الذكاء الاصطناعي)";
         if (roadmapSub) roadmapSub.textContent = "Artificial Intelligence & Data Science • ZUJ 132 Cr Plan";
         updateCoursesForStudent('basma');
@@ -3258,7 +3459,7 @@
         document.getElementById('hub-student-name').textContent = "Hanan (حنان)";
         document.getElementById('hub-student-id').textContent = "240002";
         document.getElementById('hub-avatar-initials').textContent = "HA";
-        if (island && currentRole === 'student') island.textContent = "Hanan • ZUJ";
+        if (badge && currentRole === 'student') badge.textContent = "Hanan • ZUJ";
         if (deptLabel) deptLabel.textContent = "Software Engineering Department";
         if (roadmapSub) roadmapSub.textContent = "Software Engineering • Finished courses crossed out";
         updateCoursesForStudent('hanan');
@@ -3269,7 +3470,7 @@
         document.getElementById('hub-student-name').textContent = "Abdualrhman (Abood)";
         document.getElementById('hub-student-id').textContent = "202212359";
         document.getElementById('hub-avatar-initials').textContent = "AB";
-        if (island && currentRole === 'student') island.textContent = "Abood • ZUJ";
+        if (badge && currentRole === 'student') badge.textContent = "Abood • ZUJ";
         if (deptLabel) deptLabel.textContent = "Computer Science Department";
         updateCoursesForStudent('hanan');
       }

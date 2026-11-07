@@ -7,9 +7,9 @@
     "allowNavigation": ["*"]
   },
   "ios": {
-    "contentInset": "always",
+    "contentInset": "never",
     "preferredContentMode": "mobile",
-    "scheme": "Oliver ZUJ",
+    "scheme": "oliverzuj",
     "limitsNavigationsToAppBoundDomains": false
   }
 }

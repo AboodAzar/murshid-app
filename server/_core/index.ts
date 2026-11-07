@@ -15,6 +15,7 @@ import {
   passwordResetRateLimiter,
   generalRateLimiter,
 } from "./rateLimiter";
+import { corsMiddleware } from "./cors";
 
 // Port availability check removed for Cloud Run compatibility
 
@@ -25,6 +26,9 @@ async function startServer() {
   // Trust the first proxy (Render's load balancer) to get correct client IPs for rate limiting
   app.set("trust proxy", 1);
 
+  // Enable CORS for iOS Capacitor and local network origins
+  app.use(corsMiddleware);
+
   // Security headers middleware
   app.use((req, res, next) => {
     // Content Security Policy
@@ -33,9 +37,9 @@ async function startServer() {
       "default-src 'self'; " +
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://cdn.tailwindcss.com https://cdn.jsdelivr.net; " +
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; " +
-        "img-src 'self' data: https: blob:; " +
+        "img-src 'self' data: https: http: blob: capacitor: ionic:; " +
         "font-src 'self' data: https://fonts.gstatic.com; " +
-        "connect-src 'self' https:; " +
+        "connect-src 'self' https: http: capacitor: ionic: ws: wss:; " +
         "frame-ancestors 'none';"
     );
 

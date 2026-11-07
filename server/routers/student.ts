@@ -1842,11 +1842,20 @@ export const studentRouter = router({
       if (!targetStudentId) throw new TRPCError({ code: "BAD_REQUEST", message: "Target student required" });
 
       // Validate QR Token
+      if (!input.qrPayload || typeof input.qrPayload !== "string" || !input.qrPayload.trim()) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid or empty QR payload" });
+      }
+
+      const base64Regex = /^[A-Za-z0-9+/=]+$/;
+      if (!base64Regex.test(input.qrPayload.trim())) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Malformed non-base64 QR payload" });
+      }
+
       let decodedPayload = "";
       try {
         decodedPayload = Buffer.from(input.qrPayload, "base64").toString("utf8");
       } catch {
-        decodedPayload = input.qrPayload;
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Failed to decode QR payload" });
       }
 
       const parts = decodedPayload.split("|");
@@ -1854,7 +1863,14 @@ export const studentRouter = router({
       try {
         tokenData = JSON.parse(parts[0]);
       } catch {
-        tokenData = { courseId: input.courseId, ts: Date.now(), totp: parts[0] };
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Malformed QR token structure" });
+      }
+
+      if (tokenData.courseId && Number(tokenData.courseId) !== Number(input.courseId)) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Course mismatch: QR code is for course ${tokenData.courseId}, but check-in attempted for ${input.courseId}`,
+        });
       }
 
       const now = Date.now();

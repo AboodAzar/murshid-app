@@ -1,239 +1,102 @@
-# Murshid Automated E2E Test Suite (Milestone 5 Delivery)
+# Test Readiness Declaration: Murshid Native iOS Capacitor Transformation
 
 ## Overview
-Comprehensive 5-tier automated end-to-end (E2E) testing suite for the Murshid Academic Guidance Platform (Al-Zaytoonah University of Jordan). The suite executes opaque-box tests against the live HTTP / tRPC server on `http://localhost:3000/api/trpc` using cookie jar session persistence, verifies 100% test pass rate, and ensures 0 database state drift.
+The automated opaque-box E2E test suite for the Murshid Native iOS Capacitor Transformation is **implemented, verified, and ready**. The test suite spans Tiers 1 through 4, providing requirement-driven opaque-box verification for all 12 inventoried features defined in `PROJECT.md` and `TEST_INFRA.md` derived from `ORIGINAL_REQUEST.md` (R1–R6).
 
-## Test Runner Commands
+- **Master Test Runner Command**: `node tests/e2e/ios/run-ios-e2e.mjs`
+- **Total Test Cases**: 143 tests across 4 tiers (exceeding minimum target of 138)
+- **Current Baseline Execution**: 101 Passed, 42 Failed (pending implementation milestones), **0 Database State Drift** across all 16 monitored tables.
 
-### Run Full 5-Tier Test Suite
-```bash
-npm run test:e2e
-```
-or
-```bash
-node tests/e2e/run-all-e2e.mjs
-```
+---
 
-### Run Individual Tiers
-```bash
-# Tier 1: Feature Coverage (38 tests)
-node tests/e2e/tier1-features.mjs
+## How to Run the Tests
 
-# Tier 2: Boundary & Corner Cases (39 tests)
-node tests/e2e/tier2-boundaries.mjs
+```powershell
+# Run the complete iOS E2E test suite (Tiers 1 to 4)
+node tests/e2e/ios/run-ios-e2e.mjs
 
-# Tier 3: Pairwise Cross-Feature Combinations (5 tests)
-node tests/e2e/tier3-cross-feature.mjs
-
-# Tier 4: Real-World Workload Scenarios (5 tests)
-node tests/e2e/tier4-scenarios.mjs
-
-# Tier 5: Adversarial Coverage Hardening (34 tests)
-node tests/e2e/tier5-adversarial.mjs
+# Run specific tiers individually
+node tests/e2e/ios/run-ios-e2e.mjs --tier=1   # Tier 1: Feature Coverage (60 tests)
+node tests/e2e/ios/run-ios-e2e.mjs --tier=2   # Tier 2: Boundary & Corner Cases (60 tests)
+node tests/e2e/ios/run-ios-e2e.mjs --tier=3   # Tier 3: Cross-Feature Integration (15 tests)
+node tests/e2e/ios/run-ios-e2e.mjs --tier=4   # Tier 4: Real-World Application Scenarios (8 tests)
 ```
 
 ---
 
-## Tier Coverage Metrics & Results
+## Test Architecture & Directory Layout
 
-| Tier | Description | Target | Implemented | Passed | Failed | Pass Rate |
-|---|---|:---:|:---:|:---:|:---:|:---:|
-| **Tier 1** | Feature Coverage (F1 through F7) | ≥35 | 38 | 38 | 0 | **100%** |
-| **Tier 2** | Boundary & Corner Cases (F1 through F7) | ≥35 | 39 | 39 | 0 | **100%** |
-| **Tier 3** | Pairwise Cross-Feature Combinations | ≥5 | 5 | 5 | 0 | **100%** |
-| **Tier 4** | Real-World Application Workflows | ≥5 | 5 | 5 | 0 | **100%** |
-| **Tier 5** | Adversarial Coverage Hardening & Router Audit | ≥30 | 34 | 34 | 0 | **100%** |
-| **Total** | **All Tiers Master Suite** | **≥110** | **121** | **121** | **0** | **100%** |
-
----
-
-## Feature Coverage Matrix (F1 to F7)
-
-| Feature | Feature Area | Tier 1 (Coverage) | Tier 2 (Boundaries) | Tier 3 (Cross-Feature) | Tier 4 (Workflows) | Status |
-|---|---|:---:|:---:|:---:|:---:|:---:|
-| **F1** | Auth & Session Management | 5 tests | 6 tests | ✓ (T3.1) | ✓ (S1, S2, S5) | **VERIFIED** |
-| **F2** | Student Academic Progress & Dashboard | 6 tests | 5 tests | ✓ (T3.3) | ✓ (S1, S2) | **VERIFIED** |
-| **F3** | Course Enrollment & Prerequisite Guard | 5 tests | 6 tests | ✓ (T3.5) | ✓ (S1) | **VERIFIED** |
-| **F4** | Advisor Roster & Alerts Workflow | 6 tests | 6 tests | ✓ (T3.2, T3.3, T3.4) | ✓ (S2) | **VERIFIED** |
-| **F5** | Admin User & Advisor Assignment | 5 tests | 5 tests | ✓ (T3.1, T3.2) | ✓ (S5) | **VERIFIED** |
-| **F6** | Campus Navigation & Room Finder | 5 tests | 5 tests | ✓ (T3.4) | ✓ (S4) | **VERIFIED** |
-| **F7** | AI Chat Graceful Mock & Local Fallback | 6 tests | 6 tests | ✓ (T3.5) | ✓ (S3) | **VERIFIED** |
+| Path | Purpose | Test Count |
+|------|---------|:----------:|
+| `tests/e2e/ios/helpers/test-client.mjs` | Test harness, assertion helpers, dual-mode auth session, QR generator, DB cleanup hooks | Harness |
+| `tests/e2e/ios/tier1-feature-coverage.test.mjs` | Tier 1: Comprehensive feature coverage (≥5 tests per feature for 12 features) | 60 |
+| `tests/e2e/ios/tier2-boundary-corner.test.mjs` | Tier 2: Boundary value analysis, corner cases, error paths | 60 |
+| `tests/e2e/ios/tier3-cross-feature.test.mjs` | Tier 3: Pairwise cross-feature interactions and integration flows | 15 |
+| `tests/e2e/ios/tier4-application-scenarios.test.mjs` | Tier 4: Realistic multi-step student user journeys and workflows | 8 |
+| `tests/e2e/ios/run-ios-e2e.mjs` | Master test runner with pre/post DB snapshot & zero drift verification | Master Runner |
+| **Total** | **Comprehensive Test Suite** | **143 Tests** |
 
 ---
 
-## Detailed Test Inventory
+## Feature Coverage Matrix & Baseline Results
 
-### Tier 1 — Feature Coverage (`tests/e2e/tier1-features.mjs`)
-- `T1.1.1`: Admin login succeeds with valid credentials (`abood@gmail.com` / `Abood#2004`).
-- `T1.1.2`: Advisor login succeeds with valid credentials (`a.khalil@zuj.edu.jo` / `password123`).
-- `T1.1.3`: Student login succeeds with valid credentials (`khaled.haddad@zuj.edu.jo` / `password123`).
-- `T1.1.4`: `auth.me` validates active session with correct role, email, and user ID.
-- `T1.1.5`: `auth.logout` clears session cookie and invalidates session.
-- `T1.2.1`: `student.dashboard` returns student profile, GPA, earned credits, and academic metrics.
-- `T1.2.2`: `student.myCourses` returns enrolled courses list with course details.
-- `T1.2.3`: `student.todaySchedule` returns timetable with lecture slots.
-- `T1.2.4`: `student.attendance` returns attendance log with present/absent counts.
-- `T1.2.5`: `student.assignments` returns course assignments with submission status.
-- `T1.2.6`: `student.overview` returns degree progress metrics, streak, and achievements.
-- `T1.3.1`: `courses.list` queries university course catalog with pagination metadata.
-- `T1.3.2`: `courses.getById` retrieves course details and credit hours.
-- `T1.3.3`: `courses.getPrerequisites` retrieves prerequisite courses for specified course.
-- `T1.3.4`: `courses.getAllPrerequisites` retrieves full prerequisite mapping catalog.
-- `T1.3.5`: `courses.getRecommendations` returns academic course suggestions.
-- `T1.4.1`: `advisor.getAssignedStudents` lists advisees for logged-in advisor.
-- `T1.4.2`: `advisor.getStudentProfile` retrieves detailed student academic record.
-- `T1.4.3`: `advisor.getInsights` returns advisor aggregate statistics (totalStudents, atRisk, etc.).
-- `T1.4.4`: `advisor.createAlert` creates academic alert, verified in `advisor.getAlerts`, and cleaned up.
-- `T1.4.5`: `advisor.addNote` adds advisor note, verified in `advisor.getNotes`, and cleaned up.
-- `T1.4.6`: `advisor.getAppointments` retrieves scheduled student advising sessions.
-- `T1.5.1`: `admin.dashboard` returns user metrics and system health indicators.
-- `T1.5.2`: `admin.getAdvisorsWithStudents` returns advisor roster with advisee counts.
-- `T1.5.3`: `admin.getUnassignedStudents` queries students needing advisor pairing.
-- `T1.5.4`: `admin.updateUser` updates user name and restores original name with zero state drift.
-- `T1.5.5`: `announcements.create` creates announcement, verifies it in `announcements.list`, and deletes it.
-- `T1.6.1`: `navigation.campus` returns campus buildings with geographic coordinates.
-- `T1.6.2`: `navigation.campus` returns room directory across campus buildings.
-- `T1.6.3`: Locate IT Faculty building and verify capacity and floor metadata.
-- `T1.6.4`: Filter classroom rooms by type and verify floor assignment.
-- `T1.6.5`: Verify room coordinates associate with parent building.
-- `T1.7.1`: `aiChat.getStatus` returns AI status with `local_mock_fallback` mode.
-- `T1.7.2`: `aiChat.createConversation` creates student chat session.
-- `T1.7.3`: `aiChat.sendMessage` answers FAQ query with local fallback answer.
-- `T1.7.4`: `aiChat.sendMessage` answers academic rules query with regulation text.
-- `T1.7.5`: `aiChat.getMessages` retrieves stored message thread.
-- `T1.7.6`: `aiChat.deleteConversation` cleans up conversation and messages with zero DB drift.
-
-### Tier 2 — Boundary & Corner Cases (`tests/e2e/tier2-boundaries.mjs`)
-- `T2.1.1`: Login with invalid password fails with UNAUTHORIZED.
-- `T2.1.2`: Login with unregistered email fails with UNAUTHORIZED.
-- `T2.1.3`: Registration with non-ZUJ email rejected with BAD_REQUEST.
-- `T2.1.4`: Registration with short password (<8 chars) rejected by Zod schema.
-- `T2.1.5`: Accessing protected endpoint with malformed JWT cookie rejected with UNAUTHORIZED.
-- `T2.1.6`: Accessing protected endpoint unauthenticated rejected with UNAUTHORIZED.
-- `T2.2.1`: Student accessing admin route (`admin.dashboard`) throws FORBIDDEN (10002).
-- `T2.2.2`: Student accessing advisor route (`advisor.createAlert`) throws FORBIDDEN (10003).
-- `T2.2.3`: Student accessing advisor note route (`advisor.addNote`) throws FORBIDDEN (10003).
-- `T2.2.4`: Student querying another student's dashboard throws FORBIDDEN / restricts to own ID.
-- `T2.2.5`: Student querying non-existent course details returns null gracefully.
-- `T2.3.1`: Enrolling in non-existent course ID (999999) rejected with NOT_FOUND.
-- `T2.3.2`: Enrolling in course with missing prerequisite rejected with BAD_REQUEST.
-- `T2.3.3`: Enrolling in already completed course rejected with BAD_REQUEST.
-- `T2.3.4`: Duplicate enrollment in in-progress course rejected with BAD_REQUEST.
-- `T2.3.5`: Advisor attempting `courses.enrollCourse` rejected with UNAUTHORIZED.
-- `T2.3.6`: Admin attempting `courses.enrollCourse` rejected with UNAUTHORIZED.
-- `T2.4.1`: Advisor accessing admin route (`admin.assignAdvisor`) throws FORBIDDEN (10002).
-- `T2.4.2`: Advisor attempting to create alert for unassigned/foreign student throws FORBIDDEN.
-- `T2.4.3`: Advisor attempting to add note for unassigned/foreign student throws FORBIDDEN.
-- `T2.4.4`: Advisor attempting to schedule appointment for foreign student throws FORBIDDEN.
-- `T2.4.5`: Advisor resolving non-existent alert ID throws NOT_FOUND.
-- `T2.4.6`: Advisor deleting non-existent note ID throws NOT_FOUND.
-- `T2.5.1`: Admin self-deletion attempt rejected with BAD_REQUEST.
-- `T2.5.2`: Admin updating non-existent user ID rejected with NOT_FOUND.
-- `T2.5.3`: Admin assigning non-existent advisor ID rejected with NOT_FOUND.
-- `T2.5.4`: Admin assigning advisor to non-existent student ID rejected with NOT_FOUND.
-- `T2.5.5`: Announcement creation with empty title rejected by schema validation.
-- `T2.6.1`: Campus navigation query without auth rejected with UNAUTHORIZED.
-- `T2.6.2`: Searching non-existent room code yields no matches gracefully.
-- `T2.6.3`: Buildings list contains only valid finite numeric coordinates (no null/NaN).
-- `T2.6.4`: Rooms list contains valid positive capacity values.
-- `T2.6.5`: Navigation handles special characters and XSS safely in queries.
-- `T2.7.1`: AI chat request returns response in <1500ms under offline fallback.
-- `T2.7.2`: Accessing AI chat messages for non-existent conversation returns NOT_FOUND.
-- `T2.7.3`: Rating a non-existent message ID returns NOT_FOUND.
-- `T2.7.4`: Non-student role (Advisor) attempting `createConversation` rejected with UNAUTHORIZED.
-- `T2.7.5`: Non-student role (Admin) attempting `createConversation` rejected with UNAUTHORIZED.
-- `T2.7.6`: Deleting a non-existent conversation ID returns NOT_FOUND.
-
-### Tier 3 — Pairwise Cross-Feature Combinations (`tests/e2e/tier3-cross-feature.mjs`)
-- `T3.1`: Admin creates announcement → Student and Advisor dashboards immediately reflect the announcement; cleaned up via `announcements.delete`.
-- `T3.2`: Admin assigns student to Advisor → Advisor advisee roster and insights immediately reflect the student; restored to original state.
-- `T3.3`: Advisor creates academic alert → Student dashboard reflects alert in `advisorAlerts`; Advisor resolves alert and deletes it.
-- `T3.4`: Advisor schedules advising appointment → Student timetable reflects appointment and room matches campus navigation directory; cancelled and cleaned up.
-- `T3.5`: Student asks AI about prerequisite rule → AI returns university regulation policy → Student inspects study plan catalog.
-
-### Tier 4 — Real-World Workload Scenarios (`tests/e2e/tier4-scenarios.mjs`)
-- `Scenario 1`: **New Semester Academic Onboarding**
-  - Student logs in, reviews transcript and GPA in dashboard, queries course recommendations, checks prerequisite requirements from catalog, inspects weekly timetable, and validates student announcements.
-- `Scenario 2`: **At-Risk Student Advisor Intervention**
-  - Advisor logs in, inspects advisee roster & insights, flags at-risk student, dispatches high-severity academic alert, records private clinical note (verified invisible to student), schedules advising appointment. Student logs in, verifies alert in dashboard and scheduled session. Advisor resolves alert and deletes test rows.
-- `Scenario 3`: **Offline Academic Advisory Assistance**
-  - Student opens AI Chat when model server is offline, verifies offline fallback indicator status, queries AI about minimum GPA rules and graduation credit requirements, receives deterministic local university policy guidance, rates assistant message, and cleans up conversation.
-- `Scenario 4`: **Campus Lecture Navigation**
-  - Student loads full weekly schedule, extracts lecture room code, queries campus navigation directory, locates faculty building and floor, verifies building coordinates, and checks room capacity.
-- `Scenario 5`: **Administrative Faculty Governance**
-  - Admin audits system metrics via `admin.dashboard`, lists unassigned students, pairs student with advisor, creates campus announcement, verifies announcement visible across roles, removes test announcement, and restores original advisor assignment.
-
-### Tier 5 — Adversarial Coverage Hardening (`tests/e2e/tier5-adversarial.mjs`)
-#### Category 1: TRPCError Code Preservation & Bug Verification
-- `T5.1.1`: `aiChat.getMessages` with non-existent conversation returns `NOT_FOUND` (not `INTERNAL_SERVER_ERROR`).
-- `T5.1.2`: `aiChat.rateMessage` with non-existent message returns `NOT_FOUND` (not `INTERNAL_SERVER_ERROR`).
-- `T5.1.3`: `aiChat.deleteConversation` with non-existent conversation returns `NOT_FOUND` (not `INTERNAL_SERVER_ERROR`).
-- `T5.1.4`: `aiChat.sendMessage` with non-existent conversation rejects with `NOT_FOUND` (not swallowed with fallback).
-- `T5.1.5`: `aiChat.rateMessage` IDOR check: student cannot rate messages belonging to another student's conversation.
-- `T5.1.6`: `documents.delete` with non-existent ID throws `FORBIDDEN` / `NOT_FOUND` (not `INTERNAL_SERVER_ERROR`).
-- `T5.1.7`: `documents.retryDocumentIndexing` with non-existent ID throws `NOT_FOUND` (not `INTERNAL_SERVER_ERROR`).
-
-#### Category 2: Boundary Value Analysis & Schema Guards
-- `T5.2.1`: `courses.list` with `page: 0` rejected by Zod schema with `BAD_REQUEST`.
-- `T5.2.2`: `courses.list` with negative page (`page: -1`) rejected by Zod schema.
-- `T5.2.3`: `courses.list` with `limit: 0` rejected by Zod schema.
-- `T5.2.4`: `courses.list` with excessive limit (`limit: 500` > 100 max) rejected by Zod schema.
-- `T5.2.5`: `faqs.list` with `page: 0` rejected by Zod schema.
-- `T5.2.6`: `announcements.create` with massive 50KB payload handled safely.
-- `T5.2.7`: `advisor.scheduleAppointment` with `durationMinutes: 1` (< 5 min) rejected.
-- `T5.2.8`: `advisor.scheduleAppointment` with `durationMinutes: 500` (> 240 max) rejected.
-
-#### Category 3: Course Enrollment Prerequisite & Concurrency Boundaries
-- `T5.3.1`: `courses.enrollCourse` with missing intermediate prerequisite rejected with `BAD_REQUEST`.
-- `T5.3.2`: `courses.enrollCourse` for already completed course rejected with `BAD_REQUEST`.
-- `T5.3.3`: `courses.enrollCourse` for already in-progress course rejected with `BAD_REQUEST`.
-- `T5.3.4`: `courses.enrollCourse` for non-existent course ID (999999) rejected with `NOT_FOUND`.
-- `T5.3.5`: `courses.enrollCourse` sequential double-enrollment idempotency.
-
-#### Category 4: RBAC & Multi-Tenant Scoping Boundaries
-- `T5.4.1`: Student accessing advisor route (`advisor.getAssignedStudents`) rejected with `FORBIDDEN`.
-- `T5.4.2`: Student accessing admin route (`admin.dashboard`) rejected with `FORBIDDEN`.
-- `T5.4.3`: Advisor accessing admin route (`admin.assignAdvisor`) rejected with `FORBIDDEN`.
-- `T5.4.4`: Advisor 1 cannot create academic alert for Advisor 2's student (Lina Omar).
-- `T5.4.5`: Advisor 1 cannot add note for Advisor 2's student (Lina Omar).
-- `T5.4.6`: Advisor 1 cannot schedule appointment for Advisor 2's student (Lina Omar).
-- `T5.4.7`: Advisor resolving non-existent alert ID rejected with `NOT_FOUND`.
-- `T5.4.8`: Admin self-deletion rejected with `BAD_REQUEST`.
-- `T5.4.9`: Admin assigning non-existent advisor ID rejected with `NOT_FOUND`.
-
-#### Category 5: Authentication Token Security & Concurrency Burst
-- `T5.5.1`: Session cookie with tampered JWT signature rejected with `UNAUTHORIZED`.
-- `T5.5.2`: Session cookie with invalid payload type rejected with `UNAUTHORIZED`.
-- `T5.5.3`: Session cookie with non-existent userId (999999) rejected with `UNAUTHORIZED`.
-- `T5.5.4`: SQL injection payload in login email rejected cleanly with `UNAUTHORIZED`.
-- `T5.5.5`: High concurrency burst (30 simultaneous requests across 5 endpoints).
+| # | Feature Name | Source (Req) | Milestone | Tier 1 | Tier 2 | Tier 3 | Tier 4 | Baseline Status |
+|---|--------------|-------------|:---------:|:------:|:------:|:------:|:------:|:---------------:|
+| 1 | Simulated Chrome Removal | R1 | M2 | 5 tests | 5 tests | ✓ | ✓ | 2 Failures (Fake 9:41, fake island in HTML) |
+| 2 | True Safe-Area Layout (iPhone XS/XS Max) | R1 | M2 | 5 tests | 5 tests | ✓ | ✓ | 1 Failure (Double status bar calculation) |
+| 3 | iOS 27 Liquid Glass Design System | R5 | M2 | 5 tests | 5 tests | ✓ | ✓ | 100% Passed (Tokens, blur, OLED gradients) |
+| 4 | Backend CORS & CSP Support | R4 | M1 | 5 tests | 5 tests | ✓ | — | 8 Failures (Express CORS middleware missing) |
+| 5 | Dual-Mode Bearer Token Auth | R4 | M1 | 5 tests | 5 tests | ✓ | — | 10 Failures (Bearer token in login/me missing) |
+| 6 | Native Camera QR Scanner & jsQR | R2 | M3 | 5 tests | 5 tests | ✓ | ✓ | 6 Failures (getUserMedia & jsQR DOM missing) |
+| 7 | Native Haptic & Web Audio Feedback | R3 | M3 | 5 tests | 5 tests | ✓ | ✓ | 7 Failures (Capacitor haptics & audio missing) |
+| 8 | Configurable Server Host & Network Pill | R4 | M4 | 5 tests | 5 tests | ✓ | ✓ | 1 Failure (Modal UI trigger missing) |
+| 9 | Live tRPC Client Queries & Mutations | R4 | M4 | 5 tests | 5 tests | ✓ | ✓ | 100% Passed (SuperJSON, schedule, QR verify) |
+| 10 | Real Student Sign-In & Persistence | R4 | M4 | 5 tests | 5 tests | ✓ | ✓ | 90% Passed (Auth valid, storage logic pending) |
+| 11 | Capacitor Config & Bridge Injection | R6 | M5 | 5 tests | 5 tests | ✓ | — | 3 Failures (capacitor.js script, contentInset) |
+| 12 | Updated iOS Build & Asset Sync | R6 | M5 | 5 tests | 5 tests | ✓ | — | 100% Passed (bundle-app, plist, xcodeproj) |
 
 ---
 
-## Database State Invariance (Zero State Drift)
+## Baseline Execution Summary
 
-Before and after executing the entire test suite, a database snapshot is captured across all 16 monitored tables:
+```
+================================================================================
+  MASTER TEST EXECUTION SUMMARY (MURSHID NATIVE IOS CAPACITOR)
+================================================================================
+  * Tier 1: Feature Coverage (Features 1 to 12)           : 34/60 Passed [FAILED]
+  * Tier 2: Boundary & Corner Cases (Features 1 to 12)    : 45/60 Passed [FAILED]
+  * Tier 3: Pairwise Cross-Feature Integration (15 tests) : 14/15 Passed [FAILED]
+  * Tier 4: Real-World Application Scenarios (8 tests)    :  8/8  Passed [PASSED]
+--------------------------------------------------------------------------------
+  GRAND TOTAL: 101 Passed, 42 Failed out of 143 total tests (71451ms)
+================================================================================
 
-| Monitored Table | Row Count Before | Row Count After | Delta | Drift Status |
-|---|:---:|:---:|:---:|:---:|
-| `users` | 26 | 26 | 0 | **ZERO DRIFT** |
-| `departments` | 1 | 1 | 0 | **ZERO DRIFT** |
-| `courses` | 32 | 32 | 0 | **ZERO DRIFT** |
-| `coursePrerequisites` | 10 | 10 | 0 | **ZERO DRIFT** |
-| `studyPlans` | 27 | 27 | 0 | **ZERO DRIFT** |
-| `studentCourses` | 408 | 408 | 0 | **ZERO DRIFT** |
-| `aiConversations` | 59 | 59 | 0 | **ZERO DRIFT** |
-| `chatMessages` | 58 | 58 | 0 | **ZERO DRIFT** |
-| `faqs` | 2 | 2 | 0 | **ZERO DRIFT** |
-| `documents` | 0 | 0 | 0 | **ZERO DRIFT** |
-| `buildings` | 1 | 1 | 0 | **ZERO DRIFT** |
-| `rooms` | 56 | 56 | 0 | **ZERO DRIFT** |
-| `announcements` | 1 | 1 | 0 | **ZERO DRIFT** |
-| `academicAlerts` | 0 | 0 | 0 | **ZERO DRIFT** |
-| `advisorNotes` | 0 | 0 | 0 | **ZERO DRIFT** |
-| `appointments` | 0 | 0 | 0 | **ZERO DRIFT** |
+================================================================================
+  DATABASE STATE DRIFT AUDIT (Zero Drift Verification)
+================================================================================
+  [SUCCESS] 0 Database State Drift verified across all 16 monitored tables!
+================================================================================
+```
 
 ---
 
-## Conclusion
-The Milestone 5 automated test suite is complete, fully functional, opaque-box, and compliant with all project requirements. All 121 test cases pass deterministically on back-to-back runs with 0 database state drift and exit code 0.
+## Discovered Implementation Gaps & Escalation
+
+The 42 baseline test failures are verified **true implementation gaps** currently pending execution in Milestones M1 through M5. The test suite serves as the objective verification gate for each milestone:
+
+1. **Milestone 1 Gaps (Backend CORS & Dual-Mode Bearer Auth)**:
+   - `server/_core/index.ts`: Missing `app.use(cors({ origin: ['capacitor://localhost', 'http://172.20.10.*'], credentials: true }))` and OPTIONS preflight handling.
+   - `server/_core/sdk.ts`: `extractSessionCookie` only inspects `req.headers.cookie`; must also inspect `req.headers.authorization` for `Bearer <token>`.
+   - `server/routers/auth.ts`: `login` mutation generates `token` but omits it from return payload; `auth.me` must validate Bearer tokens.
+2. **Milestone 2 Gaps (Simulated Chrome Removal & Safe Areas)**:
+   - `client/public/phone.html` / `ios-app/www/index.html`: Contains static `9:41`, `#dynamic-island`, and fake battery.
+   - `ios-app/scripts/bundle-app.mjs`: Safe area override calculates `#status-bar` as `calc(44px + env(safe-area-inset-top))`, creating double status bar (88px) on iPhone XS.
+3. **Milestone 3 Gaps (Native Camera QR, Haptics & Audio)**:
+   - `ios-app/www/index.html`: Scanner modal is a static placeholder with emoji `📷`; needs `<video>` viewfinder and `jsQR` decoder.
+   - Zero references to `Capacitor.Plugins.Haptics` or Web Audio `AudioContext` for alerts.
+4. **Milestone 4 Gaps (Server Host Modal Trigger & Full API Integration)**:
+   - `#ios-server-modal` exists in HTML, but lacks an accessible trigger button/pill in the UI header.
+5. **Milestone 5 Gaps (Capacitor Config & Bridge Script)**:
+   - `index.html` lacks `<script src="capacitor.js"></script>`.
+   - `capacitor.config.json` has `ios.contentInset: "always"` (must be `"never"`).
+   - `capacitor.config.json` has `ios.scheme: "Oliver ZUJ"` with spaces (must be RFC compliant, e.g. `"oliverzuj"` or `"capacitor"`).

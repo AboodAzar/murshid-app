@@ -144,54 +144,111 @@ export const authRouter = router({
     }
     console.log("[Auth:Me] Step 2 - No user in context");
 
-    // If no context user, try to verify JWT from cookie
-    const cookies = opts.ctx.req.headers.cookie || "";
-    const cookieMatch = cookies.match(new RegExp(`${COOKIE_NAME}=([^;]*)`));
+    // Extract Authorization header to check for explicit Bearer token
+    const authHeader = opts.ctx.req?.headers?.authorization;
+    const headerValue = Array.isArray(authHeader) ? authHeader[0] : authHeader;
+    let bearerToken: string | null = null;
+    let hasExplicitBearer = false;
 
-    if (!cookieMatch || !cookieMatch[1]) {
-      console.log("[Auth:Me] Step 3 - No auth cookie found (cookie name:", COOKIE_NAME, ")");
-      return null;
-    }
-    console.log("[Auth:Me] Step 3 - Auth cookie found");
-
-    const jwtClaims = await verifyLocalAuthToken(cookieMatch[1]);
-    if (!jwtClaims) {
-      console.log("[Auth:Me] Step 4 - JWT token invalid or expired");
-      return null;
-    }
-    console.log("[Auth:Me] Step 4 - JWT valid, userId:", jwtClaims.userId, "role:", jwtClaims.role);
-
-    // Fetch user from database
-    const db = await getDb();
-    if (!db) {
-      console.error("[Auth:Me] Step 5 - Database unavailable");
-      return null;
+    if (headerValue && typeof headerValue === "string" && headerValue.toLowerCase().startsWith("bearer ")) {
+      hasExplicitBearer = true;
+      bearerToken = headerValue.substring(7).trim() || null;
     }
 
-    try {
-      const result = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, jwtClaims.userId))
-        .limit(1);
-      const user = result[0] || null;
-      if (user) {
-        console.log("[Auth:Me] Step 5 - User loaded from DB:", user.email, "role:", user.role);
-      } else {
-        console.warn("[Auth:Me] Step 5 - User not found in DB for userId:", jwtClaims.userId);
+    // 1. If an explicit Bearer header was provided
+    if (hasExplicitBearer) {
+      // Empty Bearer token (e.g. 'Bearer ') returns null for unauthenticated session per T2.5.3
+      if (!bearerToken) {
+        console.log("[Auth:Me] Step 3 - Empty Bearer token provided, returning null");
+        return null;
       }
-      return user;
-    } catch (error) {
-      console.error("[Auth:Me] Step 5 - Failed to fetch user from DB:", error);
-      return null;
+
+      console.log("[Auth:Me] Step 3 - Explicit Bearer token found, validating...");
+      const jwtClaims = await verifyLocalAuthToken(bearerToken);
+      if (!jwtClaims) {
+        console.log("[Auth:Me] Step 4 - Bearer JWT invalid or expired, rejecting with UNAUTHORIZED");
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Unauthorized: Invalid or expired authorization token",
+        });
+      }
+
+      console.log("[Auth:Me] Step 4 - Bearer JWT valid, userId:", jwtClaims.userId, "role:", jwtClaims.role);
+
+      const db = await getDb();
+      if (!db) {
+        console.error("[Auth:Me] Step 5 - Database unavailable");
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Database unavailable",
+        });
+      }
+
+      try {
+        const result = await db
+          .select()
+          .from(users)
+          .where(eq(users.id, jwtClaims.userId))
+          .limit(1);
+        const user = result[0] || null;
+        if (!user) {
+          console.warn("[Auth:Me] Step 5 - User not found in DB for userId:", jwtClaims.userId);
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Unauthorized: Invalid or expired authorization token",
+          });
+        }
+        console.log("[Auth:Me] Step 5 - User loaded from DB:", user.email, "role:", user.role);
+        return user;
+      } catch (error) {
+        if (error instanceof TRPCError) throw error;
+        console.error("[Auth:Me] Step 5 - Failed to fetch user from DB:", error);
+        return null;
+      }
     }
+
+    // 2. Fall back to session cookie if no Bearer header was provided
+    const cookies = opts.ctx.req?.headers?.cookie || "";
+    const cookieMatch = cookies.match(new RegExp(`${COOKIE_NAME}=([^;]*)`));
+    const cookieToken = cookieMatch && cookieMatch[1] ? cookieMatch[1] : null;
+
+    if (cookieToken) {
+      console.log("[Auth:Me] Step 3 - Session cookie found, validating...");
+      const jwtClaims = await verifyLocalAuthToken(cookieToken);
+      if (!jwtClaims) {
+        console.log("[Auth:Me] Step 4 - Cookie JWT invalid or expired, returning null for guest");
+        return null;
+      }
+
+      const db = await getDb();
+      if (!db) {
+        console.error("[Auth:Me] Step 5 - Database unavailable");
+        return null;
+      }
+
+      try {
+        const result = await db
+          .select()
+          .from(users)
+          .where(eq(users.id, jwtClaims.userId))
+          .limit(1);
+        return result[0] || null;
+      } catch (error) {
+        console.error("[Auth:Me] Step 5 - Failed to fetch user from DB:", error);
+        return null;
+      }
+    }
+
+    // 3. Guest session (neither Bearer header nor session cookie)
+    console.log("[Auth:Me] Step 3 - No credentials provided, guest session returning null");
+    return null;
   }),
 
   // Login endpoint
   login: publicProcedure
     .input(
       z.object({
-        email: z.string().email(),
+        email: z.string().transform((v) => v.trim().toLowerCase()).pipe(z.string().email()),
         password: z.string().min(6),
       })
     )
@@ -221,7 +278,7 @@ export const authRouter = router({
           console.warn("[Auth:Login] Step 4 FAILED - User not found:", input.email);
           throw new TRPCError({
             code: "UNAUTHORIZED",
-            message: "User not found. Please register first.",
+            message: "Invalid credentials: User not found. Please register first.",
           });
         }
         console.log("[Auth:Login] Step 4 - User found:", { id: user.id, email: user.email, role: user.role, isEmailVerified: user.isEmailVerified, hasPassword: !!user.password });
@@ -292,6 +349,7 @@ export const authRouter = router({
         console.log("[Auth:Login] SUCCESS - Login completed for:", input.email);
         return {
           success: true,
+          token,
           user: {
             id: user.id,
             email: user.email,
@@ -498,6 +556,7 @@ export const authRouter = router({
 
         return {
           success: true,
+          token,
           user: {
             id: user.id,
             email: user.email,

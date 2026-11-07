@@ -1,65 +1,82 @@
-# Project: Murshid Academic Guidance Platform
+# Project: Murshid Native iOS Capacitor Transformation
 
 ## Architecture
-Murshid is a full-stack academic guidance web application built for Al-Zaytoonah University of Jordan (ZUJ).
-- **Backend**: Node.js v24 + Express 4.21.2 + tRPC 11.6.0 server mounted at `/api/trpc`.
-- **Database & ORM**: MariaDB 10.11 on `localhost:3306/murshid` accessed via `drizzle-orm` + `mysql2`.
-- **Security & Authentication**: HTTP-only cookie (`app_session_id`) containing a signed JOSE HS256 JWT, verified via PBKDF2 (SHA-512, 210,000 iterations). Middleware guards: `publicProcedure`, `protectedProcedure`, `advisorProcedure`, `adminProcedure`.
-- **Frontend**: React 19 + Vite 7 + Tailwind CSS v4 + Radix UI + TanStack Query 5 + tRPC client + Wouter router.
-- **AI Chat Architecture**: Decoupled from offline Runpod model server. Features a responsive 3-tier local fallback engine (FAQ matching, student academic rules guidance, simulated advisor responses) with clear UI offline badges.
+- **Client**: Native iOS Capacitor 6.2 Application (`ios-app/`) wrapping responsive HTML5/Tailwind/Vanilla JS bundle (`www/index.html`) running inside WKWebView.
+- **UI Design System**: "iOS 27 Liquid Glass" — fluid glassmorphic surfaces, multi-layer backdrop blurs, specular refractive edges, floating translucent glass cards, OLED ambient mesh gradients, and native safe-area layout (`env(safe-area-inset-top)` / `env(safe-area-inset-bottom)`).
+- **Native Hardware Integration**:
+  - Live Camera QR Code Scanner: WebRTC `getUserMedia` with real-time `jsQR` canvas decoder inside WKWebView, backed by `NSCameraUsageDescription` in `Info.plist`.
+  - Native Feedback: Apple Taptic Engine via `@capacitor/haptics` combined with Web Audio API synthesized alert audio chimes.
+  - Native Status Bar: Edge-to-edge layout with `@capacitor/status-bar` and zero simulated chrome.
+- **Backend**: Express + tRPC + MariaDB (`server/`), binding to `0.0.0.0:3000` with default target `http://172.20.10.4:3000`.
+  - CORS middleware allowing `capacitor://localhost` and origin reflection.
+  - Dual-mode authentication: Session cookies + `Authorization: Bearer <token>` for reliable iOS WebKit ITP cross-origin communication.
+  - Configurable server host URL via in-app UI modal, persisted in `localStorage`.
+- **Packaging**: Capacitor CLI sync pipeline (`npx cap sync ios`) generating Xcode project ready for sideloading / GitHub Actions Mac CI packaging.
 
 ## Feature Inventory
-| # | Feature | Description | Milestone | Source | Status |
-|---|---------|-------------|-----------|--------|--------|
-| 1 | Full-Stack Local Environment & Build Pipeline | Clean `npm run check` (0 errors), clean `npm run build`, verified DB `validate-db.mjs`, Express+Vite on `http://localhost:3000` | M1 | R1 | DONE |
-| 2 | AI Chat Decoupling & Fast Timeout | Add 1500ms AbortSignal / offline mode to `aiChat.sendMessage`, `faqs.ts`, `documents.ts` to prevent hangs | M1 | R3 | DONE |
-| 3 | AI Local Mock & FAQ Fallback Engine | 3-tier offline engine: Tier 1 FAQ matching, Tier 2 student academic rules guidance, Tier 3 simulated advisor responses | M1 | R3 | DONE |
-| 4 | AI Chat UI Offline Indicator & Banner | Replace static "AI Online" with dynamic status indicator and clear "Local Fallback / Mock Mode" banner | M1 | R3 | DONE |
-| 5 | Student Portal Academic Features | Study plan, GPA tracking, attendance logs, assignments, schedule, and degree analytics | M2 | R2 | DONE |
-| 6 | Course Prerequisite Verification Guard | Enforce prerequisite check in `courses.enrollCourse` to reject enrollment if prerequisites are not completed | M2 | R2 | DONE |
-| 7 | Study Plan Prerequisite Visualization | Add visual prerequisite badges to course cards in `StudyPlan.tsx` | M2 | R2 | DONE |
-| 8 | Advisor Portal Workflows | Advisee roster management, academic alert dispatch/resolution, advisor notes, appointments, document center | M2 | R2 | DONE |
-| 9 | Admin Portal Governance | User management, active status toggle, role switching, advisor-student pairing manager, bilingual announcements, system metrics | M2 | R2 | DONE |
-| 10 | Campus Navigation & Classroom Routing | Interactive ZUJ campus map, building search, room finder, today's lecture locator, route planner, missing Maps key fallback | M2 | R2 | DONE |
-| 11 | Authentication, Security & Route Guards | Cookie/session handling, PBKDF2 hashing, server tRPC guards, client `ProtectedRoute`, dedicated 403 `Unauthorized.tsx` page | M2 | R2 | DONE |
-| 12 | Router & Bundle Hygiene | Remove unused `Home` import in `App.tsx`, clean up orphan backup files | M2 | R2 | DONE |
-| 13 | Existing Test Scripts Modernization | Fix existing scripts in `scripts/` (`validate-db.mjs`, `smoke-test-all-apis.mjs`, `final-smoke-test-v2.mjs`) to use valid seeded credentials and cookie persistence; all exit 0 | M3 | R4 | DONE |
-| 14 | Automated E2E Testing Suite (Tiers 1-4) | Comprehensive automated test suite covering all user flows across Student, Advisor, Admin, Nav, and AI Fallback with exit 0 | M4 | R4 | DONE |
-| 15 | Tier 5 Adversarial Coverage Hardening & Audit | Adversarial edge testing, stress verification, and forensic integrity audit | M5 | R4 | DONE |
+| # | Feature | Description | Milestone | Source |
+|---|---------|-------------|-----------|--------|
+| 1 | Simulated Chrome Removal | Eliminate fake status bar (9:41, fake battery, fake wifi), fake dynamic island pill, and phone chassis mockups | M2 | R1, Survey E1 |
+| 2 | True Edge-to-Edge Safe-Area Layout | Apply dynamic safe area insets (`env(safe-area-inset-top)`, `env(safe-area-inset-bottom)`), fix double status bar (88px) on iPhone XS/XS Max, fix tab bar squishing, and pad bottom modals | M2 | R1, Survey E1 |
+| 3 | iOS 27 Liquid Glass Design System | Fluid glassmorphic surfaces, multi-layer backdrop blurs, specular refractive borders, floating cards, OLED ambient gradients, and responsive touch states | M2 | R5, Survey E1 |
+| 4 | Backend CORS & CSP Support | Express CORS middleware with OPTIONS handling and CSP `connect-src` allowing `http:` and `capacitor://localhost` | M1 | R4, Survey E3 |
+| 5 | Dual-Mode Bearer Token Authentication | JWT token returned in `auth.login`, parsed from `Authorization: Bearer <token>` in `sdk.ts` and `auth.me` for WebKit ITP compatibility | M1 | R4, Survey E3 |
+| 6 | Native Camera Access & QR Scanner | Real live camera feed via `getUserMedia` and `jsQR` canvas decoder in `#phone-scanner-modal` with `NSCameraUsageDescription` | M3 | R2, Survey E2 |
+| 7 | Native Haptic & Audio Feedback | Physical Taptic Engine feedback via `@capacitor/haptics` and Web Audio API synthesized alert chimes for check-ins and alerts | M3 | R3, Survey E2 |
+| 8 | Configurable Server Host & Network Pill | In-app settings modal to view/update server URL (`http://172.20.10.4:3000` default), live latency ping to `aiChat.getStatus`, and header status pill | M4 | R4, Survey E3 |
+| 9 | Live tRPC API Client & App Integration | Vanilla tRPC ApiClient with SuperJSON wire protocol replacing all static mockups (courses, schedule, assignments, study plan, AI chat, QR attendance) | M4 | R4, Survey E3 |
+| 10 | Real User Sign-In & Session Handling | Real login against backend MariaDB accounts (`password123`), session persistence in `localStorage`, and logout flow | M4 | R4, Survey E3 |
+| 11 | Capacitor Config & Bridge Injection | Add `<script src="capacitor.js"></script>`, configure `capacitor.config.json` (`contentInset: "never"`, scheme, plugins) | M3, M5 | R6, Survey E1/E2 |
+| 12 | Updated iOS Build & Asset Sync | Clean `bundle-app.mjs` and `npx cap sync ios` sync to `ios/App/App/public`, Xcode project readiness for packaging | M5 | R6, Survey E2 |
+| 13 | Comprehensive E2E Verification & Hardening | Full 5-tier opaque-box and adversarial testing verifying all native features, network authentication, and edge cases | M6 | Acceptance Criteria |
 
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
-| M1 | AI Chat Graceful Mock & Local Fallback Engine | Decouple from Runpod, implement 3-tier local fallback engine (FAQ + academic rules + simulated advisor), add dynamic AI status and offline banner | none | DONE |
-| M2 | Full-Stack Module Hardening & UX Polish | Prerequisite guard in `enrollCourse`, visual prerequisite badges in `StudyPlan.tsx`, dedicated 403 `Unauthorized.tsx` page, router hygiene | none | DONE |
-| M3 | Existing Test Scripts Modernization | Fix existing scripts in `scripts/` (`smoke-test-all-apis.mjs`, `final-smoke-test-v2.mjs`, etc.) with valid seeded credentials and cookie jar; exit 0 | M1, M2 | DONE |
-| M4 | Comprehensive E2E Testing Suite (Tiers 1-4) | Requirement-driven test harness and test cases (Tiers 1-4: Unit/Feature, Boundaries, Pairwise, Real-world workflows) | M1, M2 | DONE |
-| M5 | 100% E2E Pass, Tier 5 Hardening & Forensic Audit | Pass 100% E2E tests, Tier 5 adversarial testing, forensic integrity audit, final deliverable verification report | M3, M4 | DONE |
+| 1 | Backend Network & Dual-Auth Readiness | Add CORS middleware, CSP `http:`, and Bearer token auth in `server/` | none | **DONE** |
+| 2 | Native Layout, Chrome Removal & Liquid Glass | Remove fake chrome/mockups, fix safe areas on iPhone XS/XS Max, implement iOS 27 Liquid Glass UI | none | **DONE** |
+| 3 | Native Hardware: Camera QR, Haptics & Audio | Live camera feed + jsQR decoding, Capacitor Haptics + Web Audio synthesizer | none | **DONE** |
+| 4 | Live API Client, Server Host Config & Features | Vanilla tRPC client, server config modal, real sign-in, live courses/chat/attendance | M1, M2, M3 | **DONE** |
+| 5 | Capacitor Sync & iOS Build Pipeline | Capacitor config optimization, asset bundling, `cap sync ios`, Xcode config check | M2, M3, M4 | **DONE** |
+| 6 | Final Milestone: E2E Pass & Adversarial Hardening | Pass 100% of E2E test suite (Tiers 1-4) and adversarial coverage hardening (Tier 5) | M1-M5, TEST_READY | **DONE** |
 
 ## Interface Contracts
-### AI Chat Service ↔ Client
-- Query: `aiChat.getStatus`
-  - Output: `{ isOnline: boolean, mode: "local_mock_fallback" | "external_model", model: string }`
-- Mutation: `aiChat.sendMessage`
-  - Input: `{ conversationId: number, message: string }`
-  - Output: `{ success: boolean, response: string, isOfflineFallback: boolean, source: "faq" | "academic_rules" | "local_advisor" | "external_llm" }`
 
-### Course Enrollment ↔ Prerequisite Verification
-- Mutation: `courses.enrollCourse`
-  - Input: `{ courseId: number, semester?: string }`
-  - Guard: Checks if student has completed all prerequisites in `courseprerequisites`.
-  - Throws `BAD_REQUEST` if unmet prerequisites exist with informative message listing missing prerequisites.
+### Backend ↔ Mobile App (CORS & Authentication)
+- **Origin Allowed**: `capacitor://localhost`, `http://localhost`, `http://172.20.10.*`
+- **Headers Allowed**: `Content-Type`, `Authorization`, `x-trpc-source`, `Cookie`
+- **Auth Token Protocol**:
+  - `POST /api/trpc/auth.login`: Returns `{ success: true, token: string, user: { id, email, name, role, language } }`
+  - `GET /api/trpc/auth.me`: Checks `Authorization: Bearer <token>` header in addition to session cookie; returns user profile.
 
-### HTTP Session ↔ Authenticated Context
-- Cookie: `app_session_id` (HTTP-only, SameSite=Lax, Max-Age=7d)
-- Payload: `{ userId: number, email: string, name: string, role: "student" | "advisor" | "admin", type: "local-auth" }`
+### Mobile App ↔ Backend (tRPC Endpoints)
+- **Base URL**: Configurable from `localStorage.getItem('murshid_server_url') || 'http://172.20.10.4:3000'`
+- **Attendance Scan**:
+  - `POST /api/trpc/student.recordAttendanceViaQr`
+  - Input: `{ courseId: number, qrPayload: string, latitude?: number, longitude?: number }`
+  - Output: `{ success: true, message: string, hall: string, courseCode: string }`
+- **Live AI Guidance**:
+  - `POST /api/trpc/aiChat.sendMessage`
+  - Input: `{ message: string, history?: Array<{ role, content }> }`
+  - Output: `{ message: string, sources?: Array<any> }`
+- **Health / Latency Check**:
+  - `GET /api/trpc/aiChat.getStatus`
+  - Returns backend status and confirms server reachability.
+
+### Hardware Feedback Contract (`NativeFeedback`)
+- **Haptic Trigger**:
+  - `NativeFeedback.impact(style)`: calls `Capacitor.Plugins.Haptics.impact({ style: style || 'MEDIUM' })` with fallback to `navigator.vibrate(20)`.
+  - `NativeFeedback.notification(type)`: calls `Capacitor.Plugins.Haptics.notification({ type: type || 'SUCCESS' })`.
+- **Audio Synthesizer**:
+  - `NativeFeedback.playChime(type)`: generates pure Web Audio tones (`'success'` = 523Hz/659Hz/784Hz arpeggio, `'error'` = 220Hz/196Hz buzzer, `'scan'` = 880Hz crisp chirp, `'click'` = 1200Hz 10ms click).
 
 ## Code Layout
-- `server/_core/`: Server entrypoint (`index.ts`), context (`context.ts`), auth security (`authSecurity.ts`), cookies (`cookies.ts`), tRPC initialization (`trpc.ts`).
-- `server/routers/`: Domain tRPC routers (`aiChat.ts`, `student.ts`, `advisor.ts`, `admin.ts`, `courses.ts`, `navigation.ts`, `faqs.ts`, `documents.ts`, `announcements.ts`, `analytics.ts`, `preferences.ts`, `passwordReset.ts`).
-- `server/utils/`: Backend utilities (`aiFallback.ts` for offline mock & FAQ engine).
-- `client/src/pages/`: Frontend routes (`StudentDashboard.tsx`, `StudyPlan.tsx`, `AdvisorDashboard.tsx`, `AdvisorStudentProfile.tsx`, `AdminDashboard.tsx`, `CampusNavigation.tsx`, `AIChatPage.tsx`, `Unauthorized.tsx`).
-- `client/src/components/`: Reusable UI components (`DashboardLayout.tsx`, `ProtectedRoute.tsx`, `AdminAdvisorManager.tsx`, `Map.tsx`).
-- `shared/`: Shared schemas, types, constants (`schema.ts`, `const.ts`).
-- `scripts/`: Operational, verification, and testing scripts.
-- `tests/e2e/`: Automated E2E test suite.
+- `server/_core/index.ts` — Express server initialization, CORS, CSP, middleware.
+- `server/_core/sdk.ts` — Authentication session extraction (Cookie + Bearer token).
+- `server/routers/auth.ts` — Login mutation and profile queries.
+- `ios-app/capacitor.config.json` — Capacitor native iOS configuration.
+- `ios-app/scripts/bundle-app.mjs` — Web app bundling script generating `www/index.html`.
+- `client/public/phone.html` — Source mobile UI template.
+- `ios-app/www/index.html` — Bundled iOS web application.
+- `ios-app/ios/App/App/Info.plist` — iOS native configuration, camera permissions, ATS.
+- `tests/e2e/ios/` — E2E test suite for native iOS app and backend integration.
