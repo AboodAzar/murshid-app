@@ -1,62 +1,54 @@
 # Original User Request
 
-## 2026-10-27T11:00:49Z
+## Initial Request — 2026-11-07T17:19:40Z
 
-Verify complete local operation of the Murshid academic guidance platform and finalize all full-stack web development features (frontend, backend, database, UI/UX, and workflows) across Student, Advisor, Admin, and Campus Navigation modules to production readiness. Defer the heavy Runpod LLM model integration for a later phase, providing graceful local mock/FAQ fallbacks so the chat interface remains fully functional without an external model server.
+Transform the iOS Capacitor app from a simulated web preview into a fully functional native iOS application featuring native camera QR scanning, native safe-area layout, real audio/haptic feedback, live backend network authentication, and an "iOS 27 Liquid Glass" UI design system.
 
-Working directory: S:\murshid (1)
+Working directory: s:\murshid (1)\ios-app
 Integrity mode: development
 
 ## Requirements
 
-### R1. Full-Stack Local Environment & Build Pipeline
-Ensure the full-stack web application runs seamlessly and reliably in the local Windows environment:
-- Connects cleanly to the local MySQL/MariaDB database (`murshid` on `localhost:3306`).
-- Express server and Vite frontend run and serve requests without errors on `http://localhost:3000`.
-- TypeScript validation (`npm run check`) passes with zero errors.
-- Production build (`npm run build`) builds all client and server assets cleanly.
+### R1. Native Layout and Chrome Removal
+Remove all simulated phone chrome (the fake status bar displaying '9:41', fake battery, fake Wi-Fi, and fake dynamic island overlay). Replace with native iOS status bar integration, true edge-to-edge layout, and native safe area insets (`env(safe-area-inset-top)` / `env(safe-area-inset-bottom)`) dynamically matching actual device dimensions on physical iPhones (such as iPhone XS and iPhone XS Max).
 
-### R2. Complete Full-Stack Module Finalization (Non-AI Focus)
-Take full end-to-end ownership of all web application modules, ensuring high reliability, polished UX, and proper error handling:
-- **Student Dashboard & Academic Features**: Study plan tracking, prerequisite verification logic, GPA tracking, course recommendations engine, assignments, and attendance logs.
-- **Advisor Dashboard**: Advisee roster management, academic alert dispatching, advisor notes, student progress tracking, and document knowledge management.
-- **Admin Dashboard**: User management (students, advisors, admins), role assignments, department management, and academic system metrics.
-- **Campus Navigation**: Interactive map view, building search, and classroom routing.
-- **Authentication & Security**: Robust cookie/session handling, role-based route guards (client & server tRPC middleware), and Zod input validation.
+### R2. Native Camera Access for QR Code Scanning
+Provide real camera access on iOS devices for scanning QR codes with required iOS camera usage descriptions (`NSCameraUsageDescription` in Info.plist), opening the live camera feed and processing QR codes rather than showing a placeholder or failing to open.
 
-### R3. AI Chat Graceful Mock & Local Fallback
-Since the external Runpod model server is offline (credits ended), decouple the web application from external LLM endpoints:
-- Ensure the chat interface and tRPC procedures do NOT throw uncaught exceptions, freeze, or hang when `RUNPOD_API_URL` is unavailable.
-- Provide a responsive local fallback mechanism (e.g., matching against database FAQs, rule-based academic guidance responses, or simulated mock advisor answers) with clear UI messaging indicating offline/mock mode.
+### R3. Native Audio and Haptic Feedback
+Implement real device haptic feedback and alert audio sounds on physical iOS hardware for attendance check-ins, alerts, and status notifications.
 
-### R4. Automated Testing & Verification Suite
-- Verify and resolve all existing test scripts under `scripts/` (e.g., `validate-db.mjs`, `smoke-test-all-apis.mjs`, `final-smoke-test-v2.mjs`).
-- Add comprehensive automated end-to-end tests for all student, advisor, admin, and navigation features.
-- All tests must run independently, reliably, and exit with code 0.
+### R4. Live Backend Network Connectivity and Authentication
+Ensure the iOS app communicates directly over the local network with the live backend server (defaulting to `http://172.20.10.4:3000` with an in-app configurable server host setting) instead of operating offline as a static mockup, enabling real user sign-in, active session handling, database queries, and live AI responses.
+
+### R5. "iOS 27 Liquid Glass" Visual Aesthetic & UI System
+Apply the "iOS 27 Liquid Glass" aesthetic across the application interface, featuring fluid glassmorphic surfaces, dynamic multi-layer backdrop blurs, specular refractive edges, floating translucent glass cards, fluid gradients, organic depth, and soft lighting on OLED while maintaining readable typography, high contrast, and responsive touch interactions.
+
+### R6. Updated iOS Build and Sync
+Synchronize web assets to the native iOS Capacitor project and ensure the Xcode project is configured and ready for building an updated package for sideloading.
 
 ## Acceptance Criteria
 
-### Environment & Build
-- [ ] `npm run check` passes with 0 TypeScript errors.
-- [ ] `npm run build` succeeds without bundle or bundling errors.
-- [ ] Database validation (`node scripts/validate-db.mjs`) reports `ok: true`.
-- [ ] Local web server starts on `http://localhost:3000` and serves all client routes with HTTP 200.
+### Native Chrome & Layout
+- [ ] No simulated or fake status bar, battery icon, Wi-Fi icon, or dynamic island mockups exist in the UI.
+- [ ] The app renders edge-to-edge respecting native iOS safe-area insets without overlapping system indicators or notches on iPhone XS and iPhone XS Max.
 
-### Web Application Features
-- [ ] Student portal: Study plans and course prerequisite checking work accurately.
-- [ ] Advisor portal: Managing assigned students, recording advisor notes, and dispatching academic alerts succeed without errors.
-- [ ] Admin portal: User management, role updates, and system metrics operate reliably.
-- [ ] Campus navigation: Building search and classroom queries return valid data.
-- [ ] Chat UI: Loads cleanly, handles sending/receiving messages using local FAQ/fallback without hanging on external Runpod timeouts.
+### Camera & Hardware Access
+- [ ] iOS `Info.plist` includes valid `NSCameraUsageDescription`.
+- [ ] Triggering the QR code scanner activates the real camera feed on physical iOS hardware and captures QR codes.
+- [ ] Alert and check-in events trigger native haptic feedback and notification sounds on the device.
 
-### Automated Testing
-- [ ] All existing test scripts in `scripts/` execute cleanly and pass.
-- [ ] New automated E2E test suite validates all primary user flows across Student, Advisor, and Admin roles.
+### Networking & Authentication
+- [ ] The app establishes live network communication with the backend server at `http://172.20.10.4:3000`.
+- [ ] An in-app configuration setting allows updating or changing the backend server URL.
+- [ ] User authentication (sign-in) completes against the live backend and stores real session credentials.
+- [ ] Live data requests and AI endpoints return real server responses rather than offline mock data.
 
-### Final Verification Deliverable
-- [ ] Verification report detailing all full-stack components tested, verified, and ready for user review.
+### UI Design System
+- [ ] All primary screens incorporate the "iOS 27 Liquid Glass" aesthetic with fluid glassmorphic styling, dynamic multi-layer backdrop blur, specular refractive highlights, and translucent floating cards.
+- [ ] Text contrast and interactive controls remain accessible, readable, and responsive across light and dark modes.
 
-
-## Follow-up — 2026-11-01T19:30:35Z
-
-The server was restarted, which temporarily stopped background tasks. The local MySQL database on localhost:3306 has been verified and is active. Please resume the project workflow, check the status of Milestone 2 / Milestone 3, revive any necessary subagents/crons, and continue execution toward completing the remaining milestones and final verification.
+### Build & Verification
+- [ ] Capacitor sync completes cleanly with no missing native iOS plugin dependencies or configuration errors.
+- [ ] iOS project builds successfully and is ready for package export.
+- [ ] Backend connectivity and authentication endpoints are verified via automated network checks.
